@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   // สร้าง prompt ตาม mode
   const prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  const RETRY_DELAYS = [0, 2000, 4000]; // ms รอก่อน retry แต่ละรอบ
+  const RETRY_DELAYS = [0, 1000, 2000]; // ms รอก่อน retry แต่ละรอบ
 
   // วนลอง: key สำรอง × retry
   for (const key of keys) {
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       }
       try {
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -122,7 +122,7 @@ function buildArtistPrompt(query) {
   "bio": "ประวัติย่อ 2-3 ประโยค",
   "nationality": "สัญชาติ",
   "artists": [
-    {"name": "ชื่อศิลปิน", "genre": "แนวเพลง", "why": "เหตุผลสั้นๆ (1 ประโยค)", "tags": ["แท็ก1", "แท็ก2"], "wiki": "ชื่อบทความ Wikipedia ภาษาอังกฤษ ใช้ _ แทนเว้นวรรค ถ้าไม่มีใส่ \"\""}
+    {"name": "ชื่อศิลปิน", "genre": "แนวเพลง", "why": "เหตุผลสั้นๆ (1 ประโยค)", "tags": ["แท็ก1", "แท็ก2"], "wiki": "ชื่อบทความ Wikipedia ภาษาอังกฤษ ใช้ _ แทนเว้นวรรค ถ้าไม่มีใส่ \"\""}, "country": "รหัสประเทศ ISO 3166-1 alpha-2 เช่น TH US KR JP GB"}
   ]
 }
 ให้ artists 5 รายการ ตอบเป็นภาษาไทย (ยกเว้นชื่อที่เป็นภาษาอังกฤษอยู่แล้ว)`;
