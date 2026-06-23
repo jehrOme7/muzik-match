@@ -52,7 +52,9 @@ export default async function handler(req, res) {
         // สำเร็จ!
         if (geminiRes.ok) {
           const data = await geminiRes.json();
-          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          // ลบ markdown code block ถ้า AI ใส่มา
+          text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
           const parsed = JSON.parse(text);
           return res.status(200).json(parsed);
         }
