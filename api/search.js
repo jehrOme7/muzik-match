@@ -7,17 +7,17 @@ module.exports = async function handler(req, res) {
   const mode  = ((req.body && req.body.mode)  || 'artist').toString();
 
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
-  if (query.length > 100) return res.status(400).json({ error: 'ข้อความยาวเกินไป' });
 
-  // ดึง API Key มาแค่ตัวเดียว
+  // 1. ตรวจสอบ API Key จาก Vercel
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
+  if (!apiKey) return res.status(500).json({ error: 'ลืมใส่ API Key ใน Vercel หรือตั้งชื่อตัวแปรไม่ตรง' });
 
   var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
   try {
     var geminiRes = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+      // 2. เปลี่ยนมาใช้ gemini-1.5-flash ที่เสถียรและได้โควต้าเยอะกว่า
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,33 +28,23 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    if (geminiRes.status === 429) {
-      return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
-    }
-
+    // 3. เลิกซ่อน Error ของ Google - ถ้าเชื่อมต่อไม่ผ่าน ให้แสดงสาเหตุจริงออกหน้าเว็บเลย
     if (!geminiRes.ok) {
       var errData = await geminiRes.json().catch(function(){ return {}; });
-      return res.status(500).json({ error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status) });
+      return res.status(400).json({ error: 'Google แจ้งว่า: ' + JSON.stringify(errData) });
     }
 
     var data = await geminiRes.json();
-    var text = (
-      data.candidates &&
-      data.candidates[0] &&
-      data.candidates[0].content &&
-      data.candidates[0].content.parts &&
-      data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text
-    ) || '';
+    var text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // ทำความสะอาด JSON
+    text = text.replace(/```json/gi, '').replace(/
+```/g, '').trim();
 
-    // clean markdown
-    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-    // extract JSON
     var start = text.indexOf('{');
     var end   = text.lastIndexOf('}');
     if (start === -1 || end === -1) {
-      return res.status(500).json({ error: 'AI ส่งข้อมูลกลับมาผิดรูปแบบ' });
+      return res.status(500).json({ error: 'AI ตอบกลับผิดรูปแบบ (ไม่ใช่ JSON)' });
     }
     text = text.slice(start, end + 1);
 
@@ -62,8 +52,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(parsed);
 
   } catch (err) {
-    console.log('Error:', err.message);
-    return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเชื่อมต่อ AI' });
+    return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการรันโค้ด: ' + err.message });
   }
 };
 
