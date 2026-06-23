@@ -441,6 +441,61 @@ nav{
   display:flex;align-items:center;gap:10px;
 }
 
+/* PLAYLIST MODE */
+.pl-main-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#1db954,#17a348);
+  color:white;border:none;border-radius:16px;
+  padding:16px 32px;font-size:17px;font-weight:800;
+  cursor:pointer;font-family:inherit;
+  transition:all 0.2s;letter-spacing:-0.02em;
+  box-shadow:0 6px 24px rgba(29,185,84,0.35);
+}
+.pl-main-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(29,185,84,0.45)}
+.pl-main-btn.spinning svg{animation:spin 0.5s linear}
+.pl-result-card{
+  background:var(--card);
+  border:1px solid rgba(29,185,84,0.25);
+  border-radius:20px;padding:22px;
+  text-align:left;
+  animation:fadeUp 0.4s ease;
+  box-shadow:0 0 0 1px rgba(29,185,84,0.08);
+}
+.pl-result-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.pl-result-emoji-box{
+  width:64px;height:64px;border-radius:16px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(29,185,84,0.2),rgba(124,58,237,0.15));
+  border:1px solid rgba(29,185,84,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.pl-result-cat{
+  display:inline-flex;font-size:10px;font-weight:700;
+  color:#34d399;background:rgba(29,185,84,0.1);
+  border:1px solid rgba(29,185,84,0.2);
+  border-radius:6px;padding:3px 9px;margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:0.05em;
+}
+.pl-result-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:3px}
+.pl-result-desc{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif}
+.pl-result-actions{display:flex;gap:10px}
+.pl-open-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:#1db954;color:white;border:none;border-radius:12px;
+  padding:12px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;text-decoration:none;
+  transition:all 0.15s;box-shadow:0 4px 14px rgba(29,185,84,0.3);
+}
+.pl-open-btn:hover{background:#17a348;transform:translateY(-1px)}
+.pl-again-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border2);border-radius:12px;
+  padding:12px 16px;font-size:13px;font-weight:600;
+  color:var(--text2);cursor:pointer;font-family:inherit;
+  transition:all 0.15s;
+}
+.pl-again-btn:hover{border-color:var(--border);color:var(--text);background:rgba(255,255,255,0.08)}
+
 /* FOOTER */
 footer{
   position:relative;z-index:1;
@@ -465,6 +520,16 @@ footer a:hover{color:var(--purple)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ENTRANCE ANIMATIONS */
+.anim-nav{animation:slideDown 0.5s ease both;animation-delay:0.1s;opacity:0}
+.anim-eyebrow{animation:fadeUp 0.6s ease both;animation-delay:0.2s;opacity:0}
+.anim-h1{animation:fadeUp 0.7s ease both;animation-delay:0.35s;opacity:0}
+.anim-sub{animation:fadeUp 0.6s ease both;animation-delay:0.5s;opacity:0}
+.anim-mode{animation:fadeUp 0.6s ease both;animation-delay:0.65s;opacity:0}
+.anim-search{animation:fadeUp 0.6s ease both;animation-delay:0.8s;opacity:0}
 
 /* MOBILE */
 @media(max-width:600px){
@@ -499,7 +564,7 @@ footer a:hover{color:var(--purple)}
 </div>
 
 <!-- NAVBAR -->
-<nav>
+<nav class="anim-nav">
   <a class="nav-brand" href="/">
     <div class="nav-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -519,17 +584,17 @@ footer a:hover{color:var(--purple)}
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">
+  <div class="hero-eyebrow anim-eyebrow">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
     ค้นหาด้วย AI — ทั้งไทยและสากล
   </div>
-  <h1>
+  <h1 class="anim-h1">
     <div class="line1">เพลงที่ใช่</div>
     <div class="line2">เริ่มจากสิ่งที่คุณชอบ</div>
   </h1>
-  <p class="hero-sub">พิมพ์ชื่อศิลปินหรือเพลงที่ชอบ<br/>AI จะวิเคราะห์และหาเพลงที่ใกล้เคียงให้ทันที</p>
+  <p class="hero-sub anim-sub">พิมพ์ชื่อศิลปินหรือเพลงที่ชอบ<br/>AI จะวิเคราะห์และหาเพลงที่ใกล้เคียงให้ทันที</p>
 
-  <div class="mode-wrap">
+  <div class="mode-wrap anim-mode">
     <div class="mode-toggle">
       <button class="mode-btn active" id="modeArtist" data-mode="artist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
@@ -539,10 +604,14 @@ footer a:hover{color:var(--purple)}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         ค้นด้วยเพลง
       </button>
+      <button class="mode-btn" id="modePlaylist" data-mode="playlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+        สุ่ม Playlist
+      </button>
     </div>
   </div>
 
-  <div class="search-wrap">
+  <div class="search-wrap anim-search">
     <div class="search-box">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(240,238,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input id="q" type="text" placeholder="เช่น Bodyslam, blvckheart, Taylor Swift..." autofocus/>
@@ -606,19 +675,91 @@ const placeholders={
   song:'เช่น ยินดี, Blinding Lights, คิดมาก...'
 };
 
+var PL_DATA=[
+  // 🇹🇭 เพลงไทย
+  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
+  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
+  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
+  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยเพราะๆ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
+  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
+  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิม',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
+  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/indie ไทย/playlists'},
+  {emoji:'😌',name:'เพลงไทยก่อนนอน',desc:'นอนหลับสบาย ฝันดี',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยก่อนนอน/playlists'},
+  {emoji:'💔',name:'เพลงอกหักไทย',desc:'เจ็บปวดแต่เข้าใจ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงอกหักไทย/playlists'},
+  {emoji:'☀️',name:'เพลงไทยสนุก',desc:'มันส์ เฮฮา ร้องตาม',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยสนุก/playlists'},
+  // 🎤 Hip Hop ไทย
+  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีทวิธี',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
+  {emoji:'🎤',name:'แร็พไทย',desc:'เนื้อหาแรง flow แบบไทยๆ',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/แร็พไทย/playlists'},
+  {emoji:'🏙️',name:'Thai Trap',desc:'Trap ไทย เสียงหนัก bass',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/thai trap/playlists'},
+  // 🌍 เพลงสากล
+  {emoji:'😢',name:'Sad Songs',desc:'Heartbreak ภาษาสากล',lang:'🌍 สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
+  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลก',lang:'🌍 สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
+  {emoji:'😌',name:'Chill Vibes',desc:'Relax ลืมทุกอย่าง',lang:'🌍 สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
+  {emoji:'🏃',name:'Workout Hits',desc:'พลังงานพุ่ง BPM สูง',lang:'🌍 สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
+  {emoji:'🌙',name:'Sleep Playlist',desc:'ก่อนนอน นอนหลับสบาย',lang:'🌍 สากล',url:'https://open.spotify.com/search/sleep music playlist/playlists'},
+  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'🌍 สากล',url:'https://open.spotify.com/search/indie pop playlist/playlists'},
+  {emoji:'🎹',name:'Lo-fi Beats',desc:'Study/relax beats ไม่วอกแวก',lang:'🌍 สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
+  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ลื่นหู',lang:'🌍 สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
+  {emoji:'⚡',name:'EDM Bangers',desc:'Drop สะเทือนหัวใจ',lang:'🌍 สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
+  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'🌍 สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
+  {emoji:'🎺',name:'Jazz Cafe',desc:'Smooth เย็น คลาสสิก',lang:'🌍 สากล',url:'https://open.spotify.com/search/jazz cafe playlist/playlists'},
+  {emoji:'🎤',name:'Hip Hop Rap',desc:'Best hip hop ทั่วโลก',lang:'🌍 สากล',url:'https://open.spotify.com/search/hip hop rap playlist/playlists'},
+  // 🇰🇷 เพลงเกาหลี
+  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
+  {emoji:'💜',name:'K-Pop Sad',desc:'เพลงเกาหลีเศร้า ฟีลดีป',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
+  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ระเบิด',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
+  {emoji:'🌸',name:'Korean Indie',desc:'K-Indie เบาๆ ฟีลดี',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/korean indie playlist/playlists'},
+  {emoji:'🎤',name:'K-Hip Hop',desc:'Korean hip hop สตรีท',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/korean hiphop playlist/playlists'},
+  // 🇨🇳 เพลงจีน
+  {emoji:'🐉',name:'Chinese Pop C-Pop',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
+  {emoji:'💔',name:'Chinese Sad Songs',desc:'เพลงจีนเศร้า เพราะมาก',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/chinese sad songs playlist/playlists'},
+  {emoji:'🌸',name:'Mandarin Pop',desc:'Mandarin Pop เบาๆ ฟีลดี',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/mandarin pop playlist/playlists'},
+  // 🌎 เพลงละติน
+  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ',lang:'🌎 ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
+  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ฟีลไม่หยุด',lang:'🌎 ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
+  {emoji:'🌴',name:'Latin Chill',desc:'ละตินผ่อนคลาย เบาๆ',lang:'🌎 ละติน',url:'https://open.spotify.com/search/latin chill playlist/playlists'},
+];
+var plQueue=[];
+function buildPlQueue(){var a=PL_DATA.map(function(_,i){return i;});for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function plNext(){if(!plQueue.length)plQueue=buildPlQueue();return plQueue.pop();}
+function doPlShuffle(){
+  var btn=document.getElementById('plShuffleBtn');if(!btn)return;
+  btn.classList.add('spinning');
+  setTimeout(function(){
+    btn.classList.remove('spinning');
+    var pl=PL_DATA[plNext()];
+    document.getElementById('plEmoji').textContent=pl.emoji;
+    document.getElementById('plCat').textContent=pl.lang;
+    document.getElementById('plName').textContent=pl.name;
+    document.getElementById('plDesc').textContent=pl.desc;
+    document.getElementById('plLink').href=pl.url;
+    var w=document.getElementById('plResultWrap');
+    w.style.display='block';
+    w.style.animation='none';void w.offsetWidth;w.style.animation='fadeUp 0.4s ease';
+  },400);
+}
+
 function setMode(mode){
   currentMode=mode;
-  $('#modeArtist').classList.toggle('active',mode==='artist');
-  $('#modeSong').classList.toggle('active',mode==='song');
-  q.placeholder=placeholders[mode];
-  renderPresets();q.focus();
+  document.getElementById('modeArtist').classList.toggle('active',mode==='artist');
+  document.getElementById('modeSong').classList.toggle('active',mode==='song');
+  document.getElementById('modePlaylist').classList.toggle('active',mode==='playlist');
+  var sw=document.querySelector('.search-wrap');
+  var pm=document.getElementById('playlistMode');
+  var hw=document.getElementById('historyWrap');
+  if(sw)sw.style.display=(mode==='playlist')?'none':'block';
+  if(pm)pm.style.display=(mode==='playlist')?'block':'none';
+  if(hw)hw.style.display=(mode==='playlist')?'none':'';
+  if(mode!=='playlist'){q.placeholder=placeholders[mode];renderPresets();q.focus();}
 }
-function renderPresets(){
-  $('#chips').innerHTML=presets[currentMode].map(t=>`<button class="chip">${esc(t)}</button>`).join('');
-}
-$('#modeArtist').addEventListener('click',()=>setMode('artist'));
-$('#modeSong').addEventListener('click',()=>setMode('song'));
-$('#chips').addEventListener('click',e=>{if(e.target.classList.contains('chip')){q.value=e.target.textContent;search();}});
+document.getElementById('modeArtist').addEventListener('click',function(){setMode('artist');});
+document.getElementById('modeSong').addEventListener('click',function(){setMode('song');});
+document.getElementById('modePlaylist').addEventListener('click',function(){setMode('playlist');});
+document.getElementById('chips').addEventListener('click',function(e){if(e.target.classList.contains('chip')){q.value=e.target.textContent;search();}});
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='plShuffleBtn')doPlShuffle();
+  if(e.target&&e.target.id==='plAgainBtn')doPlShuffle();
+});
 renderPresets();
 
 function getHist(){try{return JSON.parse(localStorage.getItem('mm_h')||'[]');}catch{return[];}}
