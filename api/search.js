@@ -9,98 +9,79 @@ module.exports = async function handler(req, res) {
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
   if (query.length > 100) return res.status(400).json({ error: 'ข้อความยาวเกินไป' });
 
-  const keys = [
-    process.env.GEMINI_API_KEY,
-    process.env.GEMINI_API_KEY_2,
-    process.env.GEMINI_API_KEY_3,
-  ].filter(Boolean);
+  var apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
 
-  if (!keys.length) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
+  var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  const prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
+  try {
+    var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://muzik-match.vercel.app',
+        'X-Title': 'Muzik Match'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8,
+        max_tokens: 2000
+      })
+    });
 
-  for (var ki = 0; ki < keys.length; ki++) {
-    var key = keys[ki];
-    for (var attempt = 0; attempt < 1; attempt++) {
-      try {
-        var geminiRes = await fetch(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.8 }
-            })
-          }
-        );
+    if (!response.ok) {
+      var errData = await response.json().catch(function(){ return {}; });
+      console.error('OpenRouter error:', response.status, JSON.stringify(errData));
 
-        if (geminiRes.status === 429) {
-          console.log('429 key', ki, 'attempt', attempt);
-          continue;
-        }
-
-        if (!geminiRes.ok) {
-          var errData = await geminiRes.json().catch(function(){ return {}; });
-          return res.status(500).json({
-            error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status)
-          });
-        }
-
-        var data = await geminiRes.json();
-        var text = ((data.candidates &&
-                     data.candidates[0] &&
-                     data.candidates[0].content &&
-                     data.candidates[0].content.parts &&
-                     data.candidates[0].content.parts[0] &&
-                     data.candidates[0].content.parts[0].text) || '');
-
-        // clean markdown
-        text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-        // หา JSON object
-        var start = text.indexOf('{');
-        var end   = text.lastIndexOf('}');
-        if (start === -1 || end === -1) {
-          console.log('No JSON found, text:', text.slice(0, 200));
-          continue;
-        }
-        text = text.slice(start, end + 1);
-
-        try {
-          var parsed = JSON.parse(text);
-          return res.status(200).json(parsed);
-        } catch (parseErr) {
-          console.log('Parse error:', parseErr.message, 'text:', text.slice(0, 300));
-          continue;
-        }
-
-      } catch (fetchErr) {
-        console.log('Fetch error:', fetchErr.message);
+      // ถ้า free model หมด quota ลอง fallback model
+      if (response.status === 429 || response.status === 402) {
+        return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
       }
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาด: ' + response.status });
     }
+
+    var data = await response.json();
+    var text = ((data.choices &&
+                 data.choices[0] &&
+                 data.choices[0].message &&
+                 data.choices[0].message.content) || '');
+
+    // clean markdown code blocks
+    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    // หา JSON object
+    var start = text.indexOf('{');
+    var end   = text.lastIndexOf('}');
+    if (start === -1 || end === -1) {
+      console.error('No JSON found:', text.slice(0, 300));
+      return res.status(500).json({ error: 'ได้รับข้อมูลไม่ถูกต้องจาก AI กรุณาลองใหม่' });
+    }
+    text = text.slice(start, end + 1);
+
+    var parsed = JSON.parse(text);
+    return res.status(200).json(parsed);
+
+  } catch (err) {
+    console.error('Error:', err.message);
+    return res.status(500).json({ error: 'เกิดข้อผิดพลาด กรุณาลองใหม่' });
   }
-
-  return res.status(429).json({
-    error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่'
-  });
 };
-
-function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 
 function buildSongPrompt(query) {
   return 'You are a music expert. The user likes this song: "' + query + '"\n\n' +
     'Analyze the genre, mood, era, rhythm, and style. If it is a Thai artist, prioritize recommending Thai songs first.\n\n' +
     'Respond ONLY with a valid JSON object. No markdown. No code blocks. Start directly with {\n\n' +
-    '{"identified":"Song - Artist (nationality)","songs":[{"name":"song","artist":"artist","why":"reason in Thai","tags":["tag1","tag2"]}]}\n\n' +
-    'Provide exactly 6 songs.';
+    '{"identified":"Song - Artist (nationality)","songs":[{"name":"song name","artist":"artist name","why":"brief reason in Thai (1 sentence)","tags":["tag1","tag2"]}]}\n\n' +
+    'Provide exactly 6 songs. Write "why" and "tags" in Thai.';
 }
 
 function buildArtistPrompt(query) {
   return 'You are a music expert. Find artists similar to: "' + query + '"\n\n' +
-    'Note: Some artists use English names but are Thai (e.g. blvckheart, NONT TANONT, URBOYTJ, YOUNGOHM). Check carefully.\n' +
+    'Important: Some artists use English names but are Thai (e.g. blvckheart, NONT TANONT, URBOYTJ, YOUNGOHM). Check carefully using their work, label, and collaborations.\n' +
     'If the artist is Thai, prioritize recommending Thai artists first.\n\n' +
     'Respond ONLY with a valid JSON object. No markdown. No code blocks. Start directly with {\n\n' +
-    '{"identified":"Artist (nationality)","bio":"bio in Thai","nationality":"nationality in Thai","artists":[{"name":"artist","genre":"genre","why":"reason in Thai","tags":["tag1","tag2"],"wiki":"Wikipedia_title_or_empty","country":"ISO2 e.g. TH US KR"}]}\n\n' +
-    'Provide exactly 5 artists.';
+    '{"identified":"Artist (nationality)","bio":"2-3 sentence bio in Thai","nationality":"nationality in Thai","artists":[{"name":"artist name","genre":"genre","why":"brief reason in Thai (1 sentence)","tags":["tag1","tag2"],"wiki":"Wikipedia_title_or_empty_string","country":"ISO2 code e.g. TH US KR JP GB"}]}\n\n' +
+    'Provide exactly 5 artists. Write "bio", "why", "nationality" and "tags" in Thai.';
 }
