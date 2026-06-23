@@ -686,318 +686,347 @@ footer a:hover{color:var(--purple)}
 
 <div class="toast" id="toast"></div>
 
+
 <script>
-const $=s=>document.querySelector(s);
-const q=$('#q'),go=$('#go'),mainArea=$('#mainArea'),welcome=$('#welcome');
-const historyWrap=$('#historyWrap'),historyChips=$('#historyChips');
-let currentMode='artist',lastQuery='';
+// ===== INIT =====
+var currentMode = 'artist';
+var lastQuery = '';
 
-const presets={
-  artist:['Bodyslam','blvckheart','The Weeknd','NONT TANONT','Newjeans'],
-  song:['ยินดี','Blinding Lights','คิดมาก','Dynamite','ทรงอย่างแบด']
+var presets = {
+  artist: ['Bodyslam','blvckheart','The Weeknd','NONT TANONT','Newjeans'],
+  song:   ['ยินดี','Blinding Lights','คิดมาก','Dynamite','ทรงอย่างแบด']
 };
-const placeholders={
-  artist:'เช่น Bodyslam, blvckheart, Taylor Swift...',
-  song:'เช่น ยินดี, Blinding Lights, คิดมาก...'
+var placeholders = {
+  artist: 'เช่น Bodyslam, blvckheart, Taylor Swift...',
+  song:   'เช่น ยินดี, Blinding Lights, คิดมาก...'
 };
 
-var PL_DATA=[
-  // 🇹🇭 เพลงไทย
-  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
-  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
-  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
-  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยเพราะๆ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
-  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
-  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิม',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
-  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/indie ไทย/playlists'},
-  {emoji:'😌',name:'เพลงไทยก่อนนอน',desc:'นอนหลับสบาย ฝันดี',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยก่อนนอน/playlists'},
-  {emoji:'💔',name:'เพลงอกหักไทย',desc:'เจ็บปวดแต่เข้าใจ',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงอกหักไทย/playlists'},
-  {emoji:'☀️',name:'เพลงไทยสนุก',desc:'มันส์ เฮฮา ร้องตาม',lang:'🇹🇭 เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยสนุก/playlists'},
-  // 🎤 Hip Hop ไทย
-  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีทวิธี',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
-  {emoji:'🎤',name:'แร็พไทย',desc:'เนื้อหาแรง flow แบบไทยๆ',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/แร็พไทย/playlists'},
-  {emoji:'🏙️',name:'Thai Trap',desc:'Trap ไทย เสียงหนัก bass',lang:'🎤 Hip Hop ไทย',url:'https://open.spotify.com/search/thai trap/playlists'},
-  // 🌍 เพลงสากล
-  {emoji:'😢',name:'Sad Songs',desc:'Heartbreak ภาษาสากล',lang:'🌍 สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
-  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลก',lang:'🌍 สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
-  {emoji:'😌',name:'Chill Vibes',desc:'Relax ลืมทุกอย่าง',lang:'🌍 สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
-  {emoji:'🏃',name:'Workout Hits',desc:'พลังงานพุ่ง BPM สูง',lang:'🌍 สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
-  {emoji:'🌙',name:'Sleep Playlist',desc:'ก่อนนอน นอนหลับสบาย',lang:'🌍 สากล',url:'https://open.spotify.com/search/sleep music playlist/playlists'},
-  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'🌍 สากล',url:'https://open.spotify.com/search/indie pop playlist/playlists'},
-  {emoji:'🎹',name:'Lo-fi Beats',desc:'Study/relax beats ไม่วอกแวก',lang:'🌍 สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
-  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ลื่นหู',lang:'🌍 สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
-  {emoji:'⚡',name:'EDM Bangers',desc:'Drop สะเทือนหัวใจ',lang:'🌍 สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
-  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'🌍 สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
-  {emoji:'🎺',name:'Jazz Cafe',desc:'Smooth เย็น คลาสสิก',lang:'🌍 สากล',url:'https://open.spotify.com/search/jazz cafe playlist/playlists'},
-  {emoji:'🎤',name:'Hip Hop Rap',desc:'Best hip hop ทั่วโลก',lang:'🌍 สากล',url:'https://open.spotify.com/search/hip hop rap playlist/playlists'},
-  // 🇰🇷 เพลงเกาหลี
-  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
-  {emoji:'💜',name:'K-Pop Sad',desc:'เพลงเกาหลีเศร้า ฟีลดีป',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
-  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ระเบิด',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
-  {emoji:'🌸',name:'Korean Indie',desc:'K-Indie เบาๆ ฟีลดี',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/korean indie playlist/playlists'},
-  {emoji:'🎤',name:'K-Hip Hop',desc:'Korean hip hop สตรีท',lang:'🇰🇷 K-Pop',url:'https://open.spotify.com/search/korean hiphop playlist/playlists'},
-  // 🇨🇳 เพลงจีน
-  {emoji:'🐉',name:'Chinese Pop C-Pop',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
-  {emoji:'💔',name:'Chinese Sad Songs',desc:'เพลงจีนเศร้า เพราะมาก',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/chinese sad songs playlist/playlists'},
-  {emoji:'🌸',name:'Mandarin Pop',desc:'Mandarin Pop เบาๆ ฟีลดี',lang:'🇨🇳 C-Pop',url:'https://open.spotify.com/search/mandarin pop playlist/playlists'},
-  // 🌎 เพลงละติน
-  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ',lang:'🌎 ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
-  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ฟีลไม่หยุด',lang:'🌎 ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
-  {emoji:'🌴',name:'Latin Chill',desc:'ละตินผ่อนคลาย เบาๆ',lang:'🌎 ละติน',url:'https://open.spotify.com/search/latin chill playlist/playlists'},
+// ===== PLAYLIST DATA =====
+var PL_DATA = [
+  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
+  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
+  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
+  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยเพราะๆ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
+  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
+  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิม',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
+  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/indie ไทย/playlists'},
+  {emoji:'💔',name:'เพลงอกหักไทย',desc:'เจ็บปวดแต่เข้าใจ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงอกหักไทย/playlists'},
+  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีท',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
+  {emoji:'🎤',name:'แร็พไทย',desc:'เนื้อหาแรง flow แบบไทยๆ',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/แร็พไทย/playlists'},
+  {emoji:'😢',name:'Sad Songs',desc:'Heartbreak ภาษาสากล',lang:'GL สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
+  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
+  {emoji:'😌',name:'Chill Vibes',desc:'Relax ลืมทุกอย่าง',lang:'GL สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
+  {emoji:'🏃',name:'Workout Hits',desc:'พลังงานพุ่ง BPM สูง',lang:'GL สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
+  {emoji:'🌙',name:'Sleep Playlist',desc:'ก่อนนอน นอนหลับสบาย',lang:'GL สากล',url:'https://open.spotify.com/search/sleep music playlist/playlists'},
+  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'GL สากล',url:'https://open.spotify.com/search/indie pop playlist/playlists'},
+  {emoji:'🎹',name:'Lo-fi Beats',desc:'Study/relax ไม่วอกแวก',lang:'GL สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
+  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ลื่นหู',lang:'GL สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
+  {emoji:'⚡',name:'EDM Bangers',desc:'Drop สะเทือนหัวใจ',lang:'GL สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
+  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'GL สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
+  {emoji:'🎤',name:'Hip Hop Rap',desc:'Best hip hop ทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/hip hop rap playlist/playlists'},
+  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
+  {emoji:'💜',name:'K-Pop Sad',desc:'เพลงเกาหลีเศร้า ฟีลดีป',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
+  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ระเบิด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
+  {emoji:'🌸',name:'Korean Indie',desc:'K-Indie เบาๆ ฟีลดี',lang:'KR K-Pop',url:'https://open.spotify.com/search/korean indie playlist/playlists'},
+  {emoji:'🐉',name:'Chinese Pop C-Pop',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
+  {emoji:'💔',name:'Chinese Sad Songs',desc:'เพลงจีนเศร้า เพราะมาก',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese sad songs playlist/playlists'},
+  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ',lang:'LA ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
+  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ฟีลไม่หยุด',lang:'LA ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
 ];
-var plQueue=[];
-function buildPlQueue(){var a=PL_DATA.map(function(_,i){return i;});for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
-function plNext(){if(!plQueue.length)plQueue=buildPlQueue();return plQueue.pop();}
-function doPlShuffle(){
-  var btn=document.getElementById('plShuffleBtn');if(!btn)return;
-  btn.classList.add('spinning');
-  setTimeout(function(){
-    btn.classList.remove('spinning');
-    var pl=PL_DATA[plNext()];
-    document.getElementById('plEmoji').textContent=pl.emoji;
-    document.getElementById('plCat').textContent=pl.lang;
-    document.getElementById('plName').textContent=pl.name;
-    document.getElementById('plDesc').textContent=pl.desc;
-    document.getElementById('plLink').href=pl.url;
-    var w=document.getElementById('plResultWrap');
-    w.style.display='block';
-    w.style.animation='none';void w.offsetWidth;w.style.animation='fadeUp 0.4s ease';
-  },400);
+
+// ===== PLAYLIST SHUFFLE =====
+var plQueue = [];
+function buildPlQueue() {
+  var a = PL_DATA.map(function(_, i) { return i; });
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function plNext() {
+  if (!plQueue.length) plQueue = buildPlQueue();
+  return plQueue.pop();
+}
+function doPlShuffle() {
+  var btn = document.getElementById('plShuffleBtn');
+  if (!btn) return;
+  btn.style.opacity = '0.6';
+  setTimeout(function() {
+    btn.style.opacity = '1';
+    var pl = PL_DATA[plNext()];
+    document.getElementById('plEmoji').textContent = pl.emoji;
+    var langMap = {'TH เพลงไทย':'🇹🇭 เพลงไทย','HH Hip Hop ไทย':'🎤 Hip Hop ไทย','GL สากล':'🌍 สากล','KR K-Pop':'🇰🇷 K-Pop','CN C-Pop':'🇨🇳 C-Pop','LA ละติน':'🌎 ละติน'};
+    document.getElementById('plCat').textContent = langMap[pl.lang] || pl.lang;
+    document.getElementById('plName').textContent = pl.name;
+    document.getElementById('plDesc').textContent = pl.desc;
+    document.getElementById('plLink').href = pl.url;
+    var w = document.getElementById('plResultWrap');
+    w.style.display = 'block';
+  }, 350);
 }
 
-function setMode(mode){
-  currentMode=mode;
-  document.getElementById('modeArtist').classList.toggle('active',mode==='artist');
-  document.getElementById('modeSong').classList.toggle('active',mode==='song');
-  document.getElementById('modePlaylist').classList.toggle('active',mode==='playlist');
-  var sw=document.querySelector('.search-wrap');
-  var pm=document.getElementById('playlistMode');
-  var hw=document.getElementById('historyWrap');
-  if(sw)sw.style.display=(mode==='playlist')?'none':'block';
-  if(pm)pm.style.display=(mode==='playlist')?'block':'none';
-  if(hw)hw.style.display=(mode==='playlist')?'none':'';
-  if(mode!=='playlist'){q.placeholder=placeholders[mode];renderPresets();q.focus();}
+// ===== RENDER PRESETS =====
+function renderPresets() {
+  var chipsEl = document.getElementById('chips');
+  if (!chipsEl) return;
+  chipsEl.innerHTML = presets[currentMode].map(function(t) {
+    return '<button class="chip">' + esc(t) + '</button>';
+  }).join('');
 }
-document.getElementById('modeArtist').addEventListener('click',function(){setMode('artist');});
-document.getElementById('modeSong').addEventListener('click',function(){setMode('song');});
-document.getElementById('modePlaylist').addEventListener('click',function(){setMode('playlist');});
-document.getElementById('chips').addEventListener('click',function(e){if(e.target.classList.contains('chip')){q.value=e.target.textContent;search();}});
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='plShuffleBtn')doPlShuffle();
-  if(e.target&&e.target.id==='plAgainBtn')doPlShuffle();
-});
-renderPresets();
 
-function getHist(){try{return JSON.parse(localStorage.getItem('mm_h')||'[]');}catch{return[];}}
-function saveHist(t,m){
-  let h=getHist().filter(x=>!(x.t===t&&x.m===m));
-  h.unshift({t,m});h=h.slice(0,8);
-  localStorage.setItem('mm_h',JSON.stringify(h));renderHist();
+// ===== HISTORY =====
+function getHist() {
+  try { return JSON.parse(localStorage.getItem('mm_h') || '[]'); } catch { return []; }
 }
-function renderHist(){
-  const h=getHist();
-  if(!h.length){historyWrap.classList.remove('show');return;}
-  historyWrap.classList.add('show');
-  historyChips.innerHTML=h.map(x=>`<button class="chip" data-mode="${x.m}">${esc(x.t)}</button>`).join('');
+function saveHist(t, m) {
+  var h = getHist().filter(function(x) { return !(x.t === t && x.m === m); });
+  h.unshift({t: t, m: m}); h = h.slice(0, 8);
+  localStorage.setItem('mm_h', JSON.stringify(h));
+  renderHist();
 }
-$('#historyClear').addEventListener('click',()=>{localStorage.removeItem('mm_h');renderHist();});
-historyChips.addEventListener('click',e=>{
-  if(e.target.classList.contains('chip')){setMode(e.target.dataset.mode||'artist');q.value=e.target.textContent;search();}
-});
-renderHist();
+function renderHist() {
+  var hw = document.getElementById('historyWrap');
+  var hc = document.getElementById('historyChips');
+  var h = getHist();
+  if (!hw || !hc) return;
+  if (!h.length) { hw.style.display = 'none'; return; }
+  hw.style.display = '';
+  hc.innerHTML = h.map(function(x) {
+    return '<button class="chip" data-mode="' + x.m + '">' + esc(x.t) + '</button>';
+  }).join('');
+}
 
-const up=new URLSearchParams(location.search);
-if(up.get('q')){setMode(up.get('mode')||'artist');q.value=up.get('q');setTimeout(search,300);}
+// ===== SET MODE =====
+function setMode(mode) {
+  currentMode = mode;
+  var btnArtist = document.getElementById('modeArtist');
+  var btnSong   = document.getElementById('modeSong');
+  var btnPl     = document.getElementById('modePlaylist');
+  var sw  = document.querySelector('.search-wrap');
+  var pm  = document.getElementById('playlistMode');
+  var hw  = document.getElementById('historyWrap');
+  var q   = document.getElementById('q');
 
-go.addEventListener('click',search);
-q.addEventListener('keydown',e=>{if(e.key==='Enter')search();});
+  if (btnArtist) btnArtist.classList.toggle('active', mode === 'artist');
+  if (btnSong)   btnSong.classList.toggle('active', mode === 'song');
+  if (btnPl)     btnPl.classList.toggle('active', mode === 'playlist');
 
-async function search(){
-  const query=q.value.trim();
-  if(!query){q.focus();return;}
-  lastQuery=query;
-  // scroll to results
-  mainArea.scrollIntoView({behavior:'smooth',block:'start'});
-  go.disabled=true;
-  mainArea.innerHTML=`<div class="loading">
-    <div class="waveform">${Array(7).fill('<div class="wave-bar"></div>').join('')}</div>
-    <p>กำลังวิเคราะห์และค้นหาสำหรับ "${esc(query)}"...</p>
-  </div>`;
-  try{
-    const res=await fetch('/api/search',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({query,mode:currentMode})
+  var isSearch = (mode === 'artist' || mode === 'song');
+  if (sw) sw.style.display = isSearch ? '' : 'none';
+  if (pm) pm.style.display = isSearch ? 'none' : 'block';
+  if (hw) hw.style.display = isSearch ? '' : 'none';
+  if (isSearch && q) { q.placeholder = placeholders[mode]; renderPresets(); q.focus(); }
+}
+
+// ===== MAIN SEARCH =====
+async function search() {
+  var q = document.getElementById('q');
+  var mainArea = document.getElementById('mainArea');
+  var go = document.getElementById('go');
+  var query = q ? q.value.trim() : '';
+  if (!query) { if (q) q.focus(); return; }
+  lastQuery = query;
+  var welcome = document.getElementById('welcome');
+  if (welcome) welcome.style.display = 'none';
+  if (go) go.disabled = true;
+  mainArea.innerHTML = '<div class="loading"><div class="waveform">' +
+    Array(7).fill('<div class="wave-bar"></div>').join('') +
+    '</div><p>กำลังวิเคราะห์และค้นหาสำหรับ "' + esc(query) + '"...</p></div>';
+  try {
+    var res = await fetch('/api/search', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query: query, mode: currentMode})
     });
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error||'เกิดข้อผิดพลาด');
-    saveHist(query,currentMode);
-    currentMode==='artist'?renderArtist(data,query):renderSong(data,query);
-    history.replaceState(null,'','?mode='+currentMode+'&q='+encodeURIComponent(query));
-  }catch(err){
-    mainArea.innerHTML=`<div class="error-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>${esc(err.message)}</div>`;
-  }finally{go.disabled=false;}
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+    saveHist(query, currentMode);
+    if (currentMode === 'artist') renderArtist(data, query);
+    else renderSong(data, query);
+    history.replaceState(null, '', '?mode=' + currentMode + '&q=' + encodeURIComponent(query));
+  } catch(err) {
+    mainArea.innerHTML = '<div class="error-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' + esc(err.message) + '</div>';
+  } finally {
+    if (go) go.disabled = false;
+  }
 }
 
-function renderArtist(data,query){
-  let html=`<div class="result-header">
-    <span class="result-title">ผลลัพธ์ · ${esc(query)}</span>
-    <button class="share-btn" id="shareBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-      แชร์
-    </button>
-  </div>`;
-  if(data.bio){
-    html+=`<div class="bio-card">
-      <div class="bio-img" id="bio-img">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
-      </div>
-      <div class="bio-info">
-        <div class="bio-name">${esc(data.identified||query)}</div>
-        ${data.nationality?`<div class="bio-nat">${esc(data.nationality)}</div>`:''}
-        <div class="bio-text">${esc(data.bio)}</div>
-      </div>
-    </div>`;
+function renderArtist(data, query) {
+  var mainArea = document.getElementById('mainArea');
+  var html = '<div class="result-header"><span class="result-title">ผลลัพธ์ · ' + esc(query) + '</span>' +
+    '<button class="share-btn" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>แชร์</button></div>';
+  if (data.bio) {
+    html += '<div class="bio-card"><div class="bio-img" id="bio-img">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div>' +
+      '<div class="bio-info"><div class="bio-name">' + esc(data.identified || query) + '</div>' +
+      (data.nationality ? '<div class="bio-nat">' + esc(data.nationality) + '</div>' : '') +
+      '<div class="bio-text">' + esc(data.bio) + '</div></div></div>';
   }
-  if(data.artists&&data.artists.length){
-    html+=`<div class="section-divider"><div class="section-divider-line"></div><span class="section-divider-label">🎤 ศิลปินที่น่าจะชอบ</span><div class="section-divider-line"></div></div>`;
-    data.artists.forEach((a,i)=>{
-      const flag=countryFlag(a.country);
-      const ytQ=encodeURIComponent(a.name);
-      const spQ=encodeURIComponent(a.name);
-      const tagHtml=(a.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-      html+=`<div class="card" style="animation-delay:${i*0.06}s">
-        <div class="card-inner">
-          <div class="card-avatar" id="av-${i}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
-          </div>
-          <div class="card-body">
-            <div class="card-head">
-              ${flag?`<span class="card-flag">${flag}</span>`:''}
-              <span class="card-name">${esc(a.name)}</span>
-              ${a.genre?`<span class="card-genre">${esc(a.genre)}</span>`:''}
-            </div>
-            <div class="card-why">${esc(a.why||'')}</div>
-            ${tagHtml?`<div class="card-tags">${tagHtml}</div>`:''}
-            <div class="card-actions">
-              <a class="btn-yt" href="https://www.youtube.com/results?search_query=${ytQ}" target="_blank" rel="noopener">${ytIco()} YouTube</a>
-              <a class="btn-sp" href="https://open.spotify.com/search/${spQ}" target="_blank" rel="noopener">${spIco()} Spotify</a>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    });
-  }
-  mainArea.innerHTML=html;
-  $('#shareBtn').addEventListener('click',doShare);
-  data.artists&&data.artists.forEach((a,i)=>{if(a.wiki)loadWiki(a.wiki,'av-'+i);});
-  if(data.identified)loadWiki(data.identified.split('(')[0].trim().replace(/ /g,'_'),'bio-img');
-}
-
-function renderSong(data,query){
-  let html=`<div class="result-header">
-    <span class="result-title">ผลลัพธ์ · ${esc(query)}</span>
-    <button class="share-btn" id="shareBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-      แชร์
-    </button>
-  </div>`;
-  if(data.identified){
-    html+=`<div class="identified"><div class="identified-dot"></div>${esc(data.identified)}</div>`;
-  }
-  if(data.songs&&data.songs.length){
-    html+=`<div class="section-divider"><div class="section-divider-line"></div><span class="section-divider-label">🎵 เพลงที่สไตล์ใกล้เคียง</span><div class="section-divider-line"></div></div>`;
-    data.songs.forEach((s,i)=>{
-      const q2=encodeURIComponent(s.artist+' '+s.name);
-      const spQ=encodeURIComponent(s.artist+' '+s.name);
-      const tagHtml=(s.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-      html+=`<div class="song-card" style="animation-delay:${i*0.06}s">
-        <div class="song-top">
-          <div>
-            <div class="song-name">${esc(s.name)}</div>
-            <div class="song-artist">${esc(s.artist||'')}</div>
-          </div>
-        </div>
-        <div class="song-why">${esc(s.why||'')}</div>
-        ${tagHtml?`<div class="card-tags">${tagHtml}</div>`:''}
-        <div class="card-actions" style="margin-top:12px">
-          <button class="btn-yt" onclick="toggleYt(this,'${q2}')">${ytIco()} ฟังใน YouTube</button>
-          <a class="btn-sp" href="https://open.spotify.com/search/${spQ}" target="_blank" rel="noopener">${spIco()} Spotify</a>
-        </div>
-        <div class="yt-player"><div class="yt-ratio"></div></div>
-      </div>`;
+  if (data.artists && data.artists.length) {
+    html += '<div class="section-divider"><div class="section-divider-line"></div><span class="section-divider-label">🎤 ศิลปินที่น่าจะชอบ</span><div class="section-divider-line"></div></div>';
+    data.artists.forEach(function(a, i) {
+      var flag = countryFlag(a.country);
+      var tagHtml = (a.tags || []).map(function(t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
+      html += '<div class="card" style="animation-delay:' + (i * 0.06) + 's">' +
+        '<div class="card-inner"><div class="card-avatar" id="av-' + i + '">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div>' +
+        '<div class="card-body"><div class="card-head">' +
+        (flag ? '<span class="card-flag">' + flag + '</span>' : '') +
+        '<span class="card-name">' + esc(a.name) + '</span>' +
+        (a.genre ? '<span class="card-genre">' + esc(a.genre) + '</span>' : '') +
+        '</div><div class="card-why">' + esc(a.why || '') + '</div>' +
+        (tagHtml ? '<div class="card-tags">' + tagHtml + '</div>' : '') +
+        '<div class="card-actions">' +
+        '<a class="btn-yt" href="https://www.youtube.com/results?search_query=' + encodeURIComponent(a.name) + '" target="_blank" rel="noopener">' + ytIco() + ' YouTube</a>' +
+        '<a class="btn-sp" href="https://open.spotify.com/search/' + encodeURIComponent(a.name) + '" target="_blank" rel="noopener">' + spIco() + ' Spotify</a>' +
+        '</div></div></div></div>';
     });
   }
-  mainArea.innerHTML=html;
-  $('#shareBtn').addEventListener('click',doShare);
+  mainArea.innerHTML = html;
+  var sb = document.getElementById('shareBtn');
+  if (sb) sb.addEventListener('click', doShare);
+  if (data.artists) data.artists.forEach(function(a, i) { if (a.wiki) loadWiki(a.wiki, 'av-' + i); });
+  if (data.identified) loadWiki(data.identified.split('(')[0].trim().replace(/ /g,'_'), 'bio-img');
 }
 
-async function toggleYt(btn,searchQ){
-  const card=btn.closest('.song-card');
-  const player=card.querySelector('.yt-player');
-  const ratio=card.querySelector('.yt-ratio');
-  const isOpen=player.classList.contains('open');
-  document.querySelectorAll('.yt-player.open').forEach(p=>{
-    p.classList.remove('open');p.querySelector('.yt-ratio').innerHTML='';
-    const ob=p.closest('.song-card').querySelector('.btn-yt');
-    ob.classList.remove('active');ob.innerHTML=ytIco()+' ฟังใน YouTube';
+function renderSong(data, query) {
+  var mainArea = document.getElementById('mainArea');
+  var html = '<div class="result-header"><span class="result-title">ผลลัพธ์ · ' + esc(query) + '</span>' +
+    '<button class="share-btn" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>แชร์</button></div>';
+  if (data.identified) {
+    html += '<div class="identified"><div class="identified-dot"></div>' + esc(data.identified) + '</div>';
+  }
+  if (data.songs && data.songs.length) {
+    html += '<div class="section-divider"><div class="section-divider-line"></div><span class="section-divider-label">🎵 เพลงที่สไตล์ใกล้เคียง</span><div class="section-divider-line"></div></div>';
+    data.songs.forEach(function(s, i) {
+      var q2 = encodeURIComponent(s.artist + ' ' + s.name);
+      var tagHtml = (s.tags || []).map(function(t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
+      html += '<div class="song-card" style="animation-delay:' + (i * 0.06) + 's">' +
+        '<div class="song-top"><div><div class="song-name">' + esc(s.name) + '</div>' +
+        '<div class="song-artist">' + esc(s.artist || '') + '</div></div></div>' +
+        '<div class="song-why">' + esc(s.why || '') + '</div>' +
+        (tagHtml ? '<div class="card-tags">' + tagHtml + '</div>' : '') +
+        '<div class="card-actions" style="margin-top:12px">' +
+        '<button class="btn-yt" data-q="' + q2 + '" onclick="toggleYt(this,this.dataset.q)">' + ytIco() + ' ฟังใน YouTube</button>' +
+        '<a class="btn-sp" href="https://open.spotify.com/search/' + q2 + '" target="_blank" rel="noopener">' + spIco() + ' Spotify</a>' +
+        '</div><div class="yt-player"><div class="yt-ratio"></div></div></div>';
+    });
+  }
+  mainArea.innerHTML = html;
+  var sb = document.getElementById('shareBtn');
+  if (sb) sb.addEventListener('click', doShare);
+}
+
+async function toggleYt(btn, searchQ) {
+  var card = btn.closest('.song-card');
+  var player = card.querySelector('.yt-player');
+  var ratio = card.querySelector('.yt-ratio');
+  var isOpen = player.classList.contains('open');
+  document.querySelectorAll('.yt-player.open').forEach(function(p) {
+    p.classList.remove('open'); p.querySelector('.yt-ratio').innerHTML = '';
+    var ob = p.closest('.song-card').querySelector('.btn-yt');
+    ob.classList.remove('active'); ob.innerHTML = ytIco() + ' ฟังใน YouTube';
   });
-  if(isOpen)return;
-  btn.classList.add('active');btn.innerHTML=ytIco()+' กำลังโหลด...';
+  if (isOpen) return;
+  btn.classList.add('active'); btn.innerHTML = ytIco() + ' กำลังโหลด...';
   player.classList.add('open');
-  try{
-    const r=await fetch('/api/youtube?q='+searchQ);
-    const d=await r.json();
-    if(d.videoId){
-      ratio.innerHTML=`<iframe src="https://www.youtube.com/embed/${d.videoId}?autoplay=1" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
-    }else{
-      ratio.innerHTML=`<iframe src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(decodeURIComponent(searchQ)+' official audio')}" allowfullscreen></iframe>`;
+  try {
+    var r = await fetch('/api/youtube?q=' + searchQ);
+    var d = await r.json();
+    if (d.videoId) {
+      ratio.innerHTML = '<iframe src="https://www.youtube.com/embed/' + d.videoId + '?autoplay=1" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>';
+    } else {
+      ratio.innerHTML = '<iframe src="https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(decodeURIComponent(searchQ) + ' official audio') + '" allowfullscreen></iframe>';
     }
-    btn.innerHTML=ytIco()+' ซ่อนวิดีโอ';
-  }catch{btn.innerHTML=ytIco()+' ฟังใน YouTube';player.classList.remove('open');}
+    btn.innerHTML = ytIco() + ' ซ่อนวิดีโอ';
+  } catch(e) { btn.innerHTML = ytIco() + ' ฟังใน YouTube'; player.classList.remove('open'); }
 }
 
-async function loadWiki(title,elId){
-  if(!title)return;
-  try{
-    const r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));
-    if(!r.ok)return;
-    const d=await r.json();
-    if(d.thumbnail&&d.thumbnail.source){
-      const el=document.getElementById(elId);
-      if(el)el.innerHTML=`<img src="${d.thumbnail.source}" alt=""/>`;
+async function loadWiki(title, elId) {
+  if (!title) return;
+  try {
+    var r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title));
+    if (!r.ok) return;
+    var d = await r.json();
+    if (d.thumbnail && d.thumbnail.source) {
+      var el = document.getElementById(elId);
+      if (el) el.innerHTML = '<img src="' + d.thumbnail.source + '" alt=""/>';
     }
-  }catch{}
+  } catch(e) {}
 }
 
-async function doShare(){
-  const btn=$('#shareBtn');
-  const url=location.origin+'?mode='+currentMode+'&q='+encodeURIComponent(lastQuery);
-  try{
-    if(navigator.share){await navigator.share({title:'Muzik Match',text:`เพลงและศิลปินที่ใกล้เคียงกับ "${lastQuery}"`,url});}
-    else{await navigator.clipboard.writeText(url);showToast('✅ คัดลอกลิงก์แล้ว');markShared(btn);}
-  }catch{try{await navigator.clipboard.writeText(url);showToast('✅ คัดลอกลิงก์แล้ว');markShared(btn);}catch{}}
+async function doShare() {
+  var btn = document.getElementById('shareBtn');
+  var url = location.origin + '?mode=' + currentMode + '&q=' + encodeURIComponent(lastQuery);
+  try {
+    if (navigator.share) { await navigator.share({title:'Muzik Match', text:'เพลงและศิลปินที่ใกล้เคียงกับ "' + lastQuery + '"', url: url}); }
+    else { await navigator.clipboard.writeText(url); showToast('✅ คัดลอกลิงก์แล้ว'); markShared(btn); }
+  } catch(e) { try { await navigator.clipboard.writeText(url); showToast('✅ คัดลอกลิงก์แล้ว'); markShared(btn); } catch(e2) {} }
 }
-function markShared(btn){
+function markShared(btn) {
+  if (!btn) return;
   btn.classList.add('done');
-  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> คัดลอกแล้ว`;
-  setTimeout(()=>{
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> คัดลอกแล้ว';
+  setTimeout(function() {
     btn.classList.remove('done');
-    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg> แชร์`;
-  },2500);
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg> แชร์';
+  }, 2500);
 }
 
-let toastT;
-function showToast(msg){
-  const t=$('#toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2500);
+var toastT;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
-function countryFlag(code){
-  if(!code||code.length!==2)return'';
-  return code.toUpperCase().split('').map(c=>String.fromCodePoint(0x1F1E6+c.charCodeAt(0)-65)).join('');
+function countryFlag(code) {
+  if (!code || code.length !== 2) return '';
+  return code.toUpperCase().split('').map(function(c) { return String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65); }).join('');
 }
-function ytIco(){return`<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M23 12s0-3.9-.5-5.8c-.3-1-1.1-1.8-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6c-1 .3-1.8 1.1-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>`;}
-function spIco(){return`<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>`;}
-function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ytIco() { return '<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M23 12s0-3.9-.5-5.8c-.3-1-1.1-1.8-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6c-1 .3-1.8 1.1-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>'; }
+function spIco() { return '<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>'; }
+function esc(s) { return String(s || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+// ===== EVENT LISTENERS (หลัง DOM โหลด) =====
+document.addEventListener('DOMContentLoaded', function() {
+  renderPresets();
+  renderHist();
+
+  var btnA = document.getElementById('modeArtist');
+  var btnS = document.getElementById('modeSong');
+  var btnP = document.getElementById('modePlaylist');
+  var go   = document.getElementById('go');
+  var q    = document.getElementById('q');
+  var chips = document.getElementById('chips');
+  var hChips = document.getElementById('historyChips');
+  var hClear = document.getElementById('historyClear');
+  var plBtn = document.getElementById('plShuffleBtn');
+  var plAgain = document.getElementById('plAgainBtn');
+
+  if (btnA) btnA.addEventListener('click', function() { setMode('artist'); });
+  if (btnS) btnS.addEventListener('click', function() { setMode('song'); });
+  if (btnP) btnP.addEventListener('click', function() { setMode('playlist'); });
+  if (go) go.addEventListener('click', search);
+  if (q) q.addEventListener('keydown', function(e) { if (e.key === 'Enter') search(); });
+  if (chips) chips.addEventListener('click', function(e) {
+    if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); }
+  });
+  if (hChips) hChips.addEventListener('click', function(e) {
+    if (e.target.classList.contains('chip')) {
+      setMode(e.target.dataset.mode || 'artist');
+      q.value = e.target.textContent; search();
+    }
+  });
+  if (hClear) hClear.addEventListener('click', function() { localStorage.removeItem('mm_h'); renderHist(); });
+  if (plBtn) plBtn.addEventListener('click', doPlShuffle);
+  if (plAgain) plAgain.addEventListener('click', doPlShuffle);
+
+  // URL params
+  var up = new URLSearchParams(location.search);
+  if (up.get('q')) { setMode(up.get('mode') || 'artist'); q.value = up.get('q'); setTimeout(search, 300); }
+});
 </script>
 </body>
 </html>
