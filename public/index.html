@@ -193,6 +193,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);color:var(--text);border:1px solid var(--border2);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 
 @media(max-width:600px){
   .how-steps{grid-template-columns:1fr}.mode-cards{grid-template-columns:1fr}
@@ -213,7 +214,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <!-- HOME PAGE -->
 <div class="page active" id="pageHome">
   <div class="landing">
-    <div class="landing-eyebrow">✨ Music Personality Matching</div>
+    <div class="landing-eyebrow">✨ Muzik Personality Matching</div>
     <h1>เพลงที่ใช่<br/><span class="g">เริ่มจากความรู้สึกของคุณ</span></h1>
     <p class="landing-desc">ทุกคนมีเพลงที่ตรงกับอารมณ์ตัวเอง 🎵<br/>แค่ตอบ 5 คำถาม เราจะวิเคราะห์บุคลิกภาพดนตรีของคุณ แล้วจับคู่ศิลปินและ playlist ที่ match ที่สุดให้ทันที — ไม่ต้องเสียเวลาหาเอง ✨</p>
     <div class="mode-cards">
@@ -257,7 +258,14 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <button class="back-home-btn" onclick="goHome()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='rgba(167,139,250,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">← กลับหน้าหลัก</button>
   </div>
   <div id="quizScreen" class="quiz-screen">
-    <div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:20%"></div></div><div class="quiz-progress-text" id="progressText">1 / 5</div></div>
+    <!-- PROGRESS DOTS -->
+    <div class="quiz-dots" id="quizDots" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px"></div>
+    <!-- NAV BUTTONS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <button id="backBtn" onclick="prevQuestion()" style="display:flex;align-items:center;gap:5px;padding:8px 14px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.35)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">← ย้อนกลับ</button>
+      <span class="quiz-progress-text" id="progressText" style="font-size:13px;font-weight:600;color:var(--text3)">1 / 5</span>
+      <button id="skipBtn" onclick="skipQuestion()" style="display:flex;align-items:center;gap:5px;padding:8px 14px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.35)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">ข้ามข้อนี้ →</button>
+    </div>
     <div class="quiz-q-label" id="qLabel">คำถามที่ 1</div>
     <div class="quiz-q-text" id="qText"></div>
     <div class="quiz-options" id="qOptions"></div>
@@ -305,7 +313,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 </div>
 </div>
 
-<footer>Muzik Match · an Muzik-Search-Engine AI · <a href="#" onclick="switchTab('home');return false">หน้าหลัก</a></footer>
+<footer>Muzik Match · an Muzik-Search-Engine AI</footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -334,7 +342,7 @@ var ARTISTS_THAI = [
   {id:'mean',name:'Mean',emoji:'💎',nat:'🇹🇭 ไทย',genre:'Pop / Ballad',bio:'นักร้องที่ทำให้คนร้องไห้กันทั้งประเทศ 💎 Mean คือ Pop Ballad ที่ emotional มากที่สุดในวงการไทย เพลงหลายเพลงติดในใจคนมาหลายสิบปี',tags:['Pop','Ballad','Powerful'],mood:{dark:4,chill:4,energetic:5,emotional:10,indie:2},sp:'https://open.spotify.com/search/this is mean/playlists'},
   {id:'proxie',name:'Proxie',emoji:'🌌',nat:'🇹🇭 ไทย',genre:'Alternative / Indie',bio:'Alternative ไทยที่มืดและ atmospheric มากที่สุด 🌌 เพลง Proxie คือ cinematic และลึกซึ้ง เหมาะฟังคนเดียวตอนดึกที่สุด',tags:['Alternative','Dark','Atmospheric'],mood:{dark:8,chill:6,energetic:3,emotional:8,indie:9},sp:'https://open.spotify.com/search/this is proxie/playlists'},
   {id:'labanoon',name:'Labanoon',emoji:'🎸',nat:'🇹🇭 ไทย',genre:'Rock / Alternative',bio:'Rock Alternative ไทยที่เพลงหลายเพลงกลายเป็น classic 🎸 ทำนองจดจำง่าย เนื้อหาจริงใจ ฟังได้ทุกยุคสมัยโดยไม่เบื่อ',tags:['Rock','Classic','Alternative'],mood:{dark:4,chill:4,energetic:7,emotional:8,indie:4},sp:'https://open.spotify.com/search/this is labanoon/playlists'},
-  {id:'retrospect',name:'Retrospect',emoji:'🌃',nat:'🇹🇭 ไทย',genre:'Indie / Lo-fi',bio:'Lo-fi Indie ไทยที่ให้ความรู้สึก nostalgic มากที่สุด 🌃 ฟัง Retrospect แล้วเหมือนได้ย้อนเวลากลับไปช่วงเวลาดีๆ ในอดีต',tags:['Indie','Lo-fi','Nostalgic'],mood:{dark:5,chill:9,energetic:1,emotional:7,indie:10},sp:'https://open.spotify.com/search/this is retrospect thai/playlists'},
+  {id:'retrospect',name:'Retrospect',emoji:'🤘',nat:'🇹🇭 ไทย',genre:'Heavy Metal / Post-Hardcore',bio:'วง Heavy Metal ไทยที่หนักและทรงพลังที่สุด 🤘 ก่อตั้งปี 2001 เสียงกีต้าร์หนัก vocals เข้มข้น มีแฟนๆ กว่า 2 ล้านคน เปิดแล้วได้พลังงานทันที',tags:['Heavy Metal','Post-Hardcore','Powerful'],mood:{dark:8,chill:1,energetic:10,emotional:5,indie:5},sp:'https://open.spotify.com/search/this is retrospect/playlists'},
 ];
 
 var ARTISTS_INTL = [
@@ -398,12 +406,12 @@ var QUESTIONS = [
     ]
   },
   {
-    q:'เพลงที่อยากฟังตอนนี้ควร vibe แบบไหน? 🎵',
+    q:'แนวเพลงที่ตอนนี้ใจอยากฟังมากที่สุดคืออะไร? 🎸',
     opts:[
-      {emoji:'🌑',text:'มืดๆ ลึกๆ หนักๆ',sub:'เหมือนเปิดเพลงแล้วโลกช้าลง',w:{dark:4,chill:1,energetic:-1,emotional:2,indie:3}},
-      {emoji:'🎸',text:'มันส์ พลังงานสูง กระแทก',sub:'เปิดแล้วต้องขยับร่างกายตาม',w:{dark:0,chill:-2,energetic:4,emotional:1,indie:1}},
-      {emoji:'🌿',text:'เบาๆ ชิลๆ ผ่อนคลาย',sub:'ฟังแล้วหายใจได้เต็มปอดขึ้น',w:{dark:-2,chill:4,energetic:-1,emotional:1,indie:2}},
-      {emoji:'😭',text:'ให้รู้สึก ให้น้ำตาไหล',sub:'เพลงที่ทำให้ระบายออกมาได้',w:{dark:2,chill:1,energetic:-2,emotional:4,indie:1}},
+      {emoji:'🤘',text:'Rock / Metal ปลุกพลัง',sub:'กีต้าร์หนัก เสียงดัง ปลุกจิตวิญญาณ',w:{dark:3,chill:-2,energetic:5,emotional:2,indie:2}},
+      {emoji:'🌊',text:'Indie / Alternative ฟังสบาย',sub:'เบาๆ ลื่นๆ เหมาะทุกบรรยากาศ',w:{dark:1,chill:4,energetic:0,emotional:2,indie:5}},
+      {emoji:'🎤',text:'Hip Hop / R&B มันส์ๆ',sub:'Groove จังหวะดี flow ติดหู',w:{dark:2,chill:2,energetic:4,emotional:1,indie:2}},
+      {emoji:'⚡',text:'EDM / Electronic จังหวะพุ่ง',sub:'Drop หนัก BPM สูง หัวสั่น',w:{dark:1,chill:-1,energetic:5,emotional:0,indie:1}},
     ]
   },
   {
@@ -480,28 +488,82 @@ function startQuiz(){
 }
 function renderQuestion(){
   var q=QUESTIONS[currentQ];
-  var pct=((currentQ+1)/QUESTIONS.length)*100;
-  document.getElementById('progressFill').style.width=pct+'%';
   document.getElementById('progressText').textContent=(currentQ+1)+' / '+QUESTIONS.length;
   document.getElementById('qLabel').textContent='คำถามที่ '+(currentQ+1);
   document.getElementById('qText').textContent=q.q;
+  // render dots
+  var dots=document.getElementById('quizDots');
+  if(dots){
+    dots.innerHTML=QUESTIONS.map(function(_,i){
+      var done=answers[i]!==undefined;
+      var current=i===currentQ;
+      var bg=current?'var(--purple)':done?'rgba(167,139,250,0.5)':'rgba(255,255,255,0.12)';
+      var size=current?'12px':'8px';
+      var cursor=done||i<=currentQ?'pointer':'default';
+      return '<div onclick="jumpTo('+i+')" style="width:'+size+';height:'+size+';border-radius:50%;background:'+bg+';transition:all 0.3s;cursor:'+cursor+';flex-shrink:0">'+(done&&!current?'':'')+'</div>';
+    }).join('');
+  }
+  // ซ่อน/แสดง back button
+  var back=document.getElementById('backBtn');
+  if(back) back.style.visibility=currentQ>0?'visible':'hidden';
+  // render options
   document.getElementById('qOptions').innerHTML=q.opts.map(function(o,i){
-    return '<div class="quiz-opt" data-idx="'+i+'" onclick="selectOpt(this,'+i+')"><span class="quiz-opt-emoji">'+o.emoji+'</span><div class="quiz-opt-text">'+o.text+'</div><div class="quiz-opt-sub">'+o.sub+'</div></div>';
+    var isSelected=answers[currentQ]===i;
+    return '<div class="quiz-opt'+(isSelected?' selected':'')+'" data-idx="'+i+'" onclick="selectOpt(this,'+i+')"><span class="quiz-opt-emoji">'+o.emoji+'</span><div class="quiz-opt-text">'+o.text+'</div><div class="quiz-opt-sub">'+o.sub+'</div></div>';
   }).join('');
-  document.getElementById('nextBtn').classList.remove('show');
-  document.getElementById('nextBtn').textContent=currentQ<QUESTIONS.length-1?'ถัดไป →':'ดูผลลัพธ์ ✨';
+  // แสดง next button ถ้าตอบแล้ว
+  var nb=document.getElementById('nextBtn');
+  if(answers[currentQ]!==undefined){nb.classList.add('show');}
+  else{nb.classList.remove('show');}
+  var isLast=currentQ===QUESTIONS.length-1;
+  nb.textContent=isLast?'ดูผลลัพธ์ ✨':'ถัดไป →';
+}
+function jumpTo(idx){
+  // กดที่ dot เพื่อกระโดดไปคำถามที่ทำแล้ว หรือคำถามถัดจากที่ทำล่าสุด
+  var maxReached=0;
+  answers.forEach(function(_,i){maxReached=i+1;});
+  if(idx<=maxReached){currentQ=idx;renderQuestion();}
 }
 function selectOpt(el,idx){
   document.querySelectorAll('.quiz-opt').forEach(function(o){o.classList.remove('selected');});
   el.classList.add('selected');answers[currentQ]=idx;
   document.getElementById('nextBtn').classList.add('show');
+  renderQuestion(); // อัปเดต dots
+}
+function prevQuestion(){
+  if(currentQ>0){currentQ--;renderQuestion();}
+}
+function skipQuestion(){
+  // ข้ามข้อนี้ ไปข้อถัดไป (ไม่บันทึก weight)
+  if(currentQ<QUESTIONS.length-1){
+    if(answers[currentQ]===undefined) answers[currentQ]=-1; // mark ว่าข้าม
+    currentQ++;renderQuestion();
+  }
 }
 function nextQuestion(){
-  if(answers[currentQ]===undefined)return;
-  var w=QUESTIONS[currentQ].opts[answers[currentQ]].w;
-  Object.keys(w).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w[k];});
+  if(answers[currentQ]===undefined){
+    // แจ้งเตือน
+    var opts=document.getElementById('qOptions');
+    opts.style.animation='none';void opts.offsetWidth;
+    opts.style.animation='shake 0.3s ease';
+    return;
+  }
+  // บวก weight ถ้าไม่ได้ข้าม
+  if(answers[currentQ]!==-1){
+    var w=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+    Object.keys(w).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w[k];});
+  }
   if(currentQ<QUESTIONS.length-1){currentQ++;renderQuestion();}
-  else{showLoading();}
+  else{
+    // ตรวจสอบว่าตอบครบทุกข้อ (ไม่นับข้อที่ skip)
+    var unanswered=[];
+    for(var i=0;i<QUESTIONS.length;i++){if(answers[i]===undefined)unanswered.push(i+1);}
+    if(unanswered.length>0){
+      alert('ยังไม่ได้ตอบคำถามข้อที่ '+unanswered.join(', ')+' นะ กลับไปตอบให้ครบก่อนเลย 😊');
+      currentQ=unanswered[0]-1;renderQuestion();return;
+    }
+    showLoading();
+  }
 }
 function showLoading(){
   document.getElementById('quizScreen').classList.remove('active');
@@ -523,13 +585,16 @@ function showResult(){
   });
   scored.sort(function(a,b){return b.score-a.score;});
   var maxS=scored[0].score,minS=scored[scored.length-1].score,range=maxS-minS||1;
-  // กระจาย % ให้สมจริงขึ้น: top ได้ 72-92%, ลดหลั่นตามคะแนนจริง
-  function pct(sc){
-    var ratio=(sc-minS)/range;
-    // top artist ได้ 72-92% (สุ่ม ±5% ให้ดูเป็นธรรมชาติ)
-    var base=Math.round(52+ratio*38);
-    var jitter=Math.floor(Math.random()*7)-3;
-    return Math.min(93,Math.max(42,base+jitter));
+  // คำนวณ % ให้ top match สูงกว่า others เสมอ
+  // top ได้ 75-88%, อันดับ 2-6 ลดหลั่นลงไปตามจริง
+  var topBase=Math.round(75+Math.random()*13); // 75-88%
+  function pct(sc,isTop){
+    if(isTop) return topBase;
+    var ratio=(sc-minS)/(scored[0].score-minS||1);
+    // others ได้ topBase-5 ลงไปถึง topBase-28
+    var base=Math.round(topBase-8-(1-ratio)*20);
+    var jitter=Math.floor(Math.random()*5)-2;
+    return Math.min(topBase-3,Math.max(40,base+jitter));
   }
 
   var persona=PERSONALITIES[PERSONALITIES.length-1];
@@ -541,7 +606,7 @@ function showResult(){
   document.getElementById('resDesc').textContent=persona.desc;
   document.getElementById('resQuote').textContent=persona.quote;
 
-  var top=scored[0].a,topPct=pct(scored[0].score);
+  var top=scored[0].a,topPct=pct(scored[0].score,true);
   document.getElementById('topMatchCard').innerHTML=
     '<div class="match-pct-row"><div class="match-pct-num">'+topPct+'%</div><div class="match-pct-info"><div class="match-pct-label">match score 🎯</div><div class="match-pct-bar"><div class="match-pct-fill" id="topBar" style="width:0%"></div></div></div></div>'+
     '<div class="artist-row"><div class="artist-img" id="topImg">'+top.emoji+'</div><div class="artist-info"><div class="artist-name">'+esc(top.name)+'</div><div class="artist-tags"><span class="atag nat">'+esc(top.nat)+'</span><span class="atag">'+esc(top.genre)+'</span>'+(top.tags||[]).slice(0,2).map(function(t){return'<span class="atag">'+esc(t)+'</span>';}).join('')+'</div></div></div>'+
