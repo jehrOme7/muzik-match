@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
   try {
     var geminiRes = await fetch(
       // 2. เปลี่ยนมาใช้ gemini-1.5-flash ที่เสถียรและได้โควต้าเยอะกว่า
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
+      '[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)' + apiKey,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,9 +37,8 @@ module.exports = async function handler(req, res) {
     var data = await geminiRes.json();
     var text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    // ทำความสะอาด JSON
-    text = text.replace(/```json/gi, '').replace(/
-```/g, '').trim();
+    // 💡 แก้ไขบรรทัดที่ทำให้พังตรงนี้ ใช้ split/join เพื่อเลี่ยงปัญหาการแตกบรรทัด
+    text = text.split('```json').join('').split('```').join('').trim();
 
     var start = text.indexOf('{');
     var end   = text.lastIndexOf('}');
