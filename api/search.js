@@ -9,77 +9,62 @@ module.exports = async function handler(req, res) {
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
   if (query.length > 100) return res.status(400).json({ error: 'ข้อความยาวเกินไป' });
 
-  var keys = [
-    process.env.GEMINI_API_KEY,
-    process.env.GEMINI_API_KEY_2,
-    process.env.GEMINI_API_KEY_3,
-  ].filter(Boolean);
-
-  if (!keys.length) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
+  // ดึง API Key มาแค่ตัวเดียว
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
 
   var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  for (var ki = 0; ki < keys.length; ki++) {
-    try {
-      var geminiRes = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + keys[ki],
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.8 }
-          })
-        }
-      );
-
-      if (geminiRes.status === 429) {
-        console.log('429 on key', ki, '— trying next');
-        continue;
+  try {
+    var geminiRes = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.8 }
+        })
       }
+    );
 
-      if (!geminiRes.ok) {
-        var errData = await geminiRes.json().catch(function(){ return {}; });
-        return res.status(500).json({ error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status) });
-      }
-
-      var data = await geminiRes.json();
-      var text = (
-        data.candidates &&
-        data.candidates[0] &&
-        data.candidates[0].content &&
-        data.candidates[0].content.parts &&
-        data.candidates[0].content.parts[0] &&
-        data.candidates[0].content.parts[0].text
-      ) || '';
-
-      // clean markdown
-      text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-      // extract JSON
-      var start = text.indexOf('{');
-      var end   = text.lastIndexOf('}');
-      if (start === -1 || end === -1) {
-        console.log('No JSON, retrying next key. text:', text.slice(0,100));
-        continue;
-      }
-      text = text.slice(start, end + 1);
-
-      try {
-        var parsed = JSON.parse(text);
-        return res.status(200).json(parsed);
-      } catch (parseErr) {
-        console.log('Parse error:', parseErr.message);
-        continue;
-      }
-
-    } catch (fetchErr) {
-      console.log('Fetch error:', fetchErr.message);
-      continue;
+    if (geminiRes.status === 429) {
+      return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
     }
-  }
 
-  return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
+    if (!geminiRes.ok) {
+      var errData = await geminiRes.json().catch(function(){ return {}; });
+      return res.status(500).json({ error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status) });
+    }
+
+    var data = await geminiRes.json();
+    var text = (
+      data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts &&
+      data.candidates[0].content.parts[0] &&
+      data.candidates[0].content.parts[0].text
+    ) || '';
+
+    // clean markdown
+    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    // extract JSON
+    var start = text.indexOf('{');
+    var end   = text.lastIndexOf('}');
+    if (start === -1 || end === -1) {
+      return res.status(500).json({ error: 'AI ส่งข้อมูลกลับมาผิดรูปแบบ' });
+    }
+    text = text.slice(start, end + 1);
+
+    var parsed = JSON.parse(text);
+    return res.status(200).json(parsed);
+
+  } catch (err) {
+    console.log('Error:', err.message);
+    return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเชื่อมต่อ AI' });
+  }
 };
 
 function buildSongPrompt(query) {
