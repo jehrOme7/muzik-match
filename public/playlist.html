@@ -159,27 +159,6 @@ nav{
 .btn-again:hover{border-color:var(--border);color:var(--text);background:rgba(255,255,255,0.08)}
 .btn-again svg{width:18px;height:18px}
 
-/* DIVIDER */
-.pl-divider{
-  display:flex;align-items:center;gap:16px;
-  margin:40px 0 28px;color:var(--text3);font-size:12px;
-  font-weight:600;text-transform:uppercase;letter-spacing:0.08em;
-}
-.pl-divider::before,.pl-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ALL PLAYLISTS GRID */
-.all-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.pl-mini-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:14px;
-  cursor:pointer;transition:all 0.15s;
-  text-decoration:none;display:block;
-}
-.pl-mini-card:hover{border-color:rgba(29,185,84,0.3);background:var(--card2);transform:translateY(-2px)}
-.pl-mini-emoji{font-size:22px;margin-bottom:8px;display:block}
-.pl-mini-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.4}
-.pl-mini-cat{font-size:10px;color:var(--text3)}
-
 footer{position:relative;z-index:1;text-align:center;padding:24px;border-top:1px solid var(--border);color:var(--text3);font-size:13px}
 footer a{color:var(--text3);text-decoration:none}
 footer a:hover{color:var(--purple)}
@@ -247,8 +226,6 @@ footer a:hover{color:var(--purple)}
     </div>
   </div>
 
-  <div class="pl-divider">หรือเลือกเองจากทั้งหมด</div>
-  <div class="all-grid" id="allGrid"></div>
 </div>
 
 <footer>Muzik Match · <a href="/">ค้นหาศิลปินและเพลง</a></footer>
@@ -297,16 +274,30 @@ var ALL_PLAYLISTS = [
   {emoji:'🎤',name:'T-Pop / ลูกกรุง',desc:'ไทยป็อปสมัยใหม่',cat:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX1tPSm3rhMzN'},
 ];
 
-var lastIdx = -1;
+// ระบบสุ่มไม่ซ้ำ — วนไปเรื่อยๆ จนครบ แล้วค่อยสุ่มรอบใหม่
+var shuffleQueue = [];
+
+function buildQueue() {
+  // สร้าง array index สุ่มลำดับใหม่
+  var arr = ALL_PLAYLISTS.map(function(_, i) { return i; });
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+function getNext() {
+  if (shuffleQueue.length === 0) shuffleQueue = buildQueue();
+  return shuffleQueue.pop();
+}
 
 function shuffle() {
   var btn = document.getElementById('shuffleBtn');
   btn.classList.add('spinning');
   setTimeout(function() {
     btn.classList.remove('spinning');
-    var idx;
-    do { idx = Math.floor(Math.random() * ALL_PLAYLISTS.length); } while (idx === lastIdx && ALL_PLAYLISTS.length > 1);
-    lastIdx = idx;
+    var idx = getNext();
     var pl = ALL_PLAYLISTS[idx];
     document.getElementById('resultEmoji').textContent = pl.emoji;
     document.getElementById('resultCat').textContent = pl.cat;
@@ -323,16 +314,6 @@ function shuffle() {
 
 document.getElementById('shuffleBtn').addEventListener('click', shuffle);
 document.getElementById('againBtn').addEventListener('click', shuffle);
-
-// Render all grid
-var grid = document.getElementById('allGrid');
-grid.innerHTML = ALL_PLAYLISTS.map(function(p, i) {
-  return '<a class="pl-mini-card" href="' + p.url + '" target="_blank" rel="noopener" style="animation-delay:' + (i * 0.02) + 's">' +
-    '<span class="pl-mini-emoji">' + p.emoji + '</span>' +
-    '<div class="pl-mini-name">' + p.name + '</div>' +
-    '<div class="pl-mini-cat">' + p.cat + '</div>' +
-  '</a>';
-}).join('');
 </script>
 </body>
 </html>
