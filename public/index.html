@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Muzik Match — หาเพลงและศิลปินที่ใช่</title>
-<meta name="description" content="พิมพ์ชื่อเพลงหรือศิลปินที่ชอบ แล้ว AI จะหาเพลงและวงที่ใกล้เคียงให้คุณทันที" />
+<meta name="description" content="พิมพ์ชื่อศิลปินหรือเพลงที่ชอบ แล้ว AI จะหาเพลงและวงที่ใกล้เคียงให้คุณทันที" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -39,7 +39,22 @@
   }
   .logo svg { width: 26px; height: 26px; }
   .brand h1 { font-family: 'Space Grotesk',sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
-  .tagline { color: var(--text-dim); font-size: 16px; margin-bottom: 40px; text-align: center; }
+  .tagline { color: var(--text-dim); font-size: 16px; margin-bottom: 32px; text-align: center; }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: flex; gap: 6px; background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 14px; padding: 5px; margin-bottom: 16px;
+  }
+  .mode-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px; border-radius: 10px; border: none; background: none;
+    color: var(--text-dim); font-size: 15px; font-weight: 500; font-family: inherit;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mode-btn svg { width: 18px; height: 18px; }
+  .mode-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 12px var(--accent-glow); }
+
   .search-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
   .search-label { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; font-weight: 500; }
   .input-row { display: flex; gap: 10px; }
@@ -71,6 +86,7 @@
   .history-label { font-size: 12px; color: var(--text-faint); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
   .history-clear { cursor: pointer; color: var(--text-faint); font-size: 11px; }
   .history-clear:hover { color: var(--warn); }
+
   #results { display: flex; flex-direction: column; gap: 16px; }
   .result-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 -4px; }
   .result-section-title { font-family: 'Space Grotesk',sans-serif; font-size: 14px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
@@ -82,6 +98,25 @@
   .share-btn:hover { border-color: var(--accent); color: var(--text); }
   .share-btn svg { width: 14px; height: 14px; }
   .share-btn.done { color: var(--good); border-color: var(--good); }
+
+  /* Bio card */
+  .bio-card {
+    background: linear-gradient(135deg, var(--card), var(--bg-soft));
+    border: 1px solid var(--accent-soft); border-radius: 16px; padding: 20px;
+    animation: rise 0.4s ease backwards;
+  }
+  .bio-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .bio-img { width: 60px; height: 60px; border-radius: 14px; flex-shrink: 0; object-fit: cover; background: var(--bg-soft); border: 1px solid var(--line); }
+  .bio-img-fallback {
+    width: 60px; height: 60px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent-soft), var(--bg-soft));
+    border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  }
+  .bio-img-fallback svg { width: 30px; height: 30px; color: var(--text-faint); }
+  .bio-name { font-family: 'Space Grotesk',sans-serif; font-size: 20px; font-weight: 600; }
+  .bio-nat { font-size: 12px; color: var(--accent); margin-top: 2px; }
+  .bio-text { font-size: 14px; color: var(--text-dim); }
+
   .card-item {
     background: var(--card); border: 1px solid var(--line); border-radius: 16px;
     padding: 18px 20px; transition: background 0.2s, border-color 0.2s, transform 0.2s;
@@ -89,14 +124,8 @@
   }
   .card-item:hover { background: var(--card-hover); border-color: var(--accent-soft); transform: translateY(-2px); }
   @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* Artist card with image */
   .artist-row { display: flex; gap: 16px; align-items: flex-start; }
-  .artist-img {
-    width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0;
-    background: var(--bg-soft); border: 1px solid var(--line);
-    object-fit: cover; display: block;
-  }
+  .artist-img { width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; background: var(--bg-soft); border: 1px solid var(--line); object-fit: cover; display: block; }
   .artist-img-fallback {
     width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0;
     background: linear-gradient(135deg, var(--accent-soft), var(--bg-soft));
@@ -104,7 +133,6 @@
   }
   .artist-img-fallback svg { width: 32px; height: 32px; color: var(--text-faint); }
   .artist-body { flex: 1; min-width: 0; }
-
   .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
   .card-name { font-family: 'Space Grotesk',sans-serif; font-size: 18px; font-weight: 600; color: var(--text); }
   .card-meta { font-size: 13px; color: var(--accent); font-weight: 500; white-space: nowrap; }
@@ -124,13 +152,9 @@
   .listen-yt.active { background: var(--yt); color: white; }
   .listen-sp { background: rgba(29,185,84,0.15); color: var(--sp); border: 1px solid rgba(29,185,84,0.3); }
 
-  /* YouTube accordion player */
   .yt-player { max-height: 0; overflow: hidden; transition: max-height 0.45s ease, margin 0.45s ease; }
   .yt-player.open { max-height: 520px; margin-top: 14px; }
-  .yt-frame-box {
-    position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
-    border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--line);
-  }
+  .yt-frame-box { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--line); }
   .yt-frame-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
   .loading { text-align: center; padding: 50px 0; color: var(--text-dim); }
@@ -150,20 +174,20 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
   footer { text-align: center; margin-top: 50px; color: var(--text-faint); font-size: 12px; }
 
-  /* ----- มือถือ / จอเล็ก ----- */
   @media (max-width: 600px) {
     .wrap { padding: 28px 16px 64px; }
     .brand h1 { font-size: 25px; }
     .logo { width: 40px; height: 40px; }
     .logo svg { width: 22px; height: 22px; }
-    .tagline { font-size: 14px; margin-bottom: 28px; }
+    .tagline { font-size: 14px; margin-bottom: 24px; }
+    .mode-btn { font-size: 14px; padding: 10px; }
     .search-card { padding: 18px; border-radius: 16px; }
-    /* ช่องค้นหากับปุ่มเรียงลงเป็นแนวตั้ง ปุ่มเต็มความกว้าง */
     .input-row { flex-direction: column; }
     #q { font-size: 16px; padding: 14px 15px; }
     #go { padding: 14px 0; width: 100%; }
     .chip { padding: 8px 14px; font-size: 13px; }
-    /* การ์ดศิลปิน: รูปเล็กลงนิด */
+    .bio-head { gap: 12px; }
+    .bio-img, .bio-img-fallback { width: 52px; height: 52px; }
     .artist-row { gap: 12px; }
     .artist-img, .artist-img-fallback { width: 54px; height: 54px; border-radius: 12px; }
     .artist-img-fallback svg { width: 26px; height: 26px; }
@@ -171,10 +195,8 @@
     .card-name { font-size: 17px; }
     .card-head { flex-direction: column; gap: 2px; }
     .card-meta { white-space: normal; }
-    /* ปุ่มฟังเพลงเต็มความกว้าง แตะง่าย */
     .listen-row { flex-wrap: wrap; }
     .listen-btn { flex: 1; justify-content: center; min-width: 130px; padding: 11px 14px; }
-    /* กล่องวิดีโอสูงพอดีจอมือถือ */
     .yt-player.open { max-height: 320px; }
     .result-top { flex-wrap: wrap; }
     .toast { left: 16px; right: 16px; transform: translateY(100px); width: auto; }
@@ -192,21 +214,26 @@
     </div>
     <h1>Muzik Match</h1>
   </div>
-  <p class="tagline">พิมพ์ชื่อเพลงหรือศิลปินที่ชอบ แล้ว AI จะหาเพลงและวงที่ใกล้เคียงให้ทันที</p>
+  <p class="tagline">ค้นหาเพลงและศิลปินที่ใกล้เคียงกับที่คุณชอบ ด้วย AI</p>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="artist" id="modeArtist">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      ค้นด้วยศิลปิน
+    </button>
+    <button class="mode-btn" data-mode="song" id="modeSong">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      ค้นด้วยเพลง
+    </button>
+  </div>
 
   <div class="search-card">
-    <div class="search-label">เพลงหรือศิลปินที่คุณชอบ</div>
+    <div class="search-label" id="searchLabel">ชื่อศิลปินที่คุณชอบ</div>
     <div class="input-row">
-      <input id="q" type="text" placeholder="เช่น Bodyslam, Taylor Swift, หรือ ชื่อเพลง..." autofocus />
+      <input id="q" type="text" placeholder="เช่น blvckheart, Bodyslam, The Weeknd..." autofocus />
       <button id="go">ค้นหา</button>
     </div>
-    <div class="chips" id="chips">
-      <span class="chip">Bodyslam</span>
-      <span class="chip">The Weeknd</span>
-      <span class="chip">Three Man Down</span>
-      <span class="chip">Newjeans</span>
-      <span class="chip">Coldplay</span>
-    </div>
+    <div class="chips" id="chips"></div>
   </div>
 
   <div class="history-bar" id="historyBar">
@@ -223,7 +250,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
     </svg>
-    <p>พิมพ์ชื่อเพลงหรือศิลปินที่ชอบด้านบน แล้วกดค้นหาได้เลย</p>
+    <p>เลือกโหมด แล้วพิมพ์ชื่อศิลปินหรือเพลงที่ชอบด้านบน กดค้นหาได้เลย</p>
   </div>
 
   <footer>Muzik Match · ขับเคลื่อนด้วย AI</footer>
@@ -235,28 +262,62 @@
 const $ = s => document.querySelector(s);
 const q = $('#q'), go = $('#go'), results = $('#results'), welcome = $('#welcome');
 const historyBar = $('#historyBar'), historyChips = $('#historyChips');
-let lastQuery = '', lastData = null;
+const searchLabel = $('#searchLabel'), chipsBox = $('#chips');
+let currentMode = 'artist';
+let lastQuery = '';
+
+const presets = {
+  artist: ['blvckheart', 'Bodyslam', 'The Weeknd', 'NONT TANONT', 'Newjeans'],
+  song: ['ยินดี', 'Blinding Lights', 'คิดมาก', 'Dynamite', 'ทรงอย่างแบด']
+};
+const placeholders = {
+  artist: 'เช่น blvckheart, Bodyslam, The Weeknd...',
+  song: 'เช่น ยินดี, Blinding Lights, คิดมาก...'
+};
+const labels = { artist: 'ชื่อศิลปินที่คุณชอบ', song: 'ชื่อเพลงที่คุณชอบ' };
+
+function setMode(mode) {
+  currentMode = mode;
+  $('#modeArtist').classList.toggle('active', mode === 'artist');
+  $('#modeSong').classList.toggle('active', mode === 'song');
+  searchLabel.textContent = labels[mode];
+  q.placeholder = placeholders[mode];
+  renderChips();
+  q.focus();
+}
+function renderChips() {
+  chipsBox.innerHTML = presets[currentMode].map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('');
+}
+$('#modeArtist').addEventListener('click', () => setMode('artist'));
+$('#modeSong').addEventListener('click', () => setMode('song'));
+chipsBox.addEventListener('click', e => { if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); } });
+renderChips();
 
 function getHistory() { try { return JSON.parse(localStorage.getItem('mm_history')||'[]'); } catch { return []; } }
-function addHistory(term) {
-  let h = getHistory().filter(x => x.toLowerCase() !== term.toLowerCase());
-  h.unshift(term); h = h.slice(0,8);
+function addHistory(term, mode) {
+  let h = getHistory().filter(x => !(x.term.toLowerCase() === term.toLowerCase() && x.mode === mode));
+  h.unshift({ term, mode }); h = h.slice(0,8);
   localStorage.setItem('mm_history', JSON.stringify(h)); renderHistory();
 }
 function renderHistory() {
   const h = getHistory();
   if (!h.length) { historyBar.classList.remove('show'); return; }
   historyBar.classList.add('show');
-  historyChips.innerHTML = h.map(t => `<span class="chip history">${escapeHtml(t)}</span>`).join('');
+  historyChips.innerHTML = h.map(x => `<span class="chip history" data-mode="${x.mode}">${escapeHtml(x.term)}</span>`).join('');
 }
 $('#historyClear').addEventListener('click', () => { localStorage.removeItem('mm_history'); renderHistory(); });
-historyChips.addEventListener('click', e => { if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); } });
+historyChips.addEventListener('click', e => {
+  if (e.target.classList.contains('chip')) {
+    const m = e.target.dataset.mode || 'artist';
+    setMode(m); q.value = e.target.textContent; search();
+  }
+});
 renderHistory();
 
-const urlQ = new URLSearchParams(location.search).get('q');
-if (urlQ) { q.value = urlQ; setTimeout(search, 300); }
+const params = new URLSearchParams(location.search);
+const urlQ = params.get('q'), urlMode = params.get('mode');
+if (urlQ) { if (urlMode) setMode(urlMode); q.value = urlQ; setTimeout(search, 300); }
 
-$('#chips').addEventListener('click', e => { if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); } });
 go.addEventListener('click', search);
 q.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
 
@@ -266,18 +327,19 @@ async function search() {
   lastQuery = query;
   welcome.style.display = 'none';
   go.disabled = true;
-  results.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">กำลังค้นหาเพลงและศิลปินที่ใกล้เคียงกับ "${escapeHtml(query)}"...</div></div>`;
+  const what = currentMode === 'artist' ? 'ศิลปิน' : 'เพลง';
+  results.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">กำลังวิเคราะห์และค้นหา${what}ที่ใกล้เคียงกับ "${escapeHtml(query)}"...</div></div>`;
   try {
     const res = await fetch('/api/search', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query, mode: currentMode })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
-    lastData = data;
-    addHistory(query);
-    render(data, query);
-    history.replaceState(null, '', '?q=' + encodeURIComponent(query));
+    addHistory(query, currentMode);
+    if (currentMode === 'artist') renderArtistMode(data, query);
+    else renderSongMode(data, query);
+    history.replaceState(null, '', '?mode=' + currentMode + '&q=' + encodeURIComponent(query));
   } catch (err) {
     showError(escapeHtml(err.message));
   } finally {
@@ -285,29 +347,61 @@ async function search() {
   }
 }
 
-function render(data, query) {
-  let html = `<div class="result-top">
+function renderArtistMode(data, query) {
+  let html = topBar(query);
+  // Bio card
+  if (data.bio) {
+    html += `<div class="bio-card">
+      <div class="bio-head">
+        <div class="bio-img-fallback" id="bio-img">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+        </div>
+        <div>
+          <div class="bio-name">${escapeHtml(data.identified || query)}</div>
+          ${data.nationality ? `<div class="bio-nat">${escapeHtml(data.nationality)}</div>` : ''}
+        </div>
+      </div>
+      <div class="bio-text">${escapeHtml(data.bio)}</div>
+    </div>`;
+  }
+  if (data.artists?.length) {
+    html += `<div class="result-section-title" style="margin-top:8px">🎤 ศิลปิน / วงที่คุณน่าจะชอบ</div>`;
+    data.artists.forEach((a, i) => { html += artistCard(a, i); });
+  }
+  results.innerHTML = html;
+  bindShare();
+  // โหลดรูป bio (ใช้ wiki ของศิลปินแรกถ้าตรง หรือ identified)
+  data.artists?.forEach((a, i) => { if (a.wiki) loadImage(a.wiki, 'art-img-' + i); });
+  // โหลดรูป bio จากชื่อ identified
+  if (data.identified) {
+    const wikiGuess = data.identified.split('(')[0].trim().replace(/ /g, '_');
+    loadImage(wikiGuess, 'bio-img');
+  }
+}
+
+function renderSongMode(data, query) {
+  let html = topBar(query);
+  if (data.identified) {
+    html += `<div class="bio-card"><div class="bio-text" style="color:var(--text)">🎵 ${escapeHtml(data.identified)}</div></div>`;
+  }
+  if (data.songs?.length) {
+    html += `<div class="result-section-title" style="margin-top:8px">🎵 เพลงที่สไตล์ใกล้เคียง</div>`;
+    data.songs.forEach((s, i) => { html += songCard(s, i); });
+  }
+  results.innerHTML = html;
+  bindShare();
+}
+
+function topBar(query) {
+  return `<div class="result-top">
     <span class="result-section-title">ผลลัพธ์สำหรับ "${escapeHtml(query)}"</span>
     <button class="share-btn" id="shareBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
       แชร์
     </button>
   </div>`;
-
-  if (data.artists?.length) {
-    html += `<div class="result-section-title" style="margin-top:8px">🎤 ศิลปิน / วงที่คุณน่าจะชอบ</div>`;
-    data.artists.forEach((a, i) => { html += artistCard(a, i); });
-  }
-  if (data.songs?.length) {
-    html += `<div class="result-section-title" style="margin-top:8px">🎵 เพลงแนะนำ</div>`;
-    data.songs.forEach((s, i) => { html += songCard(s, i + (data.artists?.length||0)); });
-  }
-  results.innerHTML = html;
-  $('#shareBtn').addEventListener('click', shareResult);
-
-  // โหลดรูปศิลปินจาก Wikipedia
-  data.artists?.forEach((a, i) => { if (a.wiki) loadArtistImage(a.wiki, 'art-img-' + i); });
 }
+function bindShare() { const b = $('#shareBtn'); if (b) b.addEventListener('click', shareResult); }
 
 function artistCard(a, i) {
   const tagHtml = (a.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
@@ -350,7 +444,7 @@ function songCard(s, i) {
       <button class="listen-btn listen-yt" onclick="toggleYt(this, '${ytSearch}')">${ytIcon()} ฟังใน YouTube</button>
       <a class="listen-btn listen-sp" href="${spUrl}" target="_blank" rel="noopener">${spIcon()} Spotify</a>
     </div>
-    <div class="yt-player"><div class="yt-frame-box" data-loaded="0"></div></div>
+    <div class="yt-player"><div class="yt-frame-box"></div></div>
   </div>`;
 }
 
@@ -359,44 +453,33 @@ async function toggleYt(btn, searchQuery) {
   const player = card.querySelector('.yt-player');
   const box = card.querySelector('.yt-frame-box');
   const isOpen = player.classList.contains('open');
-
-  // ปิดกล่องอื่นที่เปิดอยู่
   document.querySelectorAll('.yt-player.open').forEach(p => {
     if (p !== player) {
       p.classList.remove('open');
       p.querySelector('.yt-frame-box').innerHTML = '';
-      p.querySelector('.yt-frame-box').dataset.loaded = '0';
-      const otherBtn = p.closest('.card-item').querySelector('.listen-yt');
-      otherBtn.classList.remove('active');
-      otherBtn.innerHTML = ytIcon() + ' ฟังใน YouTube';
+      const ob = p.closest('.card-item').querySelector('.listen-yt');
+      ob.classList.remove('active'); ob.innerHTML = ytIcon() + ' ฟังใน YouTube';
     }
   });
-
   if (isOpen) {
-    player.classList.remove('open');
-    box.innerHTML = ''; box.dataset.loaded = '0';
-    btn.classList.remove('active');
-    btn.innerHTML = ytIcon() + ' ฟังใน YouTube';
+    player.classList.remove('open'); box.innerHTML = '';
+    btn.classList.remove('active'); btn.innerHTML = ytIcon() + ' ฟังใน YouTube';
     return;
   }
-
-  // เปิด: โหลดวิดีโอจริงจาก YouTube
-  btn.classList.add('active');
-  btn.innerHTML = ytIcon() + ' กำลังโหลด...';
+  btn.classList.add('active'); btn.innerHTML = ytIcon() + ' กำลังโหลด...';
   player.classList.add('open');
-
   try {
     const vid = await findYoutubeId(searchQuery);
     if (vid) {
       box.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     } else {
-      const fallbackSearch = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
-      box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fallbackSearch}" allowfullscreen></iframe>`;
+      const fb = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
+      box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fb}" allowfullscreen></iframe>`;
     }
     btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
   } catch {
-    const fallbackSearch = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
-    box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fallbackSearch}" allowfullscreen></iframe>`;
+    const fb = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
+    box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fb}" allowfullscreen></iframe>`;
     btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
   }
 }
@@ -410,7 +493,8 @@ async function findYoutubeId(searchQuery) {
   } catch { return null; }
 }
 
-async function loadArtistImage(wikiTitle, elementId) {
+async function loadImage(wikiTitle, elementId) {
+  if (!wikiTitle) return;
   try {
     const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`;
     const res = await fetch(url);
@@ -421,10 +505,8 @@ async function loadArtistImage(wikiTitle, elementId) {
       const el = document.getElementById(elementId);
       if (el) {
         const imgEl = document.createElement('img');
-        imgEl.className = 'artist-img';
-        imgEl.src = img;
-        imgEl.alt = '';
-        imgEl.onerror = () => {};
+        imgEl.className = el.classList.contains('bio-img-fallback') ? 'bio-img' : 'artist-img';
+        imgEl.src = img; imgEl.alt = '';
         el.replaceWith(imgEl);
       }
     }
@@ -433,7 +515,7 @@ async function loadArtistImage(wikiTitle, elementId) {
 
 async function shareResult() {
   const btn = $('#shareBtn');
-  const shareUrl = location.origin + location.pathname + '?q=' + encodeURIComponent(lastQuery);
+  const shareUrl = location.origin + location.pathname + '?mode=' + currentMode + '&q=' + encodeURIComponent(lastQuery);
   const shareData = { title: 'Muzik Match', text: `เพลงและศิลปินที่ใกล้เคียงกับ "${lastQuery}"`, url: shareUrl };
   try {
     if (navigator.share) { await navigator.share(shareData); }
