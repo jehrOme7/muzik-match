@@ -66,36 +66,22 @@
   }
   .chip:hover { border-color: var(--accent); color: var(--text); }
   .chip.history { border-style: dashed; }
-
-  /* History bar */
   .history-bar { margin-bottom: 36px; display: none; }
   .history-bar.show { display: block; }
-  .history-label {
-    font-size: 12px; color: var(--text-faint); margin-bottom: 8px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  .history-label { font-size: 12px; color: var(--text-faint); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
   .history-clear { cursor: pointer; color: var(--text-faint); font-size: 11px; }
   .history-clear:hover { color: var(--warn); }
-
   #results { display: flex; flex-direction: column; gap: 16px; }
-  .result-top {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin: 8px 0 -4px;
-  }
-  .result-section-title {
-    font-family: 'Space Grotesk',sans-serif; font-size: 14px; font-weight: 600;
-    color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;
-  }
+  .result-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 -4px; }
+  .result-section-title { font-family: 'Space Grotesk',sans-serif; font-size: 14px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
   .share-btn {
     display: flex; align-items: center; gap: 6px; background: var(--bg-soft);
     border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px;
-    font-size: 12px; color: var(--text-dim); cursor: pointer; font-family: inherit;
-    transition: all 0.15s;
+    font-size: 12px; color: var(--text-dim); cursor: pointer; font-family: inherit; transition: all 0.15s;
   }
   .share-btn:hover { border-color: var(--accent); color: var(--text); }
   .share-btn svg { width: 14px; height: 14px; }
   .share-btn.done { color: var(--good); border-color: var(--good); }
-
   .card-item {
     background: var(--card); border: 1px solid var(--line); border-radius: 16px;
     padding: 18px 20px; transition: background 0.2s, border-color 0.2s, transform 0.2s;
@@ -103,6 +89,22 @@
   }
   .card-item:hover { background: var(--card-hover); border-color: var(--accent-soft); transform: translateY(-2px); }
   @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Artist card with image */
+  .artist-row { display: flex; gap: 16px; align-items: flex-start; }
+  .artist-img {
+    width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0;
+    background: var(--bg-soft); border: 1px solid var(--line);
+    object-fit: cover; display: block;
+  }
+  .artist-img-fallback {
+    width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent-soft), var(--bg-soft));
+    border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  }
+  .artist-img-fallback svg { width: 32px; height: 32px; color: var(--text-faint); }
+  .artist-body { flex: 1; min-width: 0; }
+
   .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
   .card-name { font-family: 'Space Grotesk',sans-serif; font-size: 18px; font-weight: 600; color: var(--text); }
   .card-meta { font-size: 13px; color: var(--accent); font-weight: 500; white-space: nowrap; }
@@ -112,20 +114,27 @@
 
   .listen-row { display: flex; gap: 8px; margin-top: 14px; }
   .listen-btn {
-    display: flex; align-items: center; gap: 6px; text-decoration: none;
+    display: flex; align-items: center; gap: 6px; text-decoration: none; background: none;
     border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 500;
-    transition: transform 0.15s, opacity 0.2s; font-family: inherit;
+    transition: transform 0.15s, opacity 0.2s; font-family: inherit; cursor: pointer;
   }
   .listen-btn:hover { transform: translateY(-1px); opacity: 0.9; }
   .listen-btn svg { width: 16px; height: 16px; }
   .listen-yt { background: rgba(255,77,77,0.15); color: var(--yt); border: 1px solid rgba(255,77,77,0.3); }
+  .listen-yt.active { background: var(--yt); color: white; }
   .listen-sp { background: rgba(29,185,84,0.15); color: var(--sp); border: 1px solid rgba(29,185,84,0.3); }
 
-  .loading { text-align: center; padding: 50px 0; color: var(--text-dim); }
-  .spinner {
-    width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid var(--line);
-    border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;
+  /* YouTube accordion player */
+  .yt-player { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, margin 0.4s ease; }
+  .yt-player.open { max-height: 260px; margin-top: 14px; }
+  .yt-frame-box {
+    position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+    border-radius: 12px; overflow: hidden; background: #000; border: 1px solid var(--line);
   }
+  .yt-frame-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+  .loading { text-align: center; padding: 50px 0; color: var(--text-dim); }
+  .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 14px; }
   .notice { text-align: center; padding: 40px 20px; color: var(--text-faint); }
@@ -197,16 +206,11 @@ const q = $('#q'), go = $('#go'), results = $('#results'), welcome = $('#welcome
 const historyBar = $('#historyBar'), historyChips = $('#historyChips');
 let lastQuery = '', lastData = null;
 
-// ---------- History ----------
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem('mm_history') || '[]'); } catch { return []; }
-}
+function getHistory() { try { return JSON.parse(localStorage.getItem('mm_history')||'[]'); } catch { return []; } }
 function addHistory(term) {
   let h = getHistory().filter(x => x.toLowerCase() !== term.toLowerCase());
-  h.unshift(term);
-  h = h.slice(0, 8);
-  localStorage.setItem('mm_history', JSON.stringify(h));
-  renderHistory();
+  h.unshift(term); h = h.slice(0,8);
+  localStorage.setItem('mm_history', JSON.stringify(h)); renderHistory();
 }
 function renderHistory() {
   const h = getHistory();
@@ -214,22 +218,14 @@ function renderHistory() {
   historyBar.classList.add('show');
   historyChips.innerHTML = h.map(t => `<span class="chip history">${escapeHtml(t)}</span>`).join('');
 }
-$('#historyClear').addEventListener('click', () => {
-  localStorage.removeItem('mm_history'); renderHistory();
-});
-historyChips.addEventListener('click', e => {
-  if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); }
-});
+$('#historyClear').addEventListener('click', () => { localStorage.removeItem('mm_history'); renderHistory(); });
+historyChips.addEventListener('click', e => { if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); } });
 renderHistory();
 
-// ---------- Search from URL (shared link) ----------
 const urlQ = new URLSearchParams(location.search).get('q');
 if (urlQ) { q.value = urlQ; setTimeout(search, 300); }
 
-// ---------- Events ----------
-$('#chips').addEventListener('click', e => {
-  if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); }
-});
+$('#chips').addEventListener('click', e => { if (e.target.classList.contains('chip')) { q.value = e.target.textContent; search(); } });
 go.addEventListener('click', search);
 q.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
 
@@ -237,11 +233,9 @@ async function search() {
   const query = q.value.trim();
   if (!query) { q.focus(); return; }
   lastQuery = query;
-
   welcome.style.display = 'none';
   go.disabled = true;
   results.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">กำลังค้นหาเพลงและศิลปินที่ใกล้เคียงกับ "${escapeHtml(query)}"...</div></div>`;
-
   try {
     const res = await fetch('/api/search', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -252,7 +246,6 @@ async function search() {
     lastData = data;
     addHistory(query);
     render(data, query);
-    // อัปเดต URL ให้แชร์ได้
     history.replaceState(null, '', '?q=' + encodeURIComponent(query));
   } catch (err) {
     showError(escapeHtml(err.message));
@@ -272,40 +265,137 @@ function render(data, query) {
 
   if (data.artists?.length) {
     html += `<div class="result-section-title" style="margin-top:8px">🎤 ศิลปิน / วงที่คุณน่าจะชอบ</div>`;
-    data.artists.forEach((a, i) => { html += card(a.name, a.genre, a.why, a.tags, i, a.name, null); });
+    data.artists.forEach((a, i) => { html += artistCard(a, i); });
   }
   if (data.songs?.length) {
     html += `<div class="result-section-title" style="margin-top:8px">🎵 เพลงแนะนำ</div>`;
-    data.songs.forEach((s, i) => { html += card(s.name, s.artist, s.why, s.tags, i + (data.artists?.length||0), s.artist, s.name); });
+    data.songs.forEach((s, i) => { html += songCard(s, i + (data.artists?.length||0)); });
   }
-  if (data.artists?.length === 0 && data.songs?.length === 0) { showError('ไม่พบผลลัพธ์ ลองพิมพ์ชื่ออื่นดูครับ'); return; }
   results.innerHTML = html;
   $('#shareBtn').addEventListener('click', shareResult);
+
+  // โหลดรูปศิลปินจาก Wikipedia
+  data.artists?.forEach((a, i) => { if (a.wiki) loadArtistImage(a.wiki, 'art-img-' + i); });
 }
 
-function card(name, meta, why, tags, i, searchArtist, searchSong) {
-  const tagHtml = (tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
-  const queryText = searchSong ? `${searchArtist} ${searchSong}` : searchArtist;
-  const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(queryText);
-  const spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(queryText);
+function artistCard(a, i) {
+  const tagHtml = (a.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(a.name);
+  const spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(a.name);
   return `<div class="card-item" style="animation-delay:${i*0.06}s">
-    <div class="card-head">
-      <span class="card-name">${escapeHtml(name)}</span>
-      <span class="card-meta">${escapeHtml(meta || '')}</span>
-    </div>
-    <div class="card-why">${escapeHtml(why || '')}</div>
-    ${tagHtml ? `<div class="card-tags">${tagHtml}</div>` : ''}
-    <div class="listen-row">
-      <a class="listen-btn listen-yt" href="${ytUrl}" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.9-.5-5.8c-.3-1-1.1-1.8-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6c-1 .3-1.8 1.1-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
-        YouTube
-      </a>
-      <a class="listen-btn listen-sp" href="${spUrl}" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>
-        Spotify
-      </a>
+    <div class="artist-row">
+      <div class="artist-img-fallback" id="art-img-${i}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      </div>
+      <div class="artist-body">
+        <div class="card-head">
+          <span class="card-name">${escapeHtml(a.name)}</span>
+          <span class="card-meta">${escapeHtml(a.genre||'')}</span>
+        </div>
+        <div class="card-why">${escapeHtml(a.why||'')}</div>
+        ${tagHtml ? `<div class="card-tags">${tagHtml}</div>` : ''}
+        <div class="listen-row">
+          <a class="listen-btn listen-yt" href="${ytUrl}" target="_blank" rel="noopener">${ytIcon()} YouTube</a>
+          <a class="listen-btn listen-sp" href="${spUrl}" target="_blank" rel="noopener">${spIcon()} Spotify</a>
+        </div>
+      </div>
     </div>
   </div>`;
+}
+
+function songCard(s, i) {
+  const tagHtml = (s.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const queryText = `${s.artist} ${s.name}`;
+  const spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(queryText);
+  const ytSearch = encodeURIComponent(queryText + ' official');
+  return `<div class="card-item" style="animation-delay:${i*0.06}s">
+    <div class="card-head">
+      <span class="card-name">${escapeHtml(s.name)}</span>
+      <span class="card-meta">${escapeHtml(s.artist||'')}</span>
+    </div>
+    <div class="card-why">${escapeHtml(s.why||'')}</div>
+    ${tagHtml ? `<div class="card-tags">${tagHtml}</div>` : ''}
+    <div class="listen-row">
+      <button class="listen-btn listen-yt" onclick="toggleYt(this, '${ytSearch}')">${ytIcon()} ฟังใน YouTube</button>
+      <a class="listen-btn listen-sp" href="${spUrl}" target="_blank" rel="noopener">${spIcon()} Spotify</a>
+    </div>
+    <div class="yt-player"><div class="yt-frame-box" data-loaded="0"></div></div>
+  </div>`;
+}
+
+async function toggleYt(btn, searchQuery) {
+  const card = btn.closest('.card-item');
+  const player = card.querySelector('.yt-player');
+  const box = card.querySelector('.yt-frame-box');
+  const isOpen = player.classList.contains('open');
+
+  // ปิดกล่องอื่นที่เปิดอยู่
+  document.querySelectorAll('.yt-player.open').forEach(p => {
+    if (p !== player) {
+      p.classList.remove('open');
+      p.querySelector('.yt-frame-box').innerHTML = '';
+      p.querySelector('.yt-frame-box').dataset.loaded = '0';
+      const otherBtn = p.closest('.card-item').querySelector('.listen-yt');
+      otherBtn.classList.remove('active');
+      otherBtn.innerHTML = ytIcon() + ' ฟังใน YouTube';
+    }
+  });
+
+  if (isOpen) {
+    player.classList.remove('open');
+    box.innerHTML = ''; box.dataset.loaded = '0';
+    btn.classList.remove('active');
+    btn.innerHTML = ytIcon() + ' ฟังใน YouTube';
+    return;
+  }
+
+  // เปิด: โหลดวิดีโอจริงจาก YouTube
+  btn.classList.add('active');
+  btn.innerHTML = ytIcon() + ' กำลังโหลด...';
+  player.classList.add('open');
+
+  try {
+    const vid = await findYoutubeId(searchQuery);
+    if (vid) {
+      box.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else {
+      box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${searchQuery}" allowfullscreen></iframe>`;
+    }
+    btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
+  } catch {
+    box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${searchQuery}" allowfullscreen></iframe>`;
+    btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
+  }
+}
+
+async function findYoutubeId(searchQuery) {
+  try {
+    const res = await fetch('/api/youtube?q=' + searchQuery);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.videoId || null;
+  } catch { return null; }
+}
+
+async function loadArtistImage(wikiTitle, elementId) {
+  try {
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    const img = data.thumbnail?.source;
+    if (img) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        const imgEl = document.createElement('img');
+        imgEl.className = 'artist-img';
+        imgEl.src = img;
+        imgEl.alt = '';
+        imgEl.onerror = () => {};
+        el.replaceWith(imgEl);
+      }
+    }
+  } catch {}
 }
 
 async function shareResult() {
@@ -339,9 +429,9 @@ function showError(msg) {
     <p>${msg}</p>
   </div>`;
 }
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+function ytIcon() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.9-.5-5.8c-.3-1-1.1-1.8-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6c-1 .3-1.8 1.1-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>`; }
+function spIcon() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>`; }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 </script>
 </body>
 </html>
