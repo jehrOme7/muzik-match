@@ -1,10 +1,11 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const query = (req.body?.query || '').toString().trim();
-  const mode  = (req.body?.mode  || 'artist').toString();
+  const query = ((req.body && req.body.query) || '').toString().trim();
+  const mode  = ((req.body && req.body.mode)  || 'artist').toString();
+
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
   if (query.length > 100) return res.status(400).json({ error: 'ข้อความยาวเกินไป' });
 
@@ -18,61 +19,65 @@ export default async function handler(req, res) {
 
   const prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  for (const key of keys) {
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) await sleep(attempt * 1000);
+  for (var ki = 0; ki < keys.length; ki++) {
+    var key = keys[ki];
+    for (var attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) await sleep(attempt * 1500);
       try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+        var geminiRes = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                temperature: 0.8,
-                // ไม่ใช้ responseMimeType เพื่อกัน Gemini บางเวอร์ชันที่ไม่รองรับ
-              }
+              generationConfig: { temperature: 0.8 }
             })
           }
         );
 
-        if (geminiRes.status === 429) continue;
+        if (geminiRes.status === 429) {
+          console.log('429 key', ki, 'attempt', attempt);
+          continue;
+        }
 
         if (!geminiRes.ok) {
-          const errData = await geminiRes.json().catch(() => ({}));
+          var errData = await geminiRes.json().catch(function(){ return {}; });
           return res.status(500).json({
-            error: 'เกิดข้อผิดพลาดจาก AI: ' + (errData?.error?.message || geminiRes.status)
+            error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status)
           });
         }
 
-        const data = await geminiRes.json();
-        let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        var data = await geminiRes.json();
+        var text = ((data.candidates &&
+                     data.candidates[0] &&
+                     data.candidates[0].content &&
+                     data.candidates[0].content.parts &&
+                     data.candidates[0].content.parts[0] &&
+                     data.candidates[0].content.parts[0].text) || '');
 
-        // clean ทุกรูปแบบที่ Gemini อาจส่งมา
-        text = text
-          .replace(/^[\s\S]*?```json\s*/i, '') // ลบทุกอย่างก่อน ```json
-          .replace(/^[\s\S]*?```\s*/i, '')      // ลบทุกอย่างก่อน ```
-          .replace(/```[\s\S]*$/i, '')           // ลบทุกอย่างหลัง ```
-          .trim();
+        // clean markdown
+        text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
 
-        // ถ้ายังไม่เป็น JSON (ไม่ขึ้นต้นด้วย {) ให้ log แล้วลองใหม่
-        if (!text.startsWith('{')) {
-          console.error('Non-JSON response:', text.slice(0, 200));
+        // หา JSON object
+        var start = text.indexOf('{');
+        var end   = text.lastIndexOf('}');
+        if (start === -1 || end === -1) {
+          console.log('No JSON found, text:', text.slice(0, 200));
           continue;
         }
+        text = text.slice(start, end + 1);
 
         try {
-          const parsed = JSON.parse(text);
+          var parsed = JSON.parse(text);
           return res.status(200).json(parsed);
         } catch (parseErr) {
-          console.error('Parse error:', parseErr.message, 'text:', text.slice(0, 300));
+          console.log('Parse error:', parseErr.message, 'text:', text.slice(0, 300));
           continue;
         }
 
-      } catch (err) {
-        console.error('Fetch error:', err.message);
-        if (attempt === 2) continue;
+      } catch (fetchErr) {
+        console.log('Fetch error:', fetchErr.message);
       }
     }
   }
@@ -80,44 +85,23 @@ export default async function handler(req, res) {
   return res.status(429).json({
     error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่'
   });
-}
+};
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 
 function buildSongPrompt(query) {
-  return `You are a music expert. The user likes this song: "${query}"
-
-Analyze the genre, mood, era, rhythm, and style. If it's a Thai artist, prioritize recommending Thai/Asian songs first.
-
-Respond ONLY with a valid JSON object. No markdown, no code blocks, no explanation. Start your response directly with {
-
-{
-  "identified": "Song name - Artist (nationality)",
-  "songs": [
-    {"name": "song name", "artist": "artist name", "why": "brief reason in Thai (1 sentence)", "tags": ["tag1", "tag2"]}
-  ]
-}
-
-Provide exactly 6 songs. Write "why" and "tags" in Thai language.`;
+  return 'You are a music expert. The user likes this song: "' + query + '"\n\n' +
+    'Analyze the genre, mood, era, rhythm, and style. If it is a Thai artist, prioritize recommending Thai songs first.\n\n' +
+    'Respond ONLY with a valid JSON object. No markdown. No code blocks. Start directly with {\n\n' +
+    '{"identified":"Song - Artist (nationality)","songs":[{"name":"song","artist":"artist","why":"reason in Thai","tags":["tag1","tag2"]}]}\n\n' +
+    'Provide exactly 6 songs.';
 }
 
 function buildArtistPrompt(query) {
-  return `You are a music expert. The user wants to find artists similar to: "${query}"
-
-Important: Some artists use English names but are Thai (e.g. blvckheart, NONT TANONT, URBOYTJ, YOUNGOHM). Check carefully using their work, label, and collaborations.
-
-If the artist is Thai, prioritize recommending Thai/Asian artists first.
-
-Respond ONLY with a valid JSON object. No markdown, no code blocks, no explanation. Start your response directly with {
-
-{
-  "identified": "Artist name (nationality)",
-  "bio": "2-3 sentence bio in Thai",
-  "nationality": "nationality in Thai",
-  "artists": [
-    {"name": "artist name", "genre": "genre", "why": "brief reason in Thai (1 sentence)", "tags": ["tag1", "tag2"], "wiki": "English Wikipedia article title using underscores, empty string if unknown", "country": "ISO 3166-1 alpha-2 code e.g. TH US KR JP GB"}
-  ]
-}
-
-Provide exactly 5 artists. Write "bio", "why", "nationality", and "tags" in Thai language.`;
+  return 'You are a music expert. Find artists similar to: "' + query + '"\n\n' +
+    'Note: Some artists use English names but are Thai (e.g. blvckheart, NONT TANONT, URBOYTJ, YOUNGOHM). Check carefully.\n' +
+    'If the artist is Thai, prioritize recommending Thai artists first.\n\n' +
+    'Respond ONLY with a valid JSON object. No markdown. No code blocks. Start directly with {\n\n' +
+    '{"identified":"Artist (nationality)","bio":"bio in Thai","nationality":"nationality in Thai","artists":[{"name":"artist","genre":"genre","why":"reason in Thai","tags":["tag1","tag2"],"wiki":"Wikipedia_title_or_empty","country":"ISO2 e.g. TH US KR"}]}\n\n' +
+    'Provide exactly 5 artists.';
 }

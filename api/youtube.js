@@ -2,7 +2,7 @@
 // official mv > official audio > official lyrics video > lyrics video
 // กรอง Shorts และคลิปแสดงสดออก โดยไม่ต้องใช้ YouTube API key
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const query = (req.query?.q || '').toString().trim();
   if (!query) {
     return res.status(400).json({ error: 'missing query' });
