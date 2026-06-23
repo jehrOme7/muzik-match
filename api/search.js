@@ -14,33 +14,56 @@ module.exports = async function handler(req, res) {
 
   var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  try {
-    var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://muzik-match.vercel.app',
-        'X-Title': 'Muzik Match'
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-3.3-70b-instruct:free',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.8,
-        max_tokens: 2000
-      })
-    });
+  // free models ที่ใช้ได้บน OpenRouter (ไล่ตามคุณภาพ)
+  var freeModels = [
+    'meta-llama/llama-3.3-70b-instruct:free',
+    'meta-llama/llama-3.1-8b-instruct:free',
+    'mistralai/mistral-7b-instruct:free',
+    'google/gemma-3-27b-it:free',
+    'google/gemma-3-12b-it:free'
+  ];
 
-    if (!response.ok) {
-      var errData = await response.json().catch(function(){ return {}; });
-      console.error('OpenRouter error:', response.status, JSON.stringify(errData));
+  var response, errData;
+  for (var mi = 0; mi < freeModels.length; mi++) {
+    try {
+      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + apiKey,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://muzik-match.vercel.app',
+          'X-Title': 'Muzik Match'
+        },
+        body: JSON.stringify({
+          model: freeModels[mi],
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.8,
+          max_tokens: 2000
+        })
+      });
 
-      // ถ้า free model หมด quota ลอง fallback model
       if (response.status === 429 || response.status === 402) {
-        return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
+        console.log('Model', freeModels[mi], 'rate limited, trying next...');
+        continue; // ลอง model ถัดไป
       }
-      return res.status(500).json({ error: 'เกิดข้อผิดพลาด: ' + response.status });
+
+      if (!response.ok) {
+        errData = await response.json().catch(function(){ return {}; });
+        console.error('OpenRouter error:', response.status, JSON.stringify(errData));
+        continue;
+      }
+      break; // สำเร็จ หยุดลอง
+    } catch (fetchErr) {
+      console.error('Fetch error:', fetchErr.message);
+      continue;
     }
+  }
+
+  if (!response || !response.ok) {
+    return res.status(429).json({ error: 'ระบบมีผู้ใช้งานสูงในขณะนี้ กรุณาลองใหม่อีกครั้งในสักครู่' });
+  }
+
+  try {
 
     var data = await response.json();
     var text = ((data.choices &&
@@ -64,7 +87,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(parsed);
 
   } catch (err) {
-    console.error('Error:', err.message);
+    console.error('Parse error:', err.message);
     return res.status(500).json({ error: 'เกิดข้อผิดพลาด กรุณาลองใหม่' });
   }
 };
