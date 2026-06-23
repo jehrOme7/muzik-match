@@ -21,8 +21,7 @@ module.exports = async function handler(req, res) {
 
   for (var ki = 0; ki < keys.length; ki++) {
     var key = keys[ki];
-    for (var attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) await sleep(attempt * 1500);
+    for (var attempt = 0; attempt < 1; attempt++) {
       try {
         var geminiRes = await fetch(
           'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key,
