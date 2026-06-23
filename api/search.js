@@ -8,6 +8,73 @@ module.exports = async function handler(req, res) {
 
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
 
+  // 1. ทำความสะอาด API Key
+  let apiKey = (process.env.GEMINI_API_KEY || '').replace(/[\s"']/g, '');
+  if (!apiKey) return res.status(500).json({ error: 'ไม่พบ API Key' });
+
+  var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
+
+  try {
+    // 2. ใช้ gemini-2.0-flash ตามที่คุณตั้งค่าไว้แต่แรก
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
+
+    var geminiRes = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8 }
+      })
+    });
+
+    if (!geminiRes.ok) {
+      const err = await geminiRes.text();
+      return res.status(400).json({ error: 'Google Error: ' + err });
+    }
+
+    var data = await geminiRes.json();
+    var text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // 3. ทำความสะอาด JSON (วิธีปลอดภัยที่สุด)
+    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    var start = text.indexOf('{');
+    var end   = text.lastIndexOf('}');
+    if (start === -1 || end === -1) {
+      return res.status(500).json({ error: 'AI ตอบกลับไม่ใช่ JSON' });
+    }
+    
+    return res.status(200).json(JSON.parse(text.slice(start, end + 1)));
+
+  } catch (err) {
+    return res.status(500).json({ error: 'Error: ' + err.message });
+  }
+};
+
+function buildSongPrompt(query) {
+  return 'You are a music expert. The user likes this song: "' + query + '"\n\n' +
+    'Identify the song, artist, and nationality. If Thai artist, recommend Thai songs first.\n\n' +
+    'Respond ONLY with valid JSON starting with { — no markdown, no explanation:\n\n' +
+    '{"identified":"Song - Artist (nationality)","songs":[{"name":"song","artist":"artist","why":"reason in Thai","tags":["tag1","tag2"]}]}\n\n' +
+    'Provide 6 songs. Write "why" and "tags" in Thai.';
+}
+
+function buildArtistPrompt(query) {
+  return 'You are a music expert. Find artists similar to: "' + query + '"\n\n' +
+    'IMPORTANT: Some artists use English names but are Thai (e.g. blvckheart, NONT TANONT, URBOYTJ, YOUNGOHM, SPRITE). Verify nationality from their work, label, and collaborations.\n' +
+    'If Thai artist, recommend Thai artists first.\n\n' +
+    'Respond ONLY with valid JSON starting with { — no markdown, no explanation:\n\n' +
+    '{"identified":"Artist (nationality)","bio":"2-3 sentences in Thai","nationality":"nationality in Thai","artists":[{"name":"artist","genre":"genre","why":"reason in Thai","tags":["tag1","tag2"],"wiki":"Wikipedia_title_or_empty","country":"ISO2 e.g. TH US KR"}]}\n\n' +
+    'Provide 5 artists. Write "bio", "why", "nationality", "tags" in Thai.';
+}module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const query = ((req.body && req.body.query) || '').toString().trim();
+  const mode  = ((req.body && req.body.mode)  || 'artist').toString();
+
+  if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
+
   // 1. ทำความสะอาด API Key (ลบช่องว่าง, ขึ้นบรรทัดใหม่, เครื่องหมายคำพูด)
   let apiKey = process.env.GEMINI_API_KEY || '';
   apiKey = apiKey.replace(/[\s"']/g, ''); 
