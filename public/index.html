@@ -149,6 +149,37 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   footer { text-align: center; margin-top: 50px; color: var(--text-faint); font-size: 12px; }
+
+  /* ----- มือถือ / จอเล็ก ----- */
+  @media (max-width: 600px) {
+    .wrap { padding: 28px 16px 64px; }
+    .brand h1 { font-size: 25px; }
+    .logo { width: 40px; height: 40px; }
+    .logo svg { width: 22px; height: 22px; }
+    .tagline { font-size: 14px; margin-bottom: 28px; }
+    .search-card { padding: 18px; border-radius: 16px; }
+    /* ช่องค้นหากับปุ่มเรียงลงเป็นแนวตั้ง ปุ่มเต็มความกว้าง */
+    .input-row { flex-direction: column; }
+    #q { font-size: 16px; padding: 14px 15px; }
+    #go { padding: 14px 0; width: 100%; }
+    .chip { padding: 8px 14px; font-size: 13px; }
+    /* การ์ดศิลปิน: รูปเล็กลงนิด */
+    .artist-row { gap: 12px; }
+    .artist-img, .artist-img-fallback { width: 54px; height: 54px; border-radius: 12px; }
+    .artist-img-fallback svg { width: 26px; height: 26px; }
+    .card-item { padding: 16px; }
+    .card-name { font-size: 17px; }
+    .card-head { flex-direction: column; gap: 2px; }
+    .card-meta { white-space: normal; }
+    /* ปุ่มฟังเพลงเต็มความกว้าง แตะง่าย */
+    .listen-row { flex-wrap: wrap; }
+    .listen-btn { flex: 1; justify-content: center; min-width: 130px; padding: 11px 14px; }
+    /* กล่องวิดีโอสูงพอดีจอมือถือ */
+    .yt-player.open { max-height: 320px; }
+    .result-top { flex-wrap: wrap; }
+    .toast { left: 16px; right: 16px; transform: translateY(100px); width: auto; }
+    .toast.show { transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
@@ -307,7 +338,7 @@ function songCard(s, i) {
   const tagHtml = (s.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
   const queryText = `${s.artist} ${s.name}`;
   const spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(queryText);
-  const ytSearch = encodeURIComponent(queryText + ' official');
+  const ytSearch = encodeURIComponent(queryText);
   return `<div class="card-item" style="animation-delay:${i*0.06}s">
     <div class="card-head">
       <span class="card-name">${escapeHtml(s.name)}</span>
@@ -359,11 +390,13 @@ async function toggleYt(btn, searchQuery) {
     if (vid) {
       box.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     } else {
-      box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${searchQuery}" allowfullscreen></iframe>`;
+      const fallbackSearch = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
+      box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fallbackSearch}" allowfullscreen></iframe>`;
     }
     btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
   } catch {
-    box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${searchQuery}" allowfullscreen></iframe>`;
+    const fallbackSearch = encodeURIComponent(decodeURIComponent(searchQuery) + ' official audio');
+    box.innerHTML = `<iframe src="https://www.youtube.com/embed?listType=search&list=${fallbackSearch}" allowfullscreen></iframe>`;
     btn.innerHTML = ytIcon() + ' ซ่อนวิดีโอ';
   }
 }
