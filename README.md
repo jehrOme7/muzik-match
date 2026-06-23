@@ -26,3 +26,4 @@ muzik-match/
 4. กด Deploy
 
 เอา Gemini API key ฟรีได้ที่ https://aistudio.google.com/apikey
+by jehrOme7
