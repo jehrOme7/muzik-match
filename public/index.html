@@ -592,15 +592,15 @@ footer a:hover{color:var(--purple)}
     <div class="mode-toggle">
       <button class="mode-btn active" id="modeArtist" data-mode="artist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
-        MatchArtists
+        ค้นด้วยศิลปิน
       </button>
       <button class="mode-btn" id="modeSong" data-mode="song">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        MatchSongs
+        ค้นด้วยเพลง
       </button>
       <button class="mode-btn" id="modePlaylist" data-mode="playlist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
-        ShufflePlaylist
+        สุ่ม Playlist
       </button>
     </div>
   </div>
@@ -631,7 +631,7 @@ footer a:hover{color:var(--purple)}
           </div>
         </div>
         <div style="display:flex;gap:10px">
-          <a id="plLink" href="#" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#1db954;color:white;border-radius:12px;padding:13px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(29,185,84,0.3)">
+          <a id="plLink" href="#" target="_blank" rel="noopener" onclick="var uri=this.getAttribute('data-uri');if(uri){var f=document.createElement('iframe');f.style.display='none';document.body.appendChild(f);f.src='spotify:search:'+encodeURIComponent(uri.replace('spotify:search:',''));setTimeout(function(){document.body.removeChild(f);},1500);return true;}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#1db954;color:white;border-radius:12px;padding:13px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(29,185,84,0.3)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>
             เปิดใน Spotify
           </a>
@@ -663,17 +663,17 @@ footer a:hover{color:var(--purple)}
     <div class="step">
       <div class="step-num">🔍</div>
       <h3>พิมพ์สิ่งที่ชอบ</h3>
-      <p>พิมพ์ชื่อศิลปินหรือเพลงที่ชอบในช่องค้นหา</p>
+      <p>พิมพ์ชื่อศิลปินหรือเพลงที่ชอบในช่องค้นหา หรือเลือกจากตัวอย่างด้านล่าง</p>
     </div>
     <div class="step">
       <div class="step-num">🤖</div>
       <h3>AI วิเคราะห์</h3>
-      <p>AI จะวิเคราะห์แนวเพลง สไตล์เพลง เพื่อหาเพลงที่ใกล้เคียงที่สุด</p>
+      <p>AI จะวิเคราะห์แนวเพลง สัญชาติ อารมณ์ และสไตล์ เพื่อหาสิ่งที่ใกล้เคียงที่สุด</p>
     </div>
     <div class="step">
       <div class="step-num">🎵</div>
-      <h3>Muzik Match ที่ใช่</h3>
-      <p>Match กับเพลงและศิลปินที่ชอบ พร้อมลิงก์ฟังบน YouTube และ Spotify ทันที</p>
+      <h3>รับ playlist ที่ใช่</h3>
+      <p>ได้รับรายชื่อศิลปินและเพลงที่แนะนำ พร้อมลิงก์ฟังบน YouTube และ Spotify ทันที</p>
     </div>
   </div>
 </section>
@@ -681,7 +681,7 @@ footer a:hover{color:var(--purple)}
 
 
 <footer>
-  Muzik Match · an Muzik-Search-Engine AI ·
+  Muzik Match · ขับเคลื่อนด้วย AI ·
   <a href="#howSection">วิธีใช้งาน</a>
 </footer>
 
@@ -704,35 +704,35 @@ var placeholders = {
 
 // ===== PLAYLIST DATA =====
 var PL_DATA = [
-  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
-  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
-  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
-  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยเพราะๆ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
-  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
-  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิม',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
-  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/indie ไทย/playlists'},
-  {emoji:'💔',name:'เพลงอกหักไทย',desc:'เจ็บปวดแต่เข้าใจ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงอกหักไทย/playlists'},
-  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีท',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
-  {emoji:'🎤',name:'แร็พไทย',desc:'เนื้อหาแรง flow แบบไทยๆ',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/แร็พไทย/playlists'},
-  {emoji:'😢',name:'Sad Songs',desc:'Heartbreak ภาษาสากล',lang:'GL สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
-  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
-  {emoji:'😌',name:'Chill Vibes',desc:'Relax ลืมทุกอย่าง',lang:'GL สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
-  {emoji:'🏃',name:'Workout Hits',desc:'พลังงานพุ่ง BPM สูง',lang:'GL สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
-  {emoji:'🌙',name:'Sleep Playlist',desc:'ก่อนนอน นอนหลับสบาย',lang:'GL สากล',url:'https://open.spotify.com/search/sleep music playlist/playlists'},
-  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'GL สากล',url:'https://open.spotify.com/search/indie pop playlist/playlists'},
-  {emoji:'🎹',name:'Lo-fi Beats',desc:'Study/relax ไม่วอกแวก',lang:'GL สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
-  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ลื่นหู',lang:'GL สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
-  {emoji:'⚡',name:'EDM Bangers',desc:'Drop สะเทือนหัวใจ',lang:'GL สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
-  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'GL สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
-  {emoji:'🎤',name:'Hip Hop Rap',desc:'Best hip hop ทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/hip hop rap playlist/playlists'},
-  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
-  {emoji:'💜',name:'K-Pop Sad',desc:'เพลงเกาหลีเศร้า ฟีลดีป',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
-  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ระเบิด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
-  {emoji:'🌸',name:'Korean Indie',desc:'K-Indie เบาๆ ฟีลดี',lang:'KR K-Pop',url:'https://open.spotify.com/search/korean indie playlist/playlists'},
-  {emoji:'🐉',name:'Chinese Pop C-Pop',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
-  {emoji:'💔',name:'Chinese Sad Songs',desc:'เพลงจีนเศร้า เพราะมาก',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese sad songs playlist/playlists'},
-  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ',lang:'LA ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
-  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ฟีลไม่หยุด',lang:'LA ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
+  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists',uri:'spotify:search:เพลงไทยเศร้า'},
+  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists',uri:'spotify:search:เพลงรักไทย'},
+  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists',uri:'spotify:search:เพลงไทยฮิต'},
+  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยเพราะๆ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists',uri:'spotify:search:สตริงไทย alternative'},
+  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists',uri:'spotify:search:เพลงไทย chill'},
+  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิม',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists',uri:'spotify:search:ลูกทุ่ง'},
+  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/indie ไทย/playlists',uri:'spotify:search:indie ไทย'},
+  {emoji:'💔',name:'เพลงอกหักไทย',desc:'เจ็บปวดแต่เข้าใจ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงอกหักไทย/playlists',uri:'spotify:search:เพลงอกหักไทย'},
+  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีท',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists',uri:'spotify:search:hip hop ไทย'},
+  {emoji:'🎤',name:'แร็พไทย',desc:'เนื้อหาแรง flow แบบไทยๆ',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/แร็พไทย/playlists',uri:'spotify:search:แร็พไทย'},
+  {emoji:'😢',name:'Sad Songs',desc:'Heartbreak ภาษาสากล',lang:'GL สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists',uri:'spotify:search:sad songs playlist'},
+  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists',uri:'spotify:search:pop hits 2024'},
+  {emoji:'😌',name:'Chill Vibes',desc:'Relax ลืมทุกอย่าง',lang:'GL สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists',uri:'spotify:search:chill vibes playlist'},
+  {emoji:'🏃',name:'Workout Hits',desc:'พลังงานพุ่ง BPM สูง',lang:'GL สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists',uri:'spotify:search:workout hits playlist'},
+  {emoji:'🌙',name:'Sleep Playlist',desc:'ก่อนนอน นอนหลับสบาย',lang:'GL สากล',url:'https://open.spotify.com/search/sleep music playlist/playlists',uri:'spotify:search:sleep music playlist'},
+  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'GL สากล',url:'https://open.spotify.com/search/indie pop playlist/playlists',uri:'spotify:search:indie pop playlist'},
+  {emoji:'🎹',name:'Lo-fi Beats',desc:'Study/relax ไม่วอกแวก',lang:'GL สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists',uri:'spotify:search:lofi hip hop beats'},
+  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ลื่นหู',lang:'GL สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists',uri:'spotify:search:rnb soul playlist'},
+  {emoji:'⚡',name:'EDM Bangers',desc:'Drop สะเทือนหัวใจ',lang:'GL สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists',uri:'spotify:search:edm bangers playlist'},
+  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'GL สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists',uri:'spotify:search:rock classics playlist'},
+  {emoji:'🎤',name:'Hip Hop Rap',desc:'Best hip hop ทั่วโลก',lang:'GL สากล',url:'https://open.spotify.com/search/hip hop rap playlist/playlists',uri:'spotify:search:hip hop rap playlist'},
+  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists',uri:'spotify:search:kpop hits playlist'},
+  {emoji:'💜',name:'K-Pop Sad',desc:'เพลงเกาหลีเศร้า ฟีลดีป',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists',uri:'spotify:search:kpop sad songs'},
+  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ระเบิด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists',uri:'spotify:search:kpop dance playlist'},
+  {emoji:'🌸',name:'Korean Indie',desc:'K-Indie เบาๆ ฟีลดี',lang:'KR K-Pop',url:'https://open.spotify.com/search/korean indie playlist/playlists',uri:'spotify:search:korean indie playlist'},
+  {emoji:'🐉',name:'Chinese Pop C-Pop',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists',uri:'spotify:search:chinese pop cpop playlist'},
+  {emoji:'💔',name:'Chinese Sad Songs',desc:'เพลงจีนเศร้า เพราะมาก',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese sad songs playlist/playlists',uri:'spotify:search:chinese sad songs playlist'},
+  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ',lang:'LA ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists',uri:'spotify:search:latin pop hits playlist'},
+  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ฟีลไม่หยุด',lang:'LA ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists',uri:'spotify:search:reggaeton playlist'},
 ];
 
 // ===== PLAYLIST SHUFFLE =====
@@ -761,6 +761,7 @@ function doPlShuffle() {
     document.getElementById('plCat').textContent = langMap[pl.lang] || pl.lang;
     document.getElementById('plName').textContent = pl.name;
     document.getElementById('plDesc').textContent = pl.desc;
+    document.getElementById('plLink').setAttribute('data-uri', pl.uri || '');
     document.getElementById('plLink').href = pl.url;
     var w = document.getElementById('plResultWrap');
     w.style.display = 'block';
@@ -989,6 +990,21 @@ function countryFlag(code) {
 function ytIco() { return '<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M23 12s0-3.9-.5-5.8c-.3-1-1.1-1.8-2.1-2.1C18.5 3.5 12 3.5 12 3.5s-6.5 0-8.4.6c-1 .3-1.8 1.1-2.1 2.1C1 8.1 1 12 1 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 8.4.6 8.4.6s6.5 0 8.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg>'; }
 function spIco() { return '<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>'; }
 function esc(s) { return String(s || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+// เปิด Spotify app ก่อน ถ้าไม่ได้ค่อย fallback ไป web
+function openSpotify(keyword) {
+  var uri = 'spotify:search:' + encodeURIComponent(keyword);
+  var web = 'https://open.spotify.com/search/' + encodeURIComponent(keyword) + '/playlists';
+  // ลอง open app ก่อน
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  iframe.src = uri;
+  // fallback ไป web ถ้า app ไม่เปิดใน 1.5 วินาที
+  setTimeout(function() {
+    document.body.removeChild(iframe);
+  }, 1500);
+}
 
 // ===== EVENT LISTENERS (หลัง DOM โหลด) =====
 document.addEventListener('DOMContentLoaded', function() {
