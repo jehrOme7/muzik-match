@@ -1,7 +1,16 @@
-# Muzik Match 🎵
+# Muzik Match — Security Checked Build
 
-Muzik Personality Matching เพลงที่ใช่ เริ่มจากความรู้สึกของคุณ ระบบสุ่ม Playlist เพลงที่ใช่ผ่านตัวตนของคุณ วิเคราะห์ และ เลือก Playlist ศิลปินที่ใกล้เคียงกับ Personality ของคุณ ด้วย AI (Gemini)
+Files in this package:
 
-แค่ตอบ 5 คำถาม เราจะวิเคราะห์บุคลิกภาพดนตรีของคุณ แล้วจับคู่ศิลปินและ playlist ที่ match ที่สุดให้ทันที — ไม่ต้องเสียเวลาหาเอง ✨
+- `public/index.html` — frontend with safer Wikipedia image rendering.
+- `api/search.js` — Gemini proxy with method/content-type validation, input cleanup, response normalization, basic rate limit, no-store cache.
+- `api/youtube.js` — YouTube lookup endpoint with method/query validation and basic rate limit.
+- `vercel.json` — security headers including CSP, HSTS, Referrer-Policy, Permissions-Policy, frame protection, and nosniff.
 
-Created by jehrOme7
+Optional environment variable:
+
+```txt
+ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
+```
+
+If `ALLOWED_ORIGINS` is empty, the API does not emit permissive CORS and stays same-origin friendly.
