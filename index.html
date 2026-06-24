@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Muzik Match — หาเพลงที่ใช่สำหรับคุณ</title>
+<meta name="description" content="ตอบ 5 คำถาม แล้วรับ playlist ที่ match อารมณ์ของคุณที่สุด"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0a1a;--card:#1a1730;--card2:#211e3a;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#f0eeff;--text2:rgba(240,238,255,0.6);--text3:rgba(240,238,255,0.35);
+  --purple:#a78bfa;--purple2:#7c3aed;--pink:#f472b6;--orange:#fb923c;
+  --green:#1db954;--green2:#17a348;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:float 12s ease-in-out infinite}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.18),transparent 70%);top:-200px;left:-100px}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(244,114,182,0.13),transparent 70%);top:-100px;right:-150px;animation-delay:-4s}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,rgba(251,146,60,0.09),transparent 70%);bottom:20%;left:60%;animation-delay:-8s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-50px) scale(1.05)}66%{transform:translate(-20px,20px) scale(0.95)}}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(13,10,26,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--purple2),var(--pink));display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(124,58,237,0.4)}
+.nav-icon svg{width:20px;height:20px}
+.nav-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.03em}
+.nav-name span{background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid var(--border2);background:rgba(255,255,255,0.04);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.nav-tab:hover{border-color:rgba(167,139,250,0.3);color:var(--text)}
+.nav-tab.active{background:linear-gradient(135deg,rgba(124,58,237,0.35),rgba(244,114,182,0.25));color:var(--text);border-color:rgba(167,139,250,0.4);box-shadow:0 0 16px rgba(124,58,237,0.2)}
+
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ===== LANDING ===== */
+.landing{max-width:720px;margin:0 auto;padding:80px 24px 60px;text-align:center}
+.landing-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);border-radius:20px;padding:6px 16px;margin-bottom:28px}
+.landing h1{font-size:clamp(34px,6vw,60px);font-weight:900;line-height:1.1;letter-spacing:-0.04em;margin-bottom:16px}
+.landing h1 .g{background:linear-gradient(90deg,var(--purple),var(--pink),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.landing-desc{font-size:17px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.9;margin-bottom:48px;max-width:520px;margin-left:auto;margin-right:auto}
+
+/* Mode Cards */
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:560px;margin:0 auto 60px}
+.mode-card{background:var(--card);border:2px solid var(--border);border-radius:22px;padding:32px 24px;cursor:pointer;transition:all 0.2s;text-align:center;text-decoration:none;display:block}
+.mode-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.3)}
+.mode-card.quiz:hover{border-color:rgba(167,139,250,0.5);box-shadow:0 12px 32px rgba(124,58,237,0.2)}
+.mode-card.shuffle:hover{border-color:rgba(29,185,84,0.5);box-shadow:0 12px 32px rgba(29,185,84,0.2)}
+.mode-card-icon{width:60px;height:60px;border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.mode-card.quiz .mode-card-icon{background:linear-gradient(135deg,rgba(124,58,237,0.25),rgba(244,114,182,0.15));border:1px solid rgba(167,139,250,0.25)}
+.mode-card.shuffle .mode-card-icon{background:linear-gradient(135deg,rgba(29,185,84,0.2),rgba(99,102,241,0.15));border:1px solid rgba(29,185,84,0.25)}
+.mode-card-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em}
+.mode-card-sub{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.6}
+.mode-card-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:12px}
+.mode-card.quiz .mode-card-badge{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.2)}
+.mode-card.shuffle .mode-card-badge{background:rgba(29,185,84,0.1);color:var(--green);border:1px solid rgba(29,185,84,0.2)}
+
+/* How it works */
+.how-section{max-width:720px;margin:0 auto;padding:0 24px 80px}
+.how-label{text-align:center;font-size:12px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.how-title{text-align:center;font-size:clamp(20px,3vw,28px);font-weight:800;color:var(--text);margin-bottom:36px;letter-spacing:-0.02em}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.how-step{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px 20px;text-align:center}
+.how-step-num{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(244,114,182,0.12));border:1px solid rgba(167,139,250,0.2)}
+.how-step h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
+.how-step p{font-size:12px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.7}
+
+/* ===== QUIZ PAGE ===== */
+.quiz-wrap{max-width:640px;margin:0 auto;padding:60px 24px 80px}
+
+/* lang select */
+.lang-screen{text-align:center;padding:10px 0 40px}
+.lang-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);border-radius:20px;padding:6px 16px;margin-bottom:24px}
+.lang-screen h2{font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-0.03em;margin-bottom:8px}
+.lang-screen p{font-size:14px;color:var(--text2);margin-bottom:32px;font-family:'Noto Sans Thai',sans-serif}
+.lang-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lang-card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:24px 16px;cursor:pointer;transition:all 0.18s;text-align:center}
+.lang-card:hover{border-color:rgba(167,139,250,0.35);background:var(--card2);transform:translateY(-2px)}
+.lang-card.selected{border-color:var(--purple);background:rgba(124,58,237,0.1);box-shadow:0 0 0 3px rgba(124,58,237,0.12)}
+.lang-emoji{font-size:36px;margin-bottom:10px;display:block}
+.lang-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px}
+.lang-sub{font-size:12px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif}
+.lang-start-btn{width:100%;margin-top:16px;padding:15px;background:linear-gradient(135deg,var(--purple2),#9333ea);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 20px rgba(124,58,237,0.35);display:none}
+.lang-start-btn.show{display:block}
+.lang-start-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,58,237,0.45)}
+
+/* questions */
+.quiz-screen{display:none}
+.quiz-screen.active{display:block}
+.quiz-progress{margin-bottom:32px}
+.quiz-progress-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:4px;margin-bottom:10px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple2),var(--pink));border-radius:4px;transition:width 0.4s ease}
+.quiz-progress-text{font-size:12px;font-weight:600;color:var(--text3);text-align:right}
+.quiz-q-label{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.quiz-q-text{font-size:clamp(20px,3.5vw,28px);font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:28px;line-height:1.3;font-family:'Noto Sans Thai',sans-serif}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quiz-opt{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:18px 16px;cursor:pointer;transition:all 0.18s;text-align:left;font-family:inherit}
+.quiz-opt:hover{border-color:rgba(167,139,250,0.35);background:var(--card2);transform:translateY(-2px)}
+.quiz-opt.selected{border-color:var(--purple);background:rgba(124,58,237,0.12);box-shadow:0 0 0 3px rgba(124,58,237,0.1)}
+.quiz-opt-emoji{font-size:24px;margin-bottom:8px;display:block}
+.quiz-opt-text{font-size:14px;font-weight:700;color:var(--text);font-family:'Noto Sans Thai',sans-serif;line-height:1.4}
+.quiz-opt-sub{font-size:12px;color:var(--text2);margin-top:4px;font-family:'Noto Sans Thai',sans-serif}
+.quiz-next-btn{width:100%;margin-top:20px;padding:15px;background:linear-gradient(135deg,var(--purple2),#9333ea);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;display:none;box-shadow:0 4px 18px rgba(124,58,237,0.35)}
+.quiz-next-btn.show{display:block}
+.quiz-next-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,58,237,0.45)}
+
+/* loading */
+.loading-screen{display:none;text-align:center;padding:60px 0}
+
+
+/* ===== ENTRANCE GIMMICK — soft cinematic fade-in ===== */
+@keyframes softReveal{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(8px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes navReveal{from{opacity:0;transform:translateY(-14px);filter:blur(8px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes textShine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes cardFloatIn{from{opacity:0;transform:translateY(26px) scale(.96);filter:blur(10px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+body.booting nav{opacity:0}
+body.ready nav{animation:navReveal .75s cubic-bezier(.16,1,.3,1) both}
+body.ready .landing-eyebrow{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .12s both}
+body.ready .landing h1{animation:softReveal .9s cubic-bezier(.16,1,.3,1) .24s both}
+body.ready .landing h1 .g{background-size:200% auto;animation:textShine 5.5s ease-in-out infinite alternate}
+body.ready .landing-desc{animation:softReveal .9s cubic-bezier(.16,1,.3,1) .38s both}
+body.ready .mode-card{animation:cardFloatIn .8s cubic-bezier(.16,1,.3,1) both}
+body.ready .mode-card:nth-child(1){animation-delay:.55s}
+body.ready .mode-card:nth-child(2){animation-delay:.68s}
+body.ready .how-label{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .86s both}
+body.ready .how-title{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .98s both}
+body.ready .how-step{animation:cardFloatIn .75s cubic-bezier(.16,1,.3,1) both}
+body.ready .how-step:nth-child(1){animation-delay:1.12s}
+body.ready .how-step:nth-child(2){animation-delay:1.24s}
+body.ready .how-step:nth-child(3){animation-delay:1.36s}
+.page.active.reveal-page .lang-screen,.page.active.reveal-page .pl-wrap,.page.active.reveal-page .quiz-wrap{animation:softReveal .65s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ===== BLACKHOLE LOADING — result processing gimmick ===== */
+.loading-screen.active{display:block;position:relative;overflow:hidden;padding:46px 0 54px;border-radius:28px}
+.loading-screen.active::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,rgba(124,58,237,.22),transparent 28%),radial-gradient(circle at 50% 50%,rgba(244,114,182,.11),transparent 42%);pointer-events:none;animation:bhBgPulse 2.4s ease-in-out infinite}
+.blackhole-loader{position:relative;width:min(420px,88vw);height:300px;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.bh-glow{position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.34) 0%,rgba(124,58,237,.18) 34%,transparent 68%);filter:blur(16px);animation:bhGlow 1.9s ease-in-out infinite alternate}
+.bh-core{position:absolute;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 48% 43%,#05040d 0 38%,#090617 46%,#000 70%);box-shadow:0 0 0 10px rgba(13,10,26,.7),0 0 46px rgba(124,58,237,.7),inset 0 0 28px rgba(0,0,0,.95);z-index:4;animation:bhBreath 1.45s ease-in-out infinite}
+.bh-core::after{content:'';position:absolute;inset:-18px;border-radius:50%;border:1px solid rgba(244,114,182,.42);filter:blur(.4px);animation:bhSpin 1.2s linear infinite}
+.bh-ring{position:absolute;border-radius:50%;border:1px solid transparent;background:conic-gradient(from 0deg,transparent,rgba(167,139,250,.78),rgba(244,114,182,.68),rgba(29,185,84,.35),transparent);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));filter:drop-shadow(0 0 14px rgba(167,139,250,.55));z-index:3}
+.bh-ring.r1{width:236px;height:92px;transform:rotate(-14deg);animation:bhSpin 1.8s linear infinite}
+.bh-ring.r2{width:276px;height:118px;transform:rotate(18deg);animation:bhSpinReverse 2.35s linear infinite}
+.bh-ring.r3{width:310px;height:142px;opacity:.5;transform:rotate(-33deg);animation:bhSpin 3s linear infinite}
+.bh-chip{position:absolute;z-index:5;padding:7px 12px;border-radius:999px;background:rgba(26,23,48,.86);border:1px solid rgba(255,255,255,.13);color:rgba(240,238,255,.78);font-size:12px;font-weight:700;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.25),0 0 18px rgba(124,58,237,.14);animation:bhSuck 3.4s cubic-bezier(.52,.02,.22,1) infinite both;white-space:nowrap}
+.bh-chip.c1{top:24px;left:24px;animation-delay:0s}.bh-chip.c2{top:42px;right:20px;animation-delay:.25s}.bh-chip.c3{left:4px;bottom:78px;animation-delay:.5s}.bh-chip.c4{right:0;bottom:92px;animation-delay:.75s}.bh-chip.c5{top:138px;left:30px;animation-delay:1s}.bh-chip.c6{right:54px;bottom:34px;animation-delay:1.25s}.bh-chip.c7{top:10px;left:43%;animation-delay:1.5s}.bh-chip.c8{bottom:10px;left:38%;animation-delay:1.75s}
+.loading-title{position:relative;z-index:2;font-size:22px;font-weight:900;color:var(--text);margin-bottom:9px;letter-spacing:-0.02em;background:linear-gradient(90deg,var(--purple),var(--pink),var(--green),var(--purple));background-size:220% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:textShine 3.8s ease-in-out infinite}
+.loading-sub{position:relative;z-index:2;font-size:14px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;min-height:26px;transition:opacity .25s ease}
+.loading-progress{position:relative;z-index:2;max-width:360px;height:6px;margin:20px auto 0;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.loading-progress span{display:block;height:100%;width:40%;border-radius:999px;background:linear-gradient(90deg,var(--purple2),var(--pink),var(--green));animation:bhProgress 1.35s ease-in-out infinite}
+@keyframes bhSpin{to{rotate:360deg}}@keyframes bhSpinReverse{to{rotate:-360deg}}@keyframes bhGlow{from{transform:scale(.92);opacity:.65}to{transform:scale(1.08);opacity:1}}@keyframes bhBreath{0%,100%{transform:scale(.94)}50%{transform:scale(1.06)}}@keyframes bhBgPulse{0%,100%{opacity:.62}50%{opacity:1}}@keyframes bhProgress{0%{transform:translateX(-110%);width:36%}55%{width:58%}100%{transform:translateX(290%);width:36%}}@keyframes bhSuck{0%{opacity:0;transform:translate(0,0) scale(.72);filter:blur(5px)}16%{opacity:1;filter:blur(0)}62%{opacity:1;transform:translate(calc((50vw - 50%) * .02),0) scale(1)}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.18);filter:blur(6px)}}
+.bh-chip.c1{--tx:155px;--ty:112px}.bh-chip.c2{--tx:-145px;--ty:96px}.bh-chip.c3{--tx:168px;--ty:-42px}.bh-chip.c4{--tx:-160px;--ty:-46px}.bh-chip.c5{--tx:118px;--ty:10px}.bh-chip.c6{--tx:-74px;--ty:-98px}.bh-chip.c7{--tx:0;--ty:124px}.bh-chip.c8{--tx:18px;--ty:-122px}
+@media(max-width:600px){.blackhole-loader{height:260px}.bh-chip{font-size:11px;padding:6px 10px}.bh-ring.r3{display:none}}
+
+
+/* result */
+.result-screen{display:none}
+.result-screen.active{display:block}
+.persona-card{background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(244,114,182,0.08));border:1px solid rgba(167,139,250,0.2);border-radius:24px;padding:32px 28px;margin-bottom:24px;text-align:center;position:relative;overflow:hidden;animation:fadeUp 0.5s ease}
+.persona-card::before{content:'';position:absolute;top:-40%;right:-20%;width:220px;height:220px;background:radial-gradient(circle,rgba(167,139,250,0.12),transparent 70%);border-radius:50%}
+.persona-emoji-wrap{font-size:64px;margin-bottom:16px;display:block;animation:bouncy 2.5s ease-in-out infinite;line-height:1}
+@keyframes bouncy{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-8px) rotate(-3deg)}75%{transform:translateY(-4px) rotate(3deg)}}
+.persona-type{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px}
+.persona-name{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-0.03em;margin-bottom:12px}
+.persona-desc{font-size:14px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.9;margin-bottom:16px;position:relative;z-index:1}
+.persona-quote{font-size:14px;color:var(--purple);background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.15);border-radius:12px;padding:14px 18px;font-family:'Noto Sans Thai',sans-serif;line-height:1.8;position:relative;z-index:1}
+
+.match-section-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.match-section-label::before,.match-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.top-card{background:var(--card);border:2px solid rgba(29,185,84,0.3);border-radius:22px;padding:24px;margin-bottom:24px;animation:fadeUp 0.5s ease 0.1s both;position:relative;overflow:hidden}
+.top-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(29,185,84,0.05),transparent);pointer-events:none}
+.match-pct-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.match-pct-num{font-size:38px;font-weight:900;color:var(--green);letter-spacing:-0.04em;line-height:1}
+.match-pct-info{flex:1}
+.match-pct-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.match-pct-bar{height:5px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+.match-pct-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:6px;transition:width 1s ease;width:0%}
+.artist-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.artist-img{width:76px;height:76px;border-radius:18px;flex-shrink:0;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(244,114,182,0.2));border:2px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:30px}
+.artist-img img{width:100%;height:100%;object-fit:cover}
+.artist-info{flex:1;min-width:0}
+.artist-name{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-0.03em;margin-bottom:6px}
+.artist-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.atag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2)}
+.atag.nat{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.2);color:var(--purple)}
+.artist-bio{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.8;margin-bottom:16px}
+.btn-spotify{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:white;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 16px rgba(29,185,84,0.3);width:100%}
+.btn-spotify:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(29,185,84,0.4)}
+
+.other-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:center;animation:fadeUp 0.4s ease both;transition:all 0.2s;cursor:pointer;text-decoration:none}
+.other-card:hover{border-color:rgba(167,139,250,0.2);background:var(--card2);transform:translateY(-2px)}
+.other-pct{font-size:20px;font-weight:900;color:var(--purple);letter-spacing:-0.03em;min-width:50px}
+.other-info{flex:1;min-width:0}
+.other-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.other-genre{font-size:12px;color:var(--text2)}
+.other-sp{display:flex;align-items:center;gap:5px;background:rgba(29,185,84,0.1);border:1px solid rgba(29,185,84,0.2);color:var(--green);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;text-decoration:none;transition:all 0.15s;white-space:nowrap;flex-shrink:0}
+.other-sp:hover{background:var(--green);color:white}
+
+.retry-btn{width:100%;margin-top:24px;padding:14px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:14px;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.retry-btn:hover{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,0.06)}
+
+/* ===== SHUFFLE PAGE ===== */
+.pl-wrap{max-width:600px;margin:0 auto;padding:60px 24px 80px;text-align:center}
+.pl-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green);background:rgba(29,185,84,0.1);border:1px solid rgba(29,185,84,0.2);border-radius:20px;padding:6px 16px;margin-bottom:24px}
+.pl-wrap h1{font-size:clamp(28px,5vw,46px);font-weight:900;line-height:1.15;letter-spacing:-0.04em;margin-bottom:12px}
+.pl-wrap h1 .g{background:linear-gradient(90deg,var(--green),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pl-wrap p{font-size:15px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;margin-bottom:36px;line-height:1.8}
+.pl-shuffle-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--green),var(--green2));color:white;border:none;border-radius:16px;padding:17px 36px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 6px 24px rgba(29,185,84,0.35);margin-bottom:10px}
+.pl-shuffle-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(29,185,84,0.45)}
+.pl-hint{font-size:12px;color:var(--text3);margin-bottom:36px}
+.pl-result{display:none;text-align:left;animation:fadeUp 0.4s ease}
+.pl-result-card{background:var(--card);border:1px solid rgba(29,185,84,0.25);border-radius:20px;padding:22px}
+.pl-result-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.pl-emoji-box{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(29,185,84,0.2),rgba(124,58,237,0.15));border:1px solid rgba(29,185,84,0.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.pl-result-cat{display:inline-block;font-size:10px;font-weight:700;color:var(--green);background:rgba(29,185,84,0.1);border:1px solid rgba(29,185,84,0.2);border-radius:6px;padding:3px 9px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.pl-result-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:3px}
+.pl-result-desc{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif}
+.pl-result-actions{display:flex;gap:10px}
+.pl-open-sp{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:white;border-radius:12px;padding:13px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.15s}
+.pl-open-sp:hover{background:var(--green2);transform:translateY(-1px)}
+.pl-again{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:12px;padding:13px 16px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.pl-again:hover{color:var(--text);border-color:var(--border)}
+
+footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-top:1px solid var(--border);color:var(--text3);font-size:13px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);color:var(--text);border:1px solid var(--border2);padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+@media(max-width:600px){
+  .how-steps{grid-template-columns:1fr}.mode-cards{grid-template-columns:1fr}
+  .lang-cards,.quiz-options{grid-template-columns:1fr}
+  .landing,.quiz-wrap,.pl-wrap{padding:40px 16px 60px}
+  .artist-row{flex-direction:column;gap:12px}.artist-img{width:64px;height:64px}
+  .pl-result-actions{flex-direction:column}
+}
+</style>
+</head>
+<body class="booting">
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+
+<nav>
+  <a class="nav-brand" href="/" onclick="goHome();return false;"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="nav-name">Muzik<span>Match</span></span></a>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="pageHome">
+  <div class="landing">
+    <div class="landing-eyebrow">✨ Muzik Personality Matching</div>
+    <h1>เพลงที่ใช่<br/><span class="g">เริ่มจากความรู้สึกของคุณ</span></h1>
+    <p class="landing-desc">ทุกคนมีเพลงที่ตรงกับอารมณ์ตัวเอง 🎵<br/>แค่ตอบ 5 คำถาม เราจะวิเคราะห์บุคลิกภาพดนตรีของคุณ แล้วจับคู่ศิลปินและ playlist ที่ match ที่สุดให้ทันที — ไม่ต้องเสียเวลาหาเอง ✨</p>
+    <div class="mode-cards">
+      <div class="mode-card quiz" onclick="switchTab('quiz')">
+        <div class="mode-card-icon">🎯</div>
+        <div class="mode-card-title">MatchQuiz</div>
+        <div class="mode-card-sub">ตอบ 5 คำถามสั้นๆ แล้วรู้ว่าคุณควรฟังเพลงแนวไหน ศิลปินใคร และ playlist อะไร — แม่นกว่าที่คิด 🎶</div>
+        <span class="mode-card-badge">🎵 5 คำถาม · 2 นาที</span>
+      </div>
+      <div class="mode-card shuffle" onclick="switchTab('playlist')">
+        <div class="mode-card-icon">🎲</div>
+        <div class="mode-card-title">ShufflePlaylist</div>
+        <div class="mode-card-sub">ไม่อยากคิดเยอะ? กดปุ่มเดียว รับ playlist สุ่มจาก Spotify ทันที ครอบคลุมทุก mood ทุกภาษา 🌍</div>
+        <span class="mode-card-badge">🎲 สุ่มได้เลย · ฟรี</span>
+      </div>
+    </div>
+  </div>
+  <div class="how-section">
+    <div class="how-label">วิธีใช้งาน</div>
+    <div class="how-title">ง่ายแค่ 3 ขั้นตอน 🙌</div>
+    <div class="how-steps">
+      <div class="how-step"><div class="how-step-num">1️⃣</div><h3>เลือก Mode</h3><p>จะทำ Quiz วิเคราะห์บุคลิก หรือกดสุ่ม Playlist เลยก็ได้ ขึ้นอยู่กับ mood ตอนนั้น 😌</p></div>
+      <div class="how-step"><div class="how-step-num">2️⃣</div><h3>ตอบคำถาม</h3><p>5 คำถามง่ายๆ เกี่ยวกับความรู้สึกและบรรยากาศที่ชอบ ไม่มีผิดไม่มีถูก — แค่ตอบตามใจ 💭</p></div>
+      <div class="how-step"><div class="how-step-num">3️⃣</div><h3>รับ Playlist</h3><p>เจอบุคลิกดนตรีของคุณ พร้อมศิลปินที่ match และลิงก์ Spotify เปิดฟังได้เลยทันที 🎧</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="pageQuiz">
+<div class="quiz-wrap">
+  <div id="langScreen" class="lang-screen">
+    <div class="lang-eyebrow">🎵 MatchQuiz</div>
+    <h2>อยากฟังเพลงแนวไหน?</h2>
+    <p>เลือกก่อนเลย แล้วเราจะ match ศิลปินให้ตรงที่สุด 🎯</p>
+    <div class="lang-cards" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="lang-card" data-lang="thai" onclick="selectLang(this)"><span class="lang-emoji">🇹🇭</span><div class="lang-title">เพลงไทย</div><div class="lang-sub">Pop · Rock · Hip-Hop · Country</div></div>
+      <div class="lang-card" data-lang="intl" onclick="selectLang(this)"><span class="lang-emoji">🌍</span><div class="lang-title">เพลงสากล</div><div class="lang-sub">Pop · Rock · R&B · Hip-Hop · Indie</div></div>
+      <div class="lang-card" data-lang="korean" onclick="selectLang(this)"><span class="lang-emoji">🇰🇷</span><div class="lang-title">เพลงเกาหลี</div><div class="lang-sub">K-Pop · K-HipHop · K-R&B</div></div>
+    </div>
+    <button class="lang-start-btn" id="langStartBtn" onclick="startQuiz()">เริ่ม Quiz เลย! →</button>
+    <button class="back-home-btn" onclick="goHome()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='rgba(167,139,250,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">← กลับหน้าหลัก</button>
+  </div>
+  <div id="quizScreen" class="quiz-screen">
+    <!-- PROGRESS DOTS -->
+    <div class="quiz-dots" id="quizDots" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px"></div>
+    <!-- NAV BUTTONS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <button id="backBtn" onclick="prevQuestion()" style="display:flex;align-items:center;gap:5px;padding:8px 14px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.35)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">← ย้อนกลับ</button>
+      <span class="quiz-progress-text" id="progressText" style="font-size:13px;font-weight:600;color:var(--text3)">1 / 5</span>
+      <button id="skipBtn" onclick="skipQuestion()" style="display:flex;align-items:center;gap:5px;padding:8px 14px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.35)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">ข้ามข้อนี้ →</button>
+    </div>
+    <div class="quiz-q-label" id="qLabel">คำถามที่ 1</div>
+    <div class="quiz-q-text" id="qText"></div>
+    <div class="quiz-options" id="qOptions"></div>
+    <button class="quiz-next-btn" id="nextBtn" onclick="nextQuestion()">ถัดไป →</button>
+  </div>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="blackhole-loader" aria-hidden="true">
+      <div class="bh-glow"></div>
+      <div class="bh-ring r3"></div><div class="bh-ring r2"></div><div class="bh-ring r1"></div>
+      <div class="bh-core"></div>
+      <span class="bh-chip c1">🎭 Personality</span>
+      <span class="bh-chip c2">🎧 แนวเพลง</span>
+      <span class="bh-chip c3">✨ Mood</span>
+      <span class="bh-chip c4">🎤 ศิลปิน</span>
+      <span class="bh-chip c5">📝 คำตอบ</span>
+      <span class="bh-chip c6">🌌 Vibe</span>
+      <span class="bh-chip c7">🇹🇭 TH</span>
+      <span class="bh-chip c8">🎶 Playlist</span>
+    </div>
+    <div class="loading-title" id="loadingTitle">กำลังเปิดจักรวาลเพลงของคุณ... 🌌</div>
+    <div class="loading-sub" id="loadingSub">Blackhole กำลังดูดรวมคำตอบ แนวเพลง ศิลปิน และ personality ✨</div>
+    <div class="loading-progress"><span></span></div>
+  </div>
+  <div id="resultScreen" class="result-screen">
+    <div class="persona-card"><span class="persona-emoji-wrap" id="resEmoji">🎵</span><div class="persona-type" id="resType"></div><div class="persona-name" id="resName"></div><div class="persona-desc" id="resDesc"></div><div class="persona-quote" id="resQuote"></div></div>
+    <div class="match-section-label">🎯 ศิลปินที่ match คุณมากที่สุด</div>
+    <div class="top-card" id="topMatchCard"></div>
+    <div class="match-section-label" style="margin-top:8px">🎶 ศิลปินที่น่าจะชอบด้วย</div>
+    <div id="otherCards"></div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+    <button onclick="goHome()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">🏠 กลับหน้าหลัก</button>
+    <button onclick="resetQuiz()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">↩ ทำ Quiz ใหม่</button>
+  </div>
+  </div>
+</div>
+</div>
+
+<!-- PLAYLIST PAGE -->
+<div class="page" id="pagePlaylist">
+<div class="pl-wrap">
+  <div class="pl-eyebrow">🎲 ShufflePlaylist</div>
+  <h1>วันนี้ไม่รู้จะ<br/><span class="g">ฟังเพลงอะไรดี?</span></h1>
+  <p>กดปุ่มเดียว รับ playlist สุ่มจาก Spotify ทันที 🎵<br/>ครบทุก mood · ทุกภาษา · ฟรี ไม่ต้อง login</p>
+  <button class="pl-shuffle-btn" id="plShuffleBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>สุ่ม Playlist ให้ฉัน! 🎲</button>
+  <p class="pl-hint">กด Spotify แล้วเปิด app ได้เลย 🎧</p>
+  <div class="pl-result" id="plResult">
+    <div class="pl-result-card">
+      <div class="pl-result-top"><div class="pl-emoji-box" id="plEmoji">🎵</div><div><div class="pl-result-cat" id="plCat"></div><div class="pl-result-name" id="plName"></div><div class="pl-result-desc" id="plDesc"></div></div></div>
+      <div class="pl-result-actions">
+        <a class="pl-open-sp" id="plLink" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>เปิดใน Spotify</a>
+        <button class="pl-again" id="plAgainBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>สุ่มใหม่</button>
+      </div>
+      <button onclick="goHome()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:rgba(240,238,255,0.35);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(29,185,84,0.3)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(240,238,255,0.35)'">🏠 กลับหน้าหลัก</button>
+      <div style="display:none">
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>Muzik Match · an Muzik-Search-Engine AI</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ARTIST DATABASE v2.0 — 300 ศิลปิน (100 TH / 100 INTL / 100 KR)
+// วิธีใช้: แทนที่ทุกอย่างระหว่าง <script> ถึง // QUESTIONS
+// ============================================================
+
+// ---- helper เพื่อสร้าง Spotify search URL ----
+function sp(name){ return 'https://open.spotify.com/search/this%20is%20'+encodeURIComponent(name)+'/playlists'; }
+
+// ============================================================
+// ARTISTS_THAI — 100 ศิลปิน (Pop · Rock · HipHop · Country · Luk Thung)
+// ============================================================
+var ARTISTS_THAI = [
+  // --- Pop / Indie Pop / Soul ---
+  {name:"PURPEECH",emoji:"🌙",nat:"🇹🇭 ไทย",genre:"Indie Pop / Soul",bio:"ดาวรุ่งปัง 2025 ⭐ กลัวว่าฉันจะไม่เสียใจ ครองอันดับ 1 Billboard TH ยาวนานที่สุด เสียง Indie Soul ลึกและ emotional จนคนฟังติดหนึบ",tags:["Indie Pop","Soul","Billboard #1"],mood:{dark:3,chill:6,energetic:2,emotional:9,indie:7},sp:sp("purpeech")},
+  {name:"Bodyslam",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Rock / Alternative",bio:"วงร็อคตำนานไทยมากกว่า 20 ปี 🎸 ยังฮิตอยู่ทุกปี ล่าสุดขึ้น Billboard TH กับเพลงความรัก เพลงเต็มพลังงานและ emotion ฟังได้ทุกวัย",tags:["Rock","Alternative","Legend"],mood:{dark:4,chill:3,energetic:7,emotional:8,indie:4},sp:sp("bodyslam")},
+  {name:"PUN",emoji:"💙",nat:"🇹🇭 ไทย",genre:"Pop / Ballad",bio:"Pop Ballad รุ่นใหม่ฮิตสุดๆ ใน Billboard TH 💙 Living Death และ รักให้เธอได้รู้ ติดชาร์ตพร้อมกัน เสียงที่แสดงออก emotion ได้อย่างทรงพลัง",tags:["Pop","Ballad","Rising"],mood:{dark:3,chill:4,energetic:3,emotional:9,indie:4},sp:sp("pun thai singer")},
+  {name:"GAVIN:D",emoji:"🌊",nat:"🇹🇭 ไทย",genre:"Indie Pop / R&B",bio:"ดาวรุ่ง Indie Pop R&B ขึ้น Billboard TH 🌊 เสียง smooth ฟังสบาย เข้าถึงง่าย มีความ chill ที่ใช่มากๆ",tags:["Indie Pop","R&B","Smooth"],mood:{dark:2,chill:8,energetic:3,emotional:7,indie:6},sp:sp("gavin d")},
+  {name:"Maiyarap",emoji:"🌧️",nat:"🇹🇭 ไทย",genre:"Hip-Hop / R&B",bio:"แร็ปเปอร์ขึ้น Billboard TH ด้วย Rain Zone 🌧️ Hip Hop ไทยสไตล์ moody เสียงและ flow ที่มีเอกลักษณ์โดดเด่น atmospheric",tags:["Hip-Hop","Moody","Dark"],mood:{dark:7,chill:3,energetic:5,emotional:5,indie:5},sp:sp("maiyarap")},
+  {name:"BLVCKHEART",emoji:"🖤",nat:"🇹🇭 ไทย",genre:"Pop R&B",bio:"Alternative ไทยขึ้น Billboard TH 🖤 ชื่ออังกฤษแต่รากไทย 100% เสียง Indie R&B ที่ chill และ romantic",tags:["R&B","Indie","Chill"],mood:{dark:2,chill:7,energetic:3,emotional:6,indie:5},sp:sp("blvckheart")},
+  {name:"Three Man Down",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Rock / Alternative",bio:"วง Rock Alternative ฮิตด้วย รักใครไม่ไหว 🎸 เสียงกีต้าร์หนักผสม emotion ลึก เพลงพูดถึงความรักและความเจ็บปวด",tags:["Rock","Emotional","Heartbreak"],mood:{dark:5,chill:3,energetic:6,emotional:8,indie:5},sp:sp("three man down")},
+  {name:"guncharlie",emoji:"💔",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop รุ่นใหม่ขึ้น Billboard TH ด้วย จากกันโดยสมบูรณ์ 💔 เพลงพูดถึงการอำลาและความสูญเสียด้วยเสียงที่นุ่มนวลและซึ้งใจ",tags:["Indie Pop","Heartbreak","Introspective"],mood:{dark:4,chill:5,energetic:2,emotional:9,indie:7},sp:sp("guncharlie")},
+  {name:"BOWKYLION",emoji:"🌸",nat:"🇹🇭 ไทย",genre:"Pop / Indie Soul",bio:"นักร้องหญิงไทยเสียงลึกและ soulful 🌸 ขึ้น Billboard TH เพลงมีความ intimate และ raw ที่ทำให้คนฟัง connect ได้ทันที",tags:["Pop","Soul","Intimate"],mood:{dark:3,chill:7,energetic:2,emotional:8,indie:8},sp:sp("bowkylion")},
+  {name:"Nont Tanont",emoji:"🎹",nat:"🇹🇭 ไทย",genre:"Pop / Soul",bio:"Soul Pop ไทยที่จริงใจที่สุด 🎹 ที่คั่นหนังสือ ขึ้น Billboard TH เสียงหวานที่มี depth ทุกเพลงเหมือนจดหมายส่งตรงถึงใจ",tags:["Pop","Soul","Heartfelt"],mood:{dark:2,chill:7,energetic:2,emotional:8,indie:7},sp:sp("nont tanont")},
+  {name:"Saran",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Pop / Indie",bio:"ขึ้น Billboard TH ด้วย กลัวความเสียใจ 🌿 Pop Indie เบาๆ อ่อนโยน เสียงให้ความรู้สึก safe และอบอุ่นทุกครั้งที่ฟัง",tags:["Pop","Indie","Gentle"],mood:{dark:3,chill:5,energetic:3,emotional:8,indie:5},sp:sp("saran thai singer")},
+  {name:"Bedroom Audio",emoji:"🌙",nat:"🇹🇭 ไทย",genre:"Indie Pop / Dream Pop",bio:"Indie Pop ฝันๆ ที่ขึ้น Billboard TH 🌙 เสียง Dream Pop นุ่มลึก ฟังแล้วเหมือนนอนอยู่ในห้องตอนเที่ยงคืน",tags:["Indie Pop","Dream Pop","Chill"],mood:{dark:3,chill:8,energetic:2,emotional:7,indie:8},sp:sp("bedroom audio")},
+  {name:"Yes'sir Days",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"Indie Pop / Folk",bio:"วง Indie Folk ไทยขึ้น Billboard TH ด้วย ฝากให้เขารัก 🎵 เสียง acoustic อบอุ่น เพลงเกี่ยวกับความรักที่อบอุ่นจริงใจ",tags:["Indie Pop","Folk","Warm"],mood:{dark:2,chill:7,energetic:2,emotional:7,indie:7},sp:sp("yes sir days")},
+  {name:"Phum Viphurit",emoji:"🌴",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie ไทยที่ดังไกลระดับโลก 🌴 Lover Boy ฮิตถึง Coachella เสียง dreamy มีเสน่ห์ ผสม Thai กับ Global Indie ได้อย่างลงตัว",tags:["Indie Pop","Global","Dreamy"],mood:{dark:2,chill:8,energetic:2,emotional:6,indie:9},sp:sp("phum viphurit")},
+  {name:"Yonlapa",emoji:"☁️",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่มีบรรยากาศ dreamy และ chill ☁️ เสียงนุ่ม ฟังสบาย ทุกเพลงให้ความรู้สึกเหมือนลอยอยู่ในอากาศ",tags:["Indie Pop","Dreamy","Chill"],mood:{dark:3,chill:8,energetic:2,emotional:6,indie:8},sp:sp("yonlapa")},
+  {name:"Getsunova",emoji:"🌈",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่สดใสและฟังง่าย 🌈 ทำให้วันธรรมดาดูดีขึ้น เนื้อหาเกี่ยวกับความรักที่ทุกคน relate ได้",tags:["Pop","Indie Pop","Feel-Good"],mood:{dark:2,chill:7,energetic:5,emotional:7,indie:7},sp:sp("getsunova")},
+  {name:"Jetset'er",emoji:"🛫",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยฟีลนุ่ม nostalgic 🛫 เสียงเบาๆ เพลงเกี่ยวกับความรักและการรอคอยที่ฟังแล้วอยากย้อนกลับไปในอดีต",tags:["Indie Pop","Nostalgic","Soft"],mood:{dark:2,chill:7,energetic:2,emotional:7,indie:7},sp:sp("jetset er")},
+  {name:"Polycat",emoji:"😎",nat:"🇹🇭 ไทย",genre:"Funk / Soul / Pop",bio:"Funk Soul ที่ chill ที่สุดในวงการไทย 😎 เปิด Polycat แล้วรับรอง vibe ดีขึ้นทันที groove สบายๆ เหมาะทุกเวลา",tags:["Funk","Soul","Chill"],mood:{dark:1,chill:9,energetic:5,emotional:5,indie:6},sp:sp("polycat")},
+  {name:"Scrubb",emoji:"🌙",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยคลาสสิก 🌙 เพลง chillout ที่ nostalgic ฟังแล้วรู้สึกเหมือนอยู่ในช่วงเวลาที่ดีที่สุดในชีวิต",tags:["Indie Pop","Nostalgic","Classic"],mood:{dark:3,chill:8,energetic:2,emotional:6,indie:8},sp:sp("scrubb")},
+  {name:"Greasy Cafe",emoji:"☕",nat:"🇹🇭 ไทย",genre:"Indie Pop / Chill",bio:"Indie Pop สไตล์ café ที่ chill ที่สุด ☕ ฟังแล้วเหมือนนั่งในร้านกาแฟเงียบๆ วันเสาร์บ่าย เสียงนุ่ม บรรยากาศสบาย",tags:["Indie Pop","Cafe Chill","Relaxing"],mood:{dark:2,chill:9,energetic:2,emotional:5,indie:8},sp:sp("greasy cafe")},
+  {name:"Violette Wautier",emoji:"🔮",nat:"🇹🇭 ไทย",genre:"Pop / Soul",bio:"เสียง Soul Pop ที่ทรงพลังที่สุดในไทย 🔮 ร้องได้ทั้งไทยและอังกฤษอย่างสมบูรณ์แบบ เสียงที่ dramatic และ emotional ในเวลาเดียวกัน",tags:["Pop","Soul","Powerful"],mood:{dark:3,chill:4,energetic:5,emotional:9,indie:5},sp:sp("violette wautier")},
+  {name:"Lipta",emoji:"💙",nat:"🇹🇭 ไทย",genre:"Pop / Indie",bio:"Pop Indie ที่พูดถึงความรักได้ตรงใจที่สุด 💙 หลายเพลงกลายเป็น soundtrack ชีวิตของคน เสียงที่จริงใจและ emotional",tags:["Pop","Indie","Romantic"],mood:{dark:2,chill:5,energetic:3,emotional:8,indie:5},sp:sp("lipta")},
+  {name:"Palmy",emoji:"🌸",nat:"🇹🇭 ไทย",genre:"Pop / Soul",bio:"Soul Pop ที่จริงใจและทรงพลัง 🌸 เพลงของ Palmy ฟังแล้วรู้สึกว่า เฮ้ คนนี้เข้าใจเรา อบอุ่นและ emotional มาก",tags:["Pop","Soul","Warm"],mood:{dark:2,chill:5,energetic:4,emotional:9,indie:3},sp:sp("palmy thai singer")},
+  {name:"Potato",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Pop Rock",bio:"Pop Rock ไทยที่เพลงหลายเพลงกลายเป็น anthem ชีวิต 🎸 เสียงกีต้าร์โดดเด่น เนื้อเพลงพูดถึงความรักที่เจ็บปวดและสวยงาม",tags:["Pop Rock","Classic","Emotional"],mood:{dark:3,chill:4,energetic:5,emotional:8,indie:4},sp:sp("potato band thailand")},
+  {name:"Cocktail",emoji:"🍹",nat:"🇹🇭 ไทย",genre:"Pop Rock",bio:"Pop Rock ไทยที่ emotional และ nostalgic ในเวลาเดียวกัน 🍹 เพลงดีฟังได้ทุกยุค หลายเพลงกลายเป็น classic ที่คนยุค 90s จำได้ทั้งหมด",tags:["Pop Rock","Nostalgic","Classic"],mood:{dark:3,chill:4,energetic:5,emotional:8,indie:4},sp:sp("cocktail band thailand")},
+  {name:"Dontanien",emoji:"🎨",nat:"🇹🇭 ไทย",genre:"Indie / Experimental",bio:"Indie ไทยที่แปลกและน่าสนใจมากที่สุด 🎨 ทำเพลงที่ไม่อยู่ในกรอบ เสียงที่ unique ที่ไม่เหมือนใครในวงการไทย",tags:["Indie","Experimental","Quirky"],mood:{dark:4,chill:5,energetic:3,emotional:5,indie:9},sp:sp("dontanien")},
+  {name:"Sqweez Animal",emoji:"🐾",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่สนุกและ quirky 🐾 เพลงฟังแล้วยิ้มได้โดยไม่รู้ตัว ผสม pop กับ indie ได้ในแบบที่เข้าถึงง่ายและน่ารัก",tags:["Indie Pop","Fun","Quirky"],mood:{dark:2,chill:6,energetic:5,emotional:5,indie:8},sp:sp("sqweez animal")},
+  {name:"Slot Machine",emoji:"⚡",nat:"🇹🇭 ไทย",genre:"Rock / Alternative",bio:"วงร็อคขวัญใจมหาชน ⚡ เสียงกีต้าร์โดดเด่น เนื้อหา deep เต็มไปด้วย emotion หลายเพลงกลายเป็น soundtrack ชีวิตของคนไทย",tags:["Rock","Alternative","Emotional"],mood:{dark:5,chill:3,energetic:7,emotional:8,indie:6},sp:sp("slot machine thailand")},
+  {name:"The Parkinson",emoji:"⚫",nat:"🇹🇭 ไทย",genre:"Alternative Rock",bio:"Alternative Rock ที่มืดและหนักที่สุดในไทย ⚫ เสียงกีต้าร์มืดๆ atmosphere intense ฟังแล้วรู้สึกว่าโลกหยุดนิ่ง",tags:["Alternative","Dark","Intense"],mood:{dark:7,chill:2,energetic:6,emotional:5,indie:7},sp:sp("the parkinson thailand")},
+  {name:"Paradox",emoji:"⚫",nat:"🇹🇭 ไทย",genre:"Rock / Metal",bio:"Heavy Metal ไทยที่มืดและทรงพลัง ⚫ เสียงหนักแต่มี melody ที่โดนใจ เพลงที่พูดถึงความมืดและการต่อสู้ในชีวิต",tags:["Rock","Metal","Dark"],mood:{dark:7,chill:2,energetic:7,emotional:5,indie:6},sp:sp("paradox thailand")},
+  {name:"Silly Fools",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Rock",bio:"Rock ไทยตำนาน ฝุ่นทอง ยังฟังได้ดีจนถึงทุกวันนี้ 🎸 เสียง classic rock ที่ emotional และ powerful เพลงหลายเพลงยังอยู่ในใจคนไทยมาสิบกว่าปี",tags:["Rock","Classic","Legend"],mood:{dark:5,chill:3,energetic:7,emotional:7,indie:4},sp:sp("silly fools")},
+  {name:"Big Ass",emoji:"🤘",nat:"🇹🇭 ไทย",genre:"Rock",bio:"Rock ไทยพลังงานสูงที่ชนะใจคนมาหลายยุค 🤘 เพลงพูดถึงชีวิตจริง ความรัก ความฝัน เสียงกีต้าร์ชัดและ energetic",tags:["Rock","Energetic","Emotional"],mood:{dark:4,chill:3,energetic:7,emotional:7,indie:4},sp:sp("big ass thailand")},
+  {name:"Sek Loso",emoji:"🏆",nat:"🇹🇭 ไทย",genre:"Rock",bio:"ตำนานที่ไม่มีใครแทนได้ 🏆 เสก โลโซ สร้างประวัติศาสตร์เพลงไทย เนื้อเพลงบอกเล่าชีวิตจริง ฟังแล้วรู้สึกว่าไม่ได้อยู่คนเดียว",tags:["Rock","Legend","Raw"],mood:{dark:5,chill:3,energetic:6,emotional:9,indie:4},sp:sp("sek loso")},
+  {name:"Labanoon",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Reggae Rock",bio:"Rock Alternative ไทยที่เพลงหลายเพลงกลายเป็น classic 🎸 ทำนองจดจำง่าย เนื้อหาจริงใจ ฟังได้ทุกยุคโดยไม่เบื่อ",tags:["Rock","Reggae","Classic"],mood:{dark:3,chill:6,energetic:5,emotional:6,indie:5},sp:sp("labanoon")},
+  // --- Hip-Hop ไทย ---
+  {name:"YOUNGOHM",emoji:"🔥",nat:"🇹🇭 ไทย",genre:"Hip-Hop / Trap",bio:"ราชาแห่ง Thai Hip Hop 🔥 ผู้บุกเบิกยุคใหม่ของ Trap ในไทย Flow แบบไทยๆ ที่แข็งแกร่ง เนื้อหาจริงจากชีวิต",tags:["Hip-Hop","Trap","OG"],mood:{dark:8,chill:2,energetic:6,emotional:4,indie:4},sp:sp("youngohm")},
+  {name:"SPRITE",emoji:"🌊",nat:"🇹🇭 ไทย",genre:"Hip-Hop",bio:"Underground Hip Hop ไทยที่มีเอกลักษณ์เฉพาะตัว 🌊 เนื้อหาลึก flow คม ได้รับการยอมรับจากทั้ง mainstream และ underground scene",tags:["Hip-Hop","Underground","Deep"],mood:{dark:6,chill:4,energetic:5,emotional:5,indie:5},sp:sp("sprite thai rapper")},
+  {name:"URBOYTJ",emoji:"🎤",nat:"🇹🇭 ไทย",genre:"Hip-Hop / R&B",bio:"R&B Hip Hop ไทยที่ลื่นไหลที่สุด 🎤 ผสม English กับ Thai ได้อย่างธรรมชาติ เพลง groove และ chill ที่ติดหูง่าย",tags:["Hip-Hop","R&B","Groovy"],mood:{dark:5,chill:4,energetic:6,emotional:4,indie:5},sp:sp("urboytj")},
+  {name:"Taitosmith",emoji:"🎧",nat:"🇹🇭 ไทย",genre:"Hip-Hop",bio:"Hip Hop ไทย underground flow จัดจ้าน เนื้อหาจริง 🎧 ศิลปินแนวหน้าที่ผสาน Thai lifestyle กับ Hip Hop culture ได้อย่างลงตัว",tags:["Hip-Hop","Underground","Flow"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:6},sp:sp("taitosmith")},
+  {name:"Lazyloxy",emoji:"🌙",nat:"🇹🇭 ไทย",genre:"Hip-Hop / R&B",bio:"Hip Hop R&B ไทยที่ chill และ romantic ที่สุด 🌙 flow ลื่น เสียง smooth ฟังแล้วรู้สึกผ่อนคลายทันที",tags:["Hip-Hop","R&B","Chill"],mood:{dark:3,chill:7,energetic:3,emotional:6,indie:6},sp:sp("lazyloxy")},
+  {name:"Twopee",emoji:"🎤",nat:"🇹🇭 ไทย",genre:"Hip-Hop",bio:"Hip Hop ไทยแนว conscious ที่พูดเรื่องสังคมได้ลึกมาก 🎤 flow คม เนื้อหา thoughtful ฟังแล้วคิดได้ไม่หยุด",tags:["Hip-Hop","Conscious","Lyrical"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:5},sp:sp("twopee")},
+  {name:"Joey Boy",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"Hip-Hop",bio:"บิดาแห่ง Thai Hip Hop 🎵 บุกเบิก genre ในไทยตั้งแต่ยุค 90s ยังมีแฟนเพลงข้ามรุ่น เพลงสนุก energetic และ catchy",tags:["Hip-Hop","OG","Fun"],mood:{dark:2,chill:5,energetic:7,emotional:3,indie:4},sp:sp("joey boy thailand")},
+  {name:"Stamp Apichart",emoji:"🎭",nat:"🇹🇭 ไทย",genre:"Pop / R&B / Hip-Hop",bio:"ศิลปินที่ทำได้ทุกแนวมากที่สุดในไทย 🎭 Pop R&B และ Hip Hop ในคนเดียว เสียงดีและ flow แข็งแกร่ง",tags:["Pop","R&B","Versatile"],mood:{dark:3,chill:5,energetic:7,emotional:6,indie:5},sp:sp("stamp apichart")},
+  {name:"Southside",emoji:"🌆",nat:"🇹🇭 ไทย",genre:"R&B / Hip-Hop",bio:"R&B Hip Hop ไทยสายเมืองที่ smooth และ urban ที่สุด 🌆 เสียงที่ trendy และ cool เพลงฟังได้ทุก mood ทุกเวลา",tags:["R&B","Hip-Hop","Urban"],mood:{dark:4,chill:5,energetic:5,emotional:5,indie:5},sp:sp("southside thailand")},
+  {name:"MILLI",emoji:"🌶️",nat:"🇹🇭 ไทย",genre:"Hip-Hop / Pop Rap",bio:"ขึ้นเวที Coachella ด้วยเพลงไทย 🌶️ แร็ปเปอร์ไทยที่ทำให้โลกหันมามอง flow คม อัตลักษณ์ไทยชัดเจน",tags:["Hip-Hop","Global","Bold"],mood:{dark:5,chill:3,energetic:8,emotional:5,indie:7},sp:sp("milli thai rapper")},
+  // --- Country / Luk Thung ---
+  {name:"ก้อง ห้วยไร่",emoji:"🌾",nat:"🇹🇭 ไทย",genre:"Country / Luk Thung",bio:"อันดับ 1 Billboard TH Country ยาวที่สุด 🌾 เสียง Country ไทยแท้ที่ผสมความ modern เพลงพูดถึงความรักและบ้านเกิดที่ฟังแล้วจุกอก",tags:["Country","Luk Thung","Authentic"],mood:{dark:3,chill:5,energetic:4,emotional:7,indie:4},sp:sp("kong huairai")},
+  {name:"โชเล่ย์ ชคัทพล",emoji:"💔",nat:"🇹🇭 ไทย",genre:"Country / Ballad",bio:"Country ไทยที่ emotional และเศร้าที่สุด 💔 หลายเพลงของโชเล่ย์ทำให้คนร้องไห้ตามโดยไม่รู้ตัว เสียงที่แสดงออกความเจ็บปวดได้อย่างลึกซึ้ง",tags:["Country","Emotional","Sad"],mood:{dark:4,chill:4,energetic:3,emotional:9,indie:3},sp:sp("cholay chakhatphol")},
+  {name:"ก้านตอง ทุ่งเงิน",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"Luk Thung ที่คลาสสิกและ timeless 🌿 เสียงหวานที่เป็นเอกลักษณ์ไทยแท้ เพลงพูดถึงชีวิตชนบทและความรักแบบดั้งเดิม",tags:["Luk Thung","Traditional","Classic"],mood:{dark:3,chill:5,energetic:4,emotional:7,indie:3},sp:sp("kantong thungngoen")},
+  {name:"ธีร์ ทีเร็กซ์",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทย modern สไตล์ ธีร์ ทีเร็กซ์ 🎸 ผสม Country กับ Rock เบาๆ เพลงสนุก energetic ฟังแล้วอยากร้องตาม",tags:["Country","Modern","Fun"],mood:{dark:2,chill:5,energetic:5,emotional:6,indie:4},sp:sp("thee trex")},
+  {name:"อูโน่ หลาวทอง",emoji:"🎉",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยสนุกสนาน ย้าย่ายะ ฮิตสุดๆ 🎉 เพลง dance-friendly เสียง fun ที่ทำให้คนฟังมีความสุข อยากขยับตามทุกครั้ง",tags:["Country","Fun","Dance"],mood:{dark:1,chill:4,energetic:8,emotional:4,indie:3},sp:sp("uno laothong")},
+  {name:"กล้วย อาร์ สยาม",emoji:"🍌",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยตลาดที่ timeless ฮิตหมดเสียงที่จดจำง่าย 🍌 เพลงพูดถึงความรักและชีวิตในแบบที่คนฟังทุกคน relate ได้",tags:["Country","Classic","Relatable"],mood:{dark:3,chill:5,energetic:4,emotional:6,indie:3},sp:sp("kluay r siam")},
+  {name:"ไมค์ ภิรมย์พร",emoji:"🎙️",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ตำนาน Luk Thung ที่ emotional มากที่สุด 🎙️ เสียงทรงพลัง เพลงพูดถึงความรัก ความสูญเสีย ชีวิตชนบทที่ฟังแล้วจุกอกทุกครั้ง",tags:["Luk Thung","Legend","Emotional"],mood:{dark:4,chill:4,energetic:3,emotional:9,indie:3},sp:sp("mike phiromphon")},
+  {name:"ต่าย อรทัย",emoji:"🌺",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชินี Luk Thung ที่เสียงดีที่สุด 🌺 เพลงเศร้า เพลงรัก เพลงชีวิต ร้องได้หมด เสียงที่แสดง emotion ได้อย่างครบถ้วนสมบูรณ์",tags:["Luk Thung","Classic","Powerful"],mood:{dark:4,chill:4,energetic:3,emotional:9,indie:3},sp:sp("tai orrathai")},
+  {name:"หญิง ธิติกานต์",emoji:"🎀",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"Luk Thung รุ่นใหม่เสียงหวานที่ยังคงความเป็นไทย 🎀 ทำให้ Luk Thung ยังคงมีชีวิตชีวาในยุค streaming",tags:["Luk Thung","Modern","Sweet"],mood:{dark:3,chill:5,energetic:4,emotional:7,indie:3},sp:sp("ying thitikarn")},
+  {name:"ยิ่งยง ยอดบัวงาม",emoji:"🌼",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชา Luk Thung ที่ครองใจคนมาหลายสิบปี 🌼 เสียงที่ทรงพลัง เพลงพูดถึงชีวิตชนบทและความรักที่คนทุกรุ่น relate ได้",tags:["Luk Thung","Legend","Timeless"],mood:{dark:3,chill:5,energetic:5,emotional:7,indie:3},sp:sp("yingyong yodbua-ngam")},
+  {name:"สายัณห์ สัญญา",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ตำนาน Luk Thung ที่ไม่มีใครลืม 🎵 เพลงที่ฟังแล้วรู้สึกถึงกลิ่นอายชีวิตไทยแท้ๆ เสียงที่ถ่ายทอด emotion ได้อย่างจริงใจ",tags:["Luk Thung","Legend","Folk"],mood:{dark:3,chill:5,energetic:3,emotional:7,indie:3},sp:sp("sayan sanya")},
+  {name:"วสันต์17",emoji:"🏙️",nat:"🇹🇭 ไทย",genre:"Country / Hip-Hop",bio:"Country ผสม Hip Hop แบบ street ที่น่าสนใจที่สุด 🏙️ ผสมความเป็นชนบทกับ urban ได้อย่างลงตัว เพลงสะท้อนชีวิตจริง",tags:["Country","Hip-Hop","Street"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:4},sp:sp("wasan 17")},
+  {name:"กู่แคน",emoji:"🌾",nat:"🇹🇭 ไทย",genre:"Country / Folk",bio:"Country Folk ไทยที่ authentic มากที่สุด 🌾 เสียงที่มาจากรากของชนบทไทย เพลงพูดถึงชีวิตและความรักอย่างตรงไปตรงมา",tags:["Country","Folk","Authentic"],mood:{dark:3,chill:6,energetic:4,emotional:6,indie:4},sp:sp("gu kaen")},
+  {name:"แอ๊ด คาราบาว",emoji:"🐃",nat:"🇹🇭 ไทย",genre:"Country Rock",bio:"ตำนาน Country Rock ที่พูดถึงสังคมไทยได้ลึกที่สุด 🐃 เพลงเต็มไปด้วย message ที่แข็งแกร่ง ยังฟังได้ดีจนถึงทุกวันนี้",tags:["Country Rock","Legend","Social"],mood:{dark:4,chill:4,energetic:5,emotional:7,indie:4},sp:sp("add carabao")},
+  {name:"ศิริพร อำไพพงษ์",emoji:"🌸",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชินี Luk Thung ที่เสียงดีและ timeless 🌸 เพลงพูดถึงความรักและชีวิตในแบบที่คนทุกรุ่นฟังแล้ว relate ได้",tags:["Luk Thung","Legend","Timeless"],mood:{dark:3,chill:5,energetic:4,emotional:8,indie:3},sp:sp("siriporn amphaipon")},
+  {name:"ไมค์ พิรัชต์",emoji:"🎙️",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยเสียงหวานที่ romantic มากที่สุด 🎙️ เพลงพูดถึงความรักในแบบที่ทำให้คนฟังรู้สึกอบอุ่นใจ",tags:["Country","Romantic","Sweet"],mood:{dark:2,chill:5,energetic:4,emotional:7,indie:3},sp:sp("mike phirat")},
+  {name:"อะตอม ธันยวาทินี",emoji:"✨",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทย melodic ที่ emotional สูง ✨ เพลงพูดถึงความรักและการสูญเสีย เสียงที่ดี ทำนองติดหู",tags:["Country","Melodic","Emotional"],mood:{dark:3,chill:5,energetic:3,emotional:7,indie:3},sp:sp("atom thanyawatini")},
+  {name:"ดิด คิตตี้",emoji:"🎉",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยสนุกสนาน ลูกทุ่งสมัยใหม่ 🎉 เพลง light-hearted ที่ฟังแล้วอารมณ์ดี เหมาะกับบรรยากาศสังสรรค์หรือเดินทาง",tags:["Country","Fun","Upbeat"],mood:{dark:1,chill:5,energetic:7,emotional:4,indie:3},sp:sp("did kitty")},
+  {name:"มอส รัศมี",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทย modern ที่มีเอกลักษณ์ตัวเอง 🌿 เสียงที่อบอุ่น เพลงพูดถึงชีวิตและความรักที่คนทุกวัย relate ได้",tags:["Country","Modern","Warm"],mood:{dark:2,chill:6,energetic:4,emotional:6,indie:4},sp:sp("moss ratsami")},
+  {name:"เจนจิรา เฉียงเอก",emoji:"🌺",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"Luk Thung เสียงหวาน traditional ที่ยังคง authentic 🌺 เพลงพูดถึงชีวิตและความรักในสไตล์ไทยแท้ๆ ที่ไม่มีวันเก่า",tags:["Luk Thung","Traditional","Sweet"],mood:{dark:3,chill:5,energetic:3,emotional:7,indie:3},sp:sp("jenjira chiangek")},
+  {name:"พงษ์เทพ กระโดนชำนาญ",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"Luk Thung / Folk",bio:"ตำนาน Luk Thung Folk ที่ไม่มีใครเหมือน 🎵 เพลงพูดถึงชีวิตคนชนบท ความรัก และสังคมในแบบที่ลึกและจริงใจ",tags:["Luk Thung","Folk","Legend"],mood:{dark:4,chill:5,energetic:3,emotional:7,indie:4},sp:sp("phongtep kradonchamnan")},
+,
+  // --- เพิ่มเติม Pop / Indie / R&B ---
+  {name:"Violette Wautier",emoji:"🔮",nat:"🇹🇭 ไทย",genre:"Pop / Soul",bio:"เสียง Soul Pop ที่ทรงพลังที่สุดในไทย 🔮 ร้องได้ทั้งไทยและอังกฤษ dramatic และ emotional ในเวลาเดียวกัน",tags:["Pop","Soul","Powerful"],mood:{dark:3,chill:4,energetic:5,emotional:9,indie:5},sp:sp("violette wautier")},
+  {name:"Nuvo",emoji:"🌙",nat:"🇹🇭 ไทย",genre:"Pop R&B",bio:"Pop R&B ไทยที่ smooth และ romantic ที่สุด 🌙 เสียงที่อบอุ่น ทุกเพลงให้ความรู้สึก intimate และ heartfelt",tags:["Pop R&B","Smooth","Romantic"],mood:{dark:2,chill:6,energetic:3,emotional:7,indie:4},sp:sp("nuvo thailand")},
+  {name:"JaoMark",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"R&B",bio:"R&B ไทยรุ่นใหม่เสียงลื่นและ chill 🎵 Pop R&B ที่เข้าถึงง่าย ฟังสบาย บรรยากาศเหมาะตอนกลางคืน",tags:["R&B","Chill","Late Night"],mood:{dark:3,chill:6,energetic:3,emotional:6,indie:5},sp:sp("jaomark thailand")},
+  {name:"Singular",emoji:"💫",nat:"🇹🇭 ไทย",genre:"Pop",bio:"Pop ไทยที่ emotional และ mainstream 💫 เพลงพูดถึงความรักในแบบที่คนฟังทุกคน relate ได้ทันที",tags:["Pop","Emotional","Mainstream"],mood:{dark:2,chill:5,energetic:3,emotional:8,indie:3},sp:sp("singular thailand")},
+  {name:"Phumin",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"R&B",bio:"R&B ไทยที่ smooth และ romantic ที่สุดคนหนึ่ง 🌿 เสียงที่ warm ทุกเพลงพูดถึงความรักอย่างจริงใจ",tags:["R&B","Smooth","Romantic"],mood:{dark:2,chill:6,energetic:3,emotional:7,indie:5},sp:sp("phumin thailand")},
+  {name:"Tilly Birds",emoji:"🐦",nat:"🇹🇭 ไทย",genre:"Indie Pop / Rock",bio:"วง Indie ไทยรุ่นใหม่มาแรงมาก 🐦 เพลงสดใส มีพลัง เข้าถึงง่าย Indie Pop ผสม Rock",tags:["Indie Pop","Rock","Fresh"],mood:{dark:3,chill:5,energetic:7,emotional:6,indie:8},sp:sp("tilly birds")},
+  {name:"Klear",emoji:"💫",nat:"🇹🇭 ไทย",genre:"Pop Rock",bio:"Pop Rock ไทยที่เพลงหลายเพลงกลายเป็น anthem วัยรุ่น 💫 เสียงกีต้าร์โดดเด่นและเนื้อหาจริงใจ",tags:["Pop Rock","Anthem","Youth"],mood:{dark:3,chill:4,energetic:7,emotional:7,indie:4},sp:sp("klear thailand")},
+  {name:"Folk9",emoji:"🎸",nat:"🇹🇭 ไทย",genre:"Folk Pop",bio:"Folk Pop ไทยที่ acoustic และ meaningful มากที่สุด 🎸 เพลงพูดถึงชีวิตและความรักในแบบที่ลึกและจริงใจ",tags:["Folk Pop","Acoustic","Meaningful"],mood:{dark:3,chill:7,energetic:2,emotional:7,indie:8},sp:sp("folk9 thailand")},
+  {name:"Instinct",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่ gentle และ introspective 🌿 เสียงที่นุ่มนวล เพลงพูดถึงความรู้สึกภายในอย่างละเอียดอ่อน",tags:["Indie Pop","Gentle","Introspective"],mood:{dark:3,chill:7,energetic:2,emotional:7,indie:8},sp:sp("instinct thailand")},
+  {name:"Ab Normal",emoji:"🎨",nat:"🇹🇭 ไทย",genre:"Alternative",bio:"Alternative ไทยที่ quirky ที่สุด 🎨 เพลงที่ไม่อยู่ในกรอบ ทำสิ่งที่ไม่มีใครคาดเดา",tags:["Alternative","Quirky","Indie"],mood:{dark:4,chill:5,energetic:4,emotional:5,indie:9},sp:sp("ab normal thailand")},
+  {name:"Srirajah Rockers",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Reggae",bio:"Reggae ไทยที่ chill และ positive มากที่สุด 🌿 เปิดฟังแล้วรู้สึกผ่อนคลายทันที vibes ดีทุกเพลง",tags:["Reggae","Chill","Positive"],mood:{dark:1,chill:8,energetic:5,emotional:4,indie:5},sp:sp("srirajah rockers")},
+  {name:"Carabao",emoji:"🐃",nat:"🇹🇭 ไทย",genre:"Country Rock",bio:"ตำนาน Country Rock ที่พูดถึงสังคมไทยได้ลึกที่สุด 🐃 แอ๊ด คาราบาว เพลง message แข็งแกร่ง ยังฟังได้ดีทุกวันนี้",tags:["Country Rock","Legend","Social"],mood:{dark:4,chill:4,energetic:5,emotional:7,indie:4},sp:sp("carabao thailand")},
+  {name:"Retrospect",emoji:"🤘",nat:"🇹🇭 ไทย",genre:"Heavy Metal",bio:"Heavy Metal ไทยที่หนักและทรงพลังที่สุด 🤘 เสียงกีต้าร์หนัก vocals เข้มข้น Industrial Metal ที่ไม่มีวงไหนเหมือน",tags:["Heavy Metal","Dark","Powerful"],mood:{dark:8,chill:1,energetic:9,emotional:5,indie:5},sp:sp("retrospect thailand")},
+  {name:"Proxie",emoji:"🌌",nat:"🇹🇭 ไทย",genre:"Alternative / Dark",bio:"Alternative ไทยที่มืดและ atmospheric มากที่สุด 🌌 เพลง cinematic ลึกซึ้ง เหมาะฟังคนเดียวตอนดึก",tags:["Alternative","Dark","Atmospheric"],mood:{dark:8,chill:6,energetic:3,emotional:7,indie:9},sp:sp("proxie thailand")},
+  {name:"Getsunova",emoji:"🌈",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่สดใสและฟังง่าย 🌈 ทำให้วันธรรมดาดูดีขึ้น เนื้อหาเกี่ยวกับความรักที่ทุกคน relate ได้",tags:["Pop","Indie Pop","Feel-Good"],mood:{dark:2,chill:7,energetic:5,emotional:7,indie:7},sp:sp("getsunova")},
+  {name:"Yellow Fang",emoji:"🌿",nat:"🇹🇭 ไทย",genre:"Alternative",bio:"Alternative ไทยที่ quirky และ unique ที่สุด 🌿 เพลงที่ไม่มีใครทำได้เหมือน sound ที่แตกต่างโดยสิ้นเชิง",tags:["Alternative","Quirky","Unique"],mood:{dark:4,chill:5,energetic:4,emotional:5,indie:9},sp:sp("yellow fang thailand")},
+  {name:"Flure",emoji:"🌺",nat:"🇹🇭 ไทย",genre:"Indie Pop",bio:"Indie Pop ไทยที่สดใสและ dreamy 🌺 ให้ความรู้สึก carefree มีสีสัน เหมือนบ่ายวันหยุดแดดดี",tags:["Indie Pop","Dreamy","Colorful"],mood:{dark:1,chill:8,energetic:6,emotional:5,indie:8},sp:sp("flure thailand")},
+  {name:"MILLI",emoji:"🌶️",nat:"🇹🇭 ไทย",genre:"Hip-Hop / Pop Rap",bio:"ขึ้นเวที Coachella ด้วยเพลงไทย 🌶️ แร็ปเปอร์ไทยที่ทำให้โลกหันมามอง flow คม อัตลักษณ์ไทยชัดเจน",tags:["Hip-Hop","Global","Bold"],mood:{dark:5,chill:3,energetic:8,emotional:5,indie:7},sp:sp("milli thai rapper")},
+  {name:"Atom Chanakan",emoji:"🎹",nat:"🇹🇭 ไทย",genre:"Pop",bio:"Pop ไทยคลาสสิกที่ emotional มากที่สุดคนหนึ่ง 🎹 เพลงพูดถึงความรักในแบบที่ทุกคนฟังแล้วรู้สึกสะท้อน",tags:["Pop","Classic","Emotional"],mood:{dark:2,chill:4,energetic:4,emotional:8,indie:3},sp:sp("atom chanakan")},
+  {name:"Mean",emoji:"💎",nat:"🇹🇭 ไทย",genre:"Pop / Ballad",bio:"นักร้องที่ทำให้คนร้องไห้กันทั้งประเทศ 💎 Pop Ballad ที่ emotional มากที่สุดในวงการไทย เพลงติดในใจคนมาหลายสิบปี",tags:["Pop","Ballad","Powerful"],mood:{dark:4,chill:4,energetic:4,emotional:10,indie:2},sp:sp("mean thai singer")},
+  {name:"Lula",emoji:"🎉",nat:"🇹🇭 ไทย",genre:"Pop",bio:"Pop ไทยสายสนุกที่ fun และ dance-friendly ที่สุด 🎉 เพลงทำให้คนฟังอยากลุกขึ้นเต้นและมีความสุข",tags:["Pop","Fun","Dance"],mood:{dark:1,chill:3,energetic:8,emotional:4,indie:3},sp:sp("lula thailand")},
+  {name:"Dontanien",emoji:"🔭",nat:"🇹🇭 ไทย",genre:"Indie / Experimental",bio:"Indie ไทยที่แปลกและน่าสนใจมากที่สุด 🔭 ทำเพลงที่ไม่อยู่ในกรอบ sound ที่ unique ที่ไม่เหมือนใคร",tags:["Indie","Experimental","Unique"],mood:{dark:4,chill:5,energetic:3,emotional:5,indie:9},sp:sp("dontanien")},
+  {name:"Chon Thanachai",emoji:"🌾",nat:"🇹🇭 ไทย",genre:"Country Pop",bio:"Country Pop ไทยที่ folk และ authentic ที่สุด 🌾 เพลงพูดถึงชีวิตชนบทและความรักในแบบที่จริงใจ",tags:["Country Pop","Folk","Authentic"],mood:{dark:3,chill:6,energetic:3,emotional:6,indie:5},sp:sp("chon thanachai")},
+  {name:"FEWJAR",emoji:"✨",nat:"🇹🇭 ไทย",genre:"R&B / Pop",bio:"R&B ไทยรุ่นใหม่เสียงหวานและ chill ✨ Pop R&B ที่เข้าถึงง่าย ฟังสบายทุกวัน บรรยากาศเหมาะตอนกลางคืน",tags:["R&B","Pop","Late Night"],mood:{dark:3,chill:7,energetic:3,emotional:6,indie:5},sp:sp("fewjar")},
+  {name:"ยิ่งยง ยอดบัวงาม",emoji:"🌼",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชา Luk Thung ที่ครองใจคนมาหลายสิบปี 🌼 เสียงที่ทรงพลัง เพลงพูดถึงชีวิตชนบทและความรักที่คนทุกรุ่น relate ได้",tags:["Luk Thung","Legend","Timeless"],mood:{dark:3,chill:5,energetic:5,emotional:7,indie:3},sp:sp("yingyong yodbua-ngam")},
+  {name:"สายัณห์ สัญญา",emoji:"🎵",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ตำนาน Luk Thung ที่ไม่มีใครลืม 🎵 เพลงที่ฟังแล้วรู้สึกถึงกลิ่นอายชีวิตไทยแท้ๆ จริงใจทุก note",tags:["Luk Thung","Legend","Folk"],mood:{dark:3,chill:5,energetic:3,emotional:7,indie:3},sp:sp("sayan sanya")},
+  {name:"ศิริพร อำไพพงษ์",emoji:"🌸",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชินี Luk Thung ที่เสียงดีและ timeless 🌸 เพลงพูดถึงความรักและชีวิตในแบบที่คนทุกรุ่นฟังแล้ว relate ได้",tags:["Luk Thung","Legend","Timeless"],mood:{dark:3,chill:5,energetic:4,emotional:8,indie:3},sp:sp("siriporn amphaipon")},
+  {name:"ต่าย อรทัย",emoji:"🌺",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ราชินี Luk Thung ที่เสียงดีที่สุด 🌺 เพลงเศร้า เพลงรัก เพลงชีวิต ร้องได้หมด เสียงที่แสดง emotion ได้อย่างสมบูรณ์แบบ",tags:["Luk Thung","Classic","Powerful"],mood:{dark:4,chill:4,energetic:3,emotional:9,indie:3},sp:sp("tai orrathai")},
+  {name:"หญิง ธิติกานต์",emoji:"🎀",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"Luk Thung รุ่นใหม่เสียงหวาน ยังคง authentic 🎀 ทำให้ Luk Thung ยังมีชีวิตชีวาในยุค streaming",tags:["Luk Thung","Modern","Sweet"],mood:{dark:3,chill:5,energetic:4,emotional:7,indie:3},sp:sp("ying thitikarn")},
+  {name:"ไมค์ ภิรมย์พร",emoji:"🎙️",nat:"🇹🇭 ไทย",genre:"Luk Thung",bio:"ตำนาน Luk Thung ที่ emotional มากที่สุด 🎙️ เสียงทรงพลัง เพลงพูดถึงความรัก ความสูญเสีย ชีวิตชนบทที่ฟังแล้วจุกอก",tags:["Luk Thung","Legend","Emotional"],mood:{dark:4,chill:4,energetic:3,emotional:9,indie:3},sp:sp("mike phiromphon")},
+  {name:"กล้วย อาร์ สยาม",emoji:"🍌",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยตลาดที่ timeless 🍌 เพลงพูดถึงความรักและชีวิตในแบบที่คนฟังทุกคน relate ได้",tags:["Country","Classic","Relatable"],mood:{dark:3,chill:5,energetic:4,emotional:6,indie:3},sp:sp("kluay r siam")},
+  {name:"ไมค์ พิรัชต์",emoji:"🎙️",nat:"🇹🇭 ไทย",genre:"Country",bio:"Country ไทยเสียงหวานที่ romantic มากที่สุด 🎙️ เพลงพูดถึงความรักในแบบที่ทำให้คนฟังรู้สึกอบอุ่นใจ",tags:["Country","Romantic","Sweet"],mood:{dark:2,chill:5,energetic:4,emotional:7,indie:3},sp:sp("mike phirat")},
+  {name:"วสันต์17",emoji:"🏙️",nat:"🇹🇭 ไทย",genre:"Country / Hip-Hop",bio:"Country ผสม Hip Hop แบบ street ที่น่าสนใจที่สุด 🏙️ ผสมความเป็นชนบทกับ urban ได้อย่างลงตัว",tags:["Country","Hip-Hop","Street"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:4},sp:sp("wasan 17")},
+  {name:"กู่แคน",emoji:"🌾",nat:"🇹🇭 ไทย",genre:"Country / Folk",bio:"Country Folk ไทยที่ authentic มากที่สุด 🌾 เสียงที่มาจากรากของชนบทไทย เพลงพูดถึงชีวิตและความรัก",tags:["Country","Folk","Authentic"],mood:{dark:3,chill:6,energetic:4,emotional:6,indie:4},sp:sp("gu kaen")},
+  {name:"Southside",emoji:"🌆",nat:"🇹🇭 ไทย",genre:"R&B / Hip-Hop",bio:"R&B Hip Hop ไทยสายเมืองที่ smooth และ urban ที่สุด 🌆 เสียงที่ trendy และ cool เพลงฟังได้ทุก mood",tags:["R&B","Hip-Hop","Urban"],mood:{dark:4,chill:5,energetic:5,emotional:5,indie:5},sp:sp("southside thailand")}
+];
+
+// ============================================================
+// ARTISTS_INTL — 100 ศิลปินสากล (Pop · Rock · R&B · HipHop · Indie · Latin)
+// ============================================================
+var ARTISTS_INTL = [
+  // --- Pop / R&B ---
+  {name:"Lady Gaga",emoji:"💜",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / Art Pop",bio:"ราชินีแห่ง Art Pop ผู้ไม่มีวันหมดไฟ 💜 Die with a Smile ครองอันดับ 1 Billboard Year-End 2025 ทุก era ของ Gaga คือ statement ที่ไม่เหมือนใคร",tags:["Pop","Art Pop","Iconic"],mood:{dark:4,chill:2,energetic:8,emotional:7,indie:4},sp:sp("lady gaga")},
+  {name:"Bruno Mars",emoji:"🎹",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B / Funk",bio:"ราชาแห่งความ groovy 🎹 ทุกเพลงเต็มไปด้วย funk และ soul ที่ทำให้คนฟังขยับตามโดยอัตโนมัติ",tags:["Pop","R&B","Groovy"],mood:{dark:1,chill:5,energetic:8,emotional:6,indie:3},sp:sp("bruno mars")},
+  {name:"Kendrick Lamar",emoji:"👑",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Conscious Rap",bio:"กวีแห่ง Hip Hop ผู้ได้ Pulitzer Prize 👑 Luther และ Not Like Us ฮิตปี 2025 ทุก album คืองานศิลปะที่ลึกและซับซ้อน",tags:["Hip-Hop","Conscious","GOAT"],mood:{dark:8,chill:2,energetic:7,emotional:7,indie:7},sp:sp("kendrick lamar")},
+  {name:"SZA",emoji:"🌸",nat:"🇺🇸 สหรัฐฯ",genre:"R&B / Soul",bio:"เสียงที่ soulful และ vulnerable ที่สุดในยุคนี้ 🌸 Luther กับ Kendrick Lamar ฮิตที่ 2 Billboard 2025 พูดถึงความรัก ตัวตน ความเจ็บปวดอย่างตรงไปตรงมา",tags:["R&B","Soul","Vulnerable"],mood:{dark:4,chill:6,energetic:3,emotional:10,indie:6},sp:sp("sza")},
+  {name:"Taylor Swift",emoji:"✨",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / Country Pop",bio:"อันดับ 1 Billboard Top Artists มาหลายปีซ้อน ✨ Storytelling ระดับ masterclass ทุก era มีเอกลักษณ์ที่แตกต่าง เพลงที่ทุกคน relate ได้",tags:["Pop","Storytelling","GOAT"],mood:{dark:3,chill:4,energetic:6,emotional:9,indie:5},sp:sp("taylor swift")},
+  {name:"Billie Eilish",emoji:"🖤",nat:"🇺🇸 สหรัฐฯ",genre:"Alt Pop / Dark Pop",bio:"เสียง whisper ที่ raw และ authentic ที่สุด 🖤 Birds of a Feather ฮิต Top 5 Billboard 2025 Gen-Z icon ที่ไม่กลัวแสดงตัวตนที่แท้จริง",tags:["Alt Pop","Dark","Gen-Z"],mood:{dark:8,chill:5,energetic:2,emotional:9,indie:8},sp:sp("billie eilish")},
+  {name:"Sabrina Carpenter",emoji:"☕",nat:"🇺🇸 สหรัฐฯ",genre:"Pop",bio:"Pop Superstar ยุค 2025 ☕ Espresso คือ summer anthem ที่ไม่มีใครไม่รู้จัก witty lyrics และ charm ที่ไม่มีใครเหมือน",tags:["Pop","Witty","Charming"],mood:{dark:1,chill:5,energetic:7,emotional:5,indie:4},sp:sp("sabrina carpenter")},
+  {name:"Chappell Roan",emoji:"🌹",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / Synth Pop",bio:"Breakout Artist ที่น่าตื่นเต้นที่สุด 🌹 Pink Pony Club ฮิต Top 10 Billboard 2025 เสียงที่ dramatic theatrical และ unapologetically herself",tags:["Pop","Synth Pop","Dramatic"],mood:{dark:3,chill:3,energetic:7,emotional:7,indie:8},sp:sp("chappell roan")},
+  {name:"Benson Boone",emoji:"🎸",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / Rock",bio:"Beautiful Things ฮิตทั่วโลก 🎸 เสียง tenor ทรงพลัง Pop Rock ที่มีความ emotional สูงมาก ฟังแล้วรู้สึกถึงความหวังและความรัก",tags:["Pop Rock","Emotional","Anthemic"],mood:{dark:4,chill:3,energetic:7,emotional:9,indie:6},sp:sp("benson boone")},
+  {name:"Shaboozey",emoji:"🌵",nat:"🇺🇸 สหรัฐฯ",genre:"Country Hip-Hop",bio:"19 สัปดาห์ที่ #1 Billboard ด้วย A Bar Song 🌵 ผสม Country กับ Hip Hop ได้อย่าง seamless เสียงที่ carefree และ groove ที่ไม่มีใครเหมือน",tags:["Country","Hip-Hop","Unique"],mood:{dark:2,chill:6,energetic:6,emotional:5,indie:6},sp:sp("shaboozey")},
+  {name:"Teddy Swims",emoji:"🎤",nat:"🇺🇸 สหรัฐฯ",genre:"Soul / R&B",bio:"อันดับ 4 Billboard Year-End 2025 ด้วย Lose Control 🎤 เสียง Soul ทรงพลัง emotional มากๆ ผสม R&B กับ Pop ได้ลงตัว",tags:["Soul","R&B","Powerful"],mood:{dark:3,chill:4,energetic:5,emotional:9,indie:4},sp:sp("teddy swims")},
+  {name:"Post Malone",emoji:"🌵",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Country",bio:"ศิลปินที่ข้ามแนวได้ดีที่สุดจาก Hip-Hop สู่ Country 🌵 I Had Some Help กับ Morgan Wallen ฮิต Billboard 2025 เสียงที่ melancholic และ versatile",tags:["Hip-Hop","Country","Versatile"],mood:{dark:5,chill:4,energetic:5,emotional:7,indie:5},sp:sp("post malone")},
+  {name:"Morgan Wallen",emoji:"🤠",nat:"🇺🇸 สหรัฐฯ",genre:"Country",bio:"อันดับ 1 Billboard Hot 100 Artists 2025 เป็นปีที่ 2 🤠 ชื่อ Country ที่ฮิตมากที่สุดในยุคนี้ เสียงที่ raw และ authentic",tags:["Country","Emotional","Mainstream"],mood:{dark:4,chill:4,energetic:5,emotional:7,indie:3},sp:sp("morgan wallen")},
+  {name:"Gracie Abrams",emoji:"🌙",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop",bio:"That's So True ฮิต Top 20 Billboard 2025 🌙 Indie Pop ที่ soft และ raw เพลงพูดถึงความรักอย่างจริงใจในแบบที่คนฟัง relate ทันที",tags:["Indie Pop","Raw","Emotional"],mood:{dark:5,chill:5,energetic:2,emotional:9,indie:8},sp:sp("gracie abrams")},
+  {name:"Alex Warren",emoji:"🎵",nat:"🇺🇸 สหรัฐฯ",genre:"Pop",bio:"Billboard Top New Artist 2025 ด้วย Ordinary 🎵 Pop ที่ emotional และ sincere มากๆ เพลงที่ทุกคน relate ได้กับชีวิตธรรมดาที่สวยงาม",tags:["Pop","Emotional","Sincere"],mood:{dark:4,chill:4,energetic:5,emotional:9,indie:5},sp:sp("alex warren")},
+  {name:"Tate McRae",emoji:"💃",nat:"🇨🇦 แคนาดา",genre:"Pop / Dance",bio:"Sports Car ฮิต Billboard 2025 💃 Pop Dance ที่ catchy สุดๆ เสียงที่แสดงออก confidence และ attitude ใน Gen-Z style",tags:["Pop","Dance","Confident"],mood:{dark:2,chill:3,energetic:8,emotional:6,indie:4},sp:sp("tate mcrae")},
+  {name:"Hozier",emoji:"🍀",nat:"🇮🇪 ไอร์แลนด์",genre:"Folk Rock / Soul",bio:"Too Sweet ฮิต Top 5 Billboard 2025 🍀 เสียงที่ deep และ soulful ผสม Folk กับ Soul Rock ได้อย่างลึกซึ้ง เพลงเกี่ยวกับความรักที่ timeless",tags:["Folk Rock","Soul","Deep"],mood:{dark:5,chill:5,energetic:4,emotional:9,indie:7},sp:sp("hozier")},
+  {name:"Doechii",emoji:"🌊",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Rap",bio:"Anxiety ฮิต Billboard 2025 🌊 Hip Hop ที่ bold feminist และ powerful มากที่สุดในยุคนี้ ศิลปินที่ไม่กลัวแสดงตัวตน",tags:["Hip-Hop","Bold","Feminist"],mood:{dark:6,chill:2,energetic:8,emotional:6,indie:7},sp:sp("doechii")},
+  {name:"Olivia Rodrigo",emoji:"💔",nat:"🇺🇸 สหรัฐฯ",genre:"Pop Punk / Indie Pop",bio:"Pop Punk ที่ raw จนทำให้คนร้องไห้ตามได้โดยไม่รู้ตัว 💔 เสียงของ Gen-Z ที่บอกเล่าความเจ็บปวดได้ตรงที่สุด",tags:["Pop Punk","Heartbreak","Authentic"],mood:{dark:5,chill:3,energetic:6,emotional:10,indie:7},sp:sp("olivia rodrigo")},
+  {name:"Ariana Grande",emoji:"☁️",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B",bio:"เสียง whistle register ที่ไม่มีใครเทียบได้ ☁️ Pop R&B ที่ emotional และ powerful ในเวลาเดียวกัน",tags:["Pop","R&B","Powerful"],mood:{dark:3,chill:4,energetic:7,emotional:9,indie:3},sp:sp("ariana grande")},
+  {name:"The Weeknd",emoji:"🌙",nat:"🇨🇦 แคนาดา",genre:"R&B / Dark Pop",bio:"ราชาแห่ง Dark R&B ที่ cinematic มากที่สุด 🌙 Timeless กับ Playboi Carti ฮิต Billboard 2025 เสียงที่ haunting และ atmospheric",tags:["R&B","Dark Pop","Cinematic"],mood:{dark:7,chill:4,energetic:5,emotional:7,indie:5},sp:sp("the weeknd")},
+  {name:"Drake",emoji:"🦉",nat:"🇨🇦 แคนาดา",genre:"Hip-Hop / R&B",bio:"ราชาแห่ง streaming 🦉 ผสม Hip Hop กับ R&B ได้ลื่นไหลที่สุด เพลงให้ความรู้สึกทั้ง flex และ vulnerable",tags:["Hip-Hop","R&B","Mainstream"],mood:{dark:5,chill:5,energetic:5,emotional:7,indie:3},sp:sp("drake")},
+  {name:"Tyler, the Creator",emoji:"🦋",nat:"🇺🇸 สหรัฐฯ",genre:"Alternative Hip-Hop",bio:"ศิลปินที่สร้างโลกใหม่ทุก album 🦋 Hip Hop ที่เป็นงานศิลปะ eccentric creative ไม่เคยทำสิ่งเดิมซ้ำ",tags:["Hip-Hop","Art","Eccentric"],mood:{dark:5,chill:5,energetic:5,emotional:6,indie:9},sp:sp("tyler the creator")},
+  {name:"Beyoncé",emoji:"👸",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B",bio:"ราชินีที่ไม่มีวันตก 👸 ทุก era คือ redefinition ของ Pop culture เสียงและ performance ที่ทรงพลังที่สุดในโลก",tags:["Pop","R&B","Iconic"],mood:{dark:3,chill:3,energetic:9,emotional:7,indie:3},sp:sp("beyonce")},
+  {name:"Lana Del Rey",emoji:"🌹",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop / Dream Pop",bio:"ราชินีแห่ง Sadcore และ Cinematic Pop 🌹 ฟังเพลง Lana Del Rey แล้วรู้สึกเหมือนอยู่ใน slow motion film",tags:["Indie Pop","Cinematic","Melancholic"],mood:{dark:8,chill:7,energetic:1,emotional:9,indie:9},sp:sp("lana del rey")},
+  {name:"Harry Styles",emoji:"🌈",nat:"🇬🇧 อังกฤษ",genre:"Pop / Rock / Indie",bio:"จาก 1D สู่ Solo ระดับโลก 🌈 เพลงเต็มไปด้วย positivity สีสัน และ self-expression ฟังแล้วยิ้มได้ทุกครั้ง",tags:["Pop","Rock","Joyful"],mood:{dark:2,chill:5,energetic:7,emotional:7,indie:7},sp:sp("harry styles")},
+  {name:"Dua Lipa",emoji:"💎",nat:"🇬🇧 อังกฤษ",genre:"Pop / Dance",bio:"ราชินีแห่ง disco pop ยุคใหม่ 💎 ทุกเพลงเป็น dance anthem ที่ทำให้อยากลุกออกไปเต้นทันที",tags:["Pop","Disco","Dance"],mood:{dark:2,chill:3,energetic:9,emotional:5,indie:3},sp:sp("dua lipa")},
+  {name:"Justin Bieber",emoji:"🎤",nat:"🇨🇦 แคนาดา",genre:"Pop / R&B",bio:"Daisies ฮิต Billboard 2025 🎤 ศิลปินที่เติบโตไปพร้อมกับแฟนๆ ทั่วโลก เสียงที่ emotional และ soulful ในช่วงปัจจุบัน",tags:["Pop","R&B","Emotional"],mood:{dark:3,chill:4,energetic:5,emotional:7,indie:3},sp:sp("justin bieber")},
+  {name:"Ed Sheeran",emoji:"🎸",nat:"🇬🇧 อังกฤษ",genre:"Pop / Folk",bio:"เสียง acoustic ที่ romantic และ heartfelt ที่สุด 🎸 เพลงพูดถึงความรักในแบบที่ทุกคน relate ได้ storytelling ระดับ world-class",tags:["Pop","Folk","Romantic"],mood:{dark:2,chill:6,energetic:4,emotional:9,indie:5},sp:sp("ed sheeran")},
+  {name:"Adele",emoji:"🎙️",nat:"🇬🇧 อังกฤษ",genre:"Soul / Pop",bio:"เสียงที่ทรงพลังมากที่สุดในโลก 🎙️ ทุกเพลงคือ emotional journey ที่ทำให้ผู้ฟังได้สัมผัสความเจ็บปวดและความสวยงามของชีวิต",tags:["Soul","Pop","Legendary"],mood:{dark:4,chill:4,energetic:3,emotional:10,indie:3},sp:sp("adele")},
+  {name:"Bad Bunny",emoji:"🐰",nat:"🇵🇷 เปอร์โตริโก",genre:"Reggaeton / Trap Latino",bio:"ราชาแห่ง Latin music ที่ทำลายทุก record streaming 🐰 DTMF ฮิต Billboard 2025 เพลง Spanish ที่คนทั่วโลกฟัง ไม่ต้องเข้าใจก็รู้สึก vibe",tags:["Reggaeton","Latin","Iconic"],mood:{dark:3,chill:6,energetic:8,emotional:5,indie:4},sp:sp("bad bunny")},
+  {name:"Miley Cyrus",emoji:"🌟",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / Rock",bio:"ศิลปินที่กล้าเปลี่ยนตัวเองทุก era 🌟 Flowers คือ anthem ของการ move on ที่ดีที่สุด bold expressive ไม่มีกรอบ",tags:["Pop","Rock","Bold"],mood:{dark:4,chill:3,energetic:7,emotional:6,indie:5},sp:sp("miley cyrus")},
+  // --- Rock / Alternative / Indie ---
+  {name:"Arctic Monkeys",emoji:"🐒",nat:"🇬🇧 อังกฤษ",genre:"Indie Rock / Alt Rock",bio:"วงที่ช่วยนิยาม Indie Rock ยุค 2000s 🐒 Alex Turner เขียน lyric ที่ witty และ poetic มากที่สุดในโลก",tags:["Indie Rock","British","Iconic"],mood:{dark:5,chill:5,energetic:7,emotional:6,indie:9},sp:sp("arctic monkeys")},
+  {name:"Coldplay",emoji:"🌈",nat:"🇬🇧 อังกฤษ",genre:"Rock / Indie",bio:"วงที่สร้าง anthem ให้โลกมานานกว่า 25 ปี 🌈 ทุก concert คือ experience ที่ไม่มีใครลืม เพลงที่ hopeful และ emotional",tags:["Rock","Anthemic","Hopeful"],mood:{dark:4,chill:4,energetic:7,emotional:8,indie:6},sp:sp("coldplay")},
+  {name:"Imagine Dragons",emoji:"⚡",nat:"🇺🇸 สหรัฐฯ",genre:"Pop Rock",bio:"Pop Rock anthem ที่ทรงพลังและ uplifting ⚡ เพลงที่ทำให้คนฟังรู้สึกสู้ต่อได้ทุกครั้ง เสียงกีต้าร์และ drums ที่หนักแน่น",tags:["Pop Rock","Anthemic","Uplifting"],mood:{dark:4,chill:3,energetic:8,emotional:7,indie:4},sp:sp("imagine dragons")},
+  {name:"Paramore",emoji:"🔥",nat:"🇺🇸 สหรัฐฯ",genre:"Pop Punk / Rock",bio:"Pop Punk ที่ energetic และ emotional ในเวลาเดียวกัน 🔥 เสียง Hayley Williams ที่ทรงพลังมากที่สุดใน Rock",tags:["Pop Punk","Rock","Energetic"],mood:{dark:5,chill:2,energetic:8,emotional:7,indie:6},sp:sp("paramore")},
+  {name:"Linkin Park",emoji:"⚫",nat:"🇺🇸 สหรัฐฯ",genre:"Rock / Nu Metal",bio:"วงที่เป็น soundtrack ของความเจ็บปวดของคนทั้งโลก ⚫ ผสม Rock กับ Hip Hop ในแบบที่ทำให้คนรู้สึกไม่ได้อยู่คนเดียว",tags:["Rock","Nu Metal","Emotional"],mood:{dark:7,chill:1,energetic:9,emotional:8,indie:4},sp:sp("linkin park")},
+  {name:"Green Day",emoji:"🤘",nat:"🇺🇸 สหรัฐฯ",genre:"Punk Rock",bio:"ราชาแห่ง Punk Rock ที่ rebellious ที่สุด 🤘 เพลงที่พูดถึงการต่อต้านสังคมด้วย energy ที่ไม่มีวันหมด",tags:["Punk Rock","Rebellious","Energetic"],mood:{dark:5,chill:1,energetic:9,emotional:5,indie:6},sp:sp("green day")},
+  {name:"Nirvana",emoji:"⚫",nat:"🇺🇸 สหรัฐฯ",genre:"Grunge",bio:"วงที่เปลี่ยนโลก Rock ตลอดกาล ⚫ Kurt Cobain คือ icon ของความ raw และ authentic ที่ไม่มีใครเทียบได้",tags:["Grunge","Legend","Raw"],mood:{dark:8,chill:2,energetic:7,emotional:7,indie:9},sp:sp("nirvana")},
+  {name:"Red Hot Chili Peppers",emoji:"🌶️",nat:"🇺🇸 สหรัฐฯ",genre:"Alternative Rock / Funk",bio:"Alternative Rock ที่ funky energetic และ timeless 🌶️ ผสม Rock กับ Funk ได้ในแบบที่ไม่มีใครทำได้เหมือน",tags:["Alternative","Funk Rock","Energetic"],mood:{dark:4,chill:4,energetic:8,emotional:5,indie:6},sp:sp("red hot chili peppers")},
+  {name:"The 1975",emoji:"💫",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop",bio:"Indie Pop ที่ introspective และ nostalgic ในเวลาเดียวกัน 💫 Matt Healy เขียน lyric ที่ deep และ relatable มากที่สุด",tags:["Indie Pop","Introspective","British"],mood:{dark:5,chill:5,energetic:5,emotional:7,indie:9},sp:sp("the 1975")},
+  {name:"Tame Impala",emoji:"🌀",nat:"🇦🇺 ออสเตรเลีย",genre:"Psychedelic Pop",bio:"Psychedelic Pop ที่ dreamy ที่สุดในโลก 🌀 ฟังแล้วรู้สึกเหมือนโลกหมุน ผสม Rock กับ Electronic ได้อย่างสมบูรณ์แบบ",tags:["Psychedelic","Dreamy","Indie"],mood:{dark:5,chill:7,energetic:4,emotional:6,indie:9},sp:sp("tame impala")},
+  {name:"Radiohead",emoji:"🔮",nat:"🇬🇧 อังกฤษ",genre:"Alternative / Experimental",bio:"วงที่ดูแลทั้งจิตใจและความคิดด้วยดนตรีที่ experimental มากที่สุด 🔮 Thom Yorke คือ genius แห่งยุค",tags:["Alternative","Experimental","Iconic"],mood:{dark:9,chill:4,energetic:4,emotional:7,indie:10},sp:sp("radiohead")},
+  {name:"Fleetwood Mac",emoji:"🌙",nat:"🇬🇧/🇺🇸",genre:"Classic Rock",bio:"วงที่สร้าง Rock ที่ timeless ที่สุด 🌙 Rumours เป็นหนึ่งใน album ที่ดีที่สุดตลอดกาล เพลงที่ nostalgic และ emotional ฟังได้ทุกยุค",tags:["Classic Rock","Timeless","Legend"],mood:{dark:4,chill:5,energetic:5,emotional:8,indie:5},sp:sp("fleetwood mac")},
+  {name:"Queen",emoji:"👑",nat:"🇬🇧 อังกฤษ",genre:"Classic Rock",bio:"วงที่ทำให้ Rock กลายเป็น art form 👑 Freddie Mercury คือ performer ที่ยิ่งใหญ่ที่สุดที่โลกเคยเห็น",tags:["Classic Rock","Theatrical","Legend"],mood:{dark:3,chill:3,energetic:9,emotional:8,indie:5},sp:sp("queen band")},
+  {name:"Foo Fighters",emoji:"🤘",nat:"🇺🇸 สหรัฐฯ",genre:"Rock",bio:"Rock ที่ powerful และ timeless 🤘 เสียงกีต้าร์ที่หนักแน่น เพลงที่ทำให้คนฟังรู้สึกมีพลังและแข็งแกร่ง",tags:["Rock","Powerful","Energetic"],mood:{dark:4,chill:2,energetic:8,emotional:6,indie:5},sp:sp("foo fighters")},
+  // --- R&B / Hip-Hop ---
+  {name:"Frank Ocean",emoji:"🌊",nat:"🇺🇸 สหรัฐฯ",genre:"R&B / Neo-Soul",bio:"อัจฉริยะแห่ง Neo-Soul ที่หายากและลึกลับ 🌊 ทุก note ที่ Frank Ocean ร้องเต็มไปด้วย emotion ที่อธิบายไม่ได้แต่รู้สึกได้ 100%",tags:["R&B","Neo-Soul","Artistic"],mood:{dark:6,chill:7,energetic:2,emotional:10,indie:9},sp:sp("frank ocean")},
+  {name:"Eminem",emoji:"⚡",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Rap",bio:"ราชาแห่ง Rap ครองโลกมานานกว่า 25 ปี ⚡ flow เร็ว lyric คม และ storytelling ที่ไม่มีใครเทียบได้",tags:["Hip-Hop","Rap","GOAT"],mood:{dark:7,chill:1,energetic:9,emotional:6,indie:5},sp:sp("eminem")},
+  {name:"Kanye West",emoji:"🎭",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Art",bio:"ศิลปินที่ controversial มากที่สุดแต่ก็ influential มากที่สุด 🎭 ทุก album คือ statement ที่เปลี่ยนวงการ Hip Hop",tags:["Hip-Hop","Iconic","Controversial"],mood:{dark:6,chill:3,energetic:7,emotional:6,indie:8},sp:sp("kanye west")},
+  {name:"J. Cole",emoji:"🌲",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop",bio:"Conscious Rapper ที่ lyrical ที่สุดในยุคนี้ 🌲 เพลงที่พูดถึงชีวิต สังคม และการเติบโต เสียงที่ smooth แต่เนื้อหาที่ลึกมาก",tags:["Hip-Hop","Conscious","Lyrical"],mood:{dark:6,chill:4,energetic:5,emotional:7,indie:6},sp:sp("j cole")},
+  {name:"Travis Scott",emoji:"🌌",nat:"🇺🇸 สหรัฐฯ",genre:"Trap / Hip-Hop",bio:"ราชาแห่ง Astroworld 🌌 Trap sound ที่ hypnotic และ atmospheric concert ระดับ spectacle เพลงที่ทำให้รู้สึกเหมือนอยู่ในอีกโลก",tags:["Trap","Psychedelic","Dark"],mood:{dark:8,chill:3,energetic:8,emotional:4,indie:5},sp:sp("travis scott")},
+  {name:"Mac Miller",emoji:"🎵",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / R&B",bio:"Hip Hop ที่ introspective และ soulful มากที่สุด 🎵 เพลงพูดถึงการต่อสู้กับชีวิตในแบบที่ raw และ honest",tags:["Hip-Hop","Introspective","Emotional"],mood:{dark:6,chill:5,energetic:4,emotional:8,indie:7},sp:sp("mac miller")},
+  {name:"GloRilla",emoji:"💪",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Rap",bio:"Whatchu Kno About Me ฮิต Billboard 2025 💪 Hip Hop ที่ bold ที่สุดในยุคนี้ เสียงที่ fierce และ unapologetic",tags:["Hip-Hop","Bold","Hype"],mood:{dark:5,chill:2,energetic:9,emotional:4,indie:4},sp:sp("glorilla")},
+  {name:"Chris Brown",emoji:"💃",nat:"🇺🇸 สหรัฐฯ",genre:"R&B / Pop",bio:"ราชาแห่ง R&B ที่ dance ได้ดีที่สุด 💃 Residuals ฮิต Billboard 2025 เสียง smooth danceable เพลงที่ทำให้อยากลุกขึ้นเต้นทันที",tags:["R&B","Dance","Smooth"],mood:{dark:3,chill:4,energetic:8,emotional:5,indie:2},sp:sp("chris brown")},
+  {name:"Usher",emoji:"🕺",nat:"🇺🇸 สหรัฐฯ",genre:"R&B",bio:"ราชาแห่ง R&B ที่ stage presence ที่ดีที่สุด 🕺 Super Bowl performance ปี 2024 คือ iconic moment ที่จะจดจำไปตลอด",tags:["R&B","Dance","Legendary"],mood:{dark:2,chill:4,energetic:8,emotional:6,indie:2},sp:sp("usher")},
+  // --- Indie / Alternative ---
+  {name:"Phoebe Bridgers",emoji:"💀",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Folk",bio:"เนื้อเพลงที่ทำให้ร้องไห้ได้ทุกครั้ง 💀 Folk ที่ dark และ beautiful เสียง fragile แต่ทรงพลังอย่างไม่น่าเชื่อ",tags:["Indie Folk","Dark","Emotional"],mood:{dark:8,chill:6,energetic:1,emotional:10,indie:9},sp:sp("phoebe bridgers")},
+  {name:"Bon Iver",emoji:"❄️",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Folk",bio:"Indie Folk ที่ ethereal และ introspective มากที่สุด ❄️ เสียงที่ haunting และ beautiful ฟังแล้วรู้สึกเหมือนอยู่ท่ามกลางป่าหิมะ",tags:["Indie Folk","Ethereal","Introspective"],mood:{dark:5,chill:7,energetic:1,emotional:8,indie:10},sp:sp("bon iver")},
+  {name:"Noah Kahan",emoji:"🌲",nat:"🇺🇸 สหรัฐฯ",genre:"Folk Pop",bio:"Stick Season ติด Billboard Year-End 2024 🌲 Folk Pop ที่ raw และ honest มากๆ เพลงเกี่ยวกับ home nostalgia ที่ทำให้คนฟัง relate ได้ทันที",tags:["Folk Pop","Honest","Nostalgic"],mood:{dark:4,chill:6,energetic:3,emotional:9,indie:8},sp:sp("noah kahan")},
+  {name:"Cigarettes After Sex",emoji:"🌑",nat:"🇺🇸 สหรัฐฯ",genre:"Ambient Pop",bio:"Ambient Pop ที่ dreamy และ nocturnal ที่สุด 🌑 ฟังแล้วรู้สึกเหมือนนั่งมองหน้าต่างตอนฝนตกตอนดึก สวยงามอย่างเงียบเชียบ",tags:["Ambient Pop","Dreamy","Nocturnal"],mood:{dark:6,chill:9,energetic:1,emotional:7,indie:9},sp:sp("cigarettes after sex")},
+  {name:"beabadoobee",emoji:"🌸",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop / Lo-fi",bio:"Indie Pop Lo-fi ที่ dreamy สุดๆ 🌸 เสียงที่ fuzzy และ nostalgic เหมือนฟังเพลงจากเทปเก่าๆ ในยุค 90s",tags:["Indie Pop","Lo-fi","Dreamy"],mood:{dark:4,chill:6,energetic:4,emotional:7,indie:9},sp:sp("beabadoobee")},
+  {name:"Lola Young",emoji:"🔥",nat:"🇬🇧 อังกฤษ",genre:"Alt Pop",bio:"Messy ฮิต Billboard 2025 🔥 Alt Pop ที่ raw และ vulnerable มากที่สุด เสียงที่ powerful ฟังแล้วรู้สึกถึงความจริงทุกคำ",tags:["Alt Pop","Raw","Vulnerable"],mood:{dark:6,chill:4,energetic:4,emotional:9,indie:7},sp:sp("lola young")},
+  {name:"Myles Smith",emoji:"🌟",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop / Soul",bio:"Stargazing ฮิตจาก UK สู่ Billboard 2025 🌟 เสียง Soul อบอุ่นผสม Indie Pop ให้ความรู้สึก hopeful และ uplifting",tags:["Indie Pop","Soul","Hopeful"],mood:{dark:1,chill:6,energetic:5,emotional:8,indie:7},sp:sp("myles smith")},
+  {name:"Glass Animals",emoji:"🍈",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop / Psychedelic",bio:"Indie Pop ที่ catchy และ psychedelic ในเวลาเดียวกัน 🍈 Heat Waves ฮิตอยู่ใน Billboard นาน 112 สัปดาห์",tags:["Indie Pop","Psychedelic","Catchy"],mood:{dark:4,chill:5,energetic:6,emotional:6,indie:8},sp:sp("glass animals")},
+  {name:"Rex Orange County",emoji:"🧡",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop",bio:"Indie Pop ที่ whimsical และ tender ที่สุด 🧡 เพลงเกี่ยวกับความรักและ self-discovery ที่ทำให้คนฟังรู้สึกอบอุ่น",tags:["Indie Pop","Whimsical","Tender"],mood:{dark:3,chill:6,energetic:3,emotional:7,indie:9},sp:sp("rex orange county")},
+  {name:"Faye Webster",emoji:"🌸",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop / Jazz",bio:"Indie Pop ที่ chill และ jazzy ที่สุด 🌸 บรรยากาศ cozy ฟังแล้วรู้สึกเหมือนนั่งในร้านกาแฟวันอากาศดี",tags:["Indie Pop","Jazzy","Chill"],mood:{dark:3,chill:8,energetic:2,emotional:6,indie:9},sp:sp("faye webster")},
+  {name:"Gorillaz",emoji:"🤖",nat:"🇬🇧 อังกฤษ",genre:"Alternative / Electronic",bio:"วงที่ eclectic และ experimental มากที่สุด 🤖 ผสมทุก genre โดยไม่มีกรอบ ทุก album คือ adventure ที่แตกต่างกันสิ้นเชิง",tags:["Alternative","Eclectic","Experimental"],mood:{dark:5,chill:5,energetic:5,emotional:5,indie:9},sp:sp("gorillaz")},
+  {name:"Vampire Weekend",emoji:"☀️",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Rock",bio:"Indie Rock ที่ witty eclectic และ intellectual 🌞 ผสม World Music กับ Indie Rock ได้อย่างน่าทึ่ง",tags:["Indie Rock","Witty","Eclectic"],mood:{dark:3,chill:5,energetic:6,emotional:5,indie:9},sp:sp("vampire weekend")},
+  // --- Latin ---
+  {name:"Bad Bunny",emoji:"🐰",nat:"🇺🇸 สหรัฐฯ",genre:"Reggaeton / Trap Latino",bio:"ราชาแห่ง Latin music ที่ทำลายทุก record streaming 🐰 DTMF ฮิต Billboard 2025 เพลง Spanish ที่คนทั่วโลกฟัง",tags:["Reggaeton","Latin","Iconic"],mood:{dark:3,chill:6,energetic:8,emotional:5,indie:4},sp:sp("bad bunny")},
+  {name:"Karol G",emoji:"💚",nat:"🇨🇴 โคลอมเบีย",genre:"Reggaeton / Pop",bio:"ราชินีแห่ง Reggaeton ที่มาแรงที่สุด 💚 empowering สนุก และ move ทันทีที่เปิดเพลง เสียงและ energy ที่ไม่มีใครหยุดได้",tags:["Reggaeton","Empowering","Dance"],mood:{dark:2,chill:4,energetic:10,emotional:5,indie:3},sp:sp("karol g")},
+  // --- Electronic ---
+  {name:"Daft Punk",emoji:"🤖",nat:"🇫🇷 ฝรั่งเศส",genre:"Electronic / House",bio:"ดูโอ French Electronic ที่เปลี่ยนโลกดนตรีตลอดกาล 🤖 ทุก album คือ milestone ที่ยังฟังได้ตลอดไป",tags:["Electronic","House","Timeless"],mood:{dark:3,chill:5,energetic:8,emotional:6,indie:7},sp:sp("daft punk")},
+  {name:"Massive Attack",emoji:"🌑",nat:"🇬🇧 อังกฤษ",genre:"Trip-Hop",bio:"ผู้บุกเบิก Trip-Hop ที่ cinematic มากที่สุด 🌑 เสียงที่ dark atmospheric ฟังแล้วรู้สึกเหมือนอยู่ในหนัง noir ยุค 90s",tags:["Trip-Hop","Dark","Cinematic"],mood:{dark:8,chill:6,energetic:3,emotional:6,indie:9},sp:sp("massive attack")},
+  // --- Legends ---
+  {name:"Michael Jackson",emoji:"🕺",nat:"🇺🇸 สหรัฐฯ",genre:"Pop",bio:"ราชาแห่ง Pop ที่ไม่มีวันถูกแทนที่ 🕺 เพลงที่ timeless สุดขีด ทุก MV คือ art และ performance ที่ไม่มีใครทำได้เหมือน",tags:["Pop","Legend","Iconic"],mood:{dark:3,chill:3,energetic:9,emotional:7,indie:2},sp:sp("michael jackson")},
+  {name:"Whitney Houston",emoji:"🎙️",nat:"🇺🇸 สหรัฐฯ",genre:"R&B / Soul",bio:"เสียงที่ทรงพลังที่สุดที่โลกเคยได้ยิน 🎙️ I Will Always Love You คือ performance ที่ไม่มีใครทำได้เหมือน",tags:["R&B","Soul","Legendary"],mood:{dark:2,chill:4,energetic:6,emotional:10,indie:2},sp:sp("whitney houston")},
+  {name:"Amy Winehouse",emoji:"🎤",nat:"🇬🇧 อังกฤษ",genre:"Soul / Jazz / R&B",bio:"ตำนานที่ไม่มีใครเทียบได้ 🎤 เสียง Jazz Soul ของ Amy Winehouse raw และ powerful มากที่สุด Back to Black คือ album ที่ดีที่สุดตลอดกาล",tags:["Soul","Jazz","Legend"],mood:{dark:7,chill:5,energetic:4,emotional:10,indie:7},sp:sp("amy winehouse")},
+  {name:"Mariah Carey",emoji:"🎄",nat:"🇺🇸 สหรัฐฯ",genre:"R&B / Pop",bio:"ราชินีแห่ง R&B ที่ vocal range กว้างที่สุด 🎄 All I Want for Christmas Is You ยังติด Billboard ทุกปี เสียงที่ iconic จนกลายเป็น cultural phenomenon",tags:["R&B","Pop","Legendary"],mood:{dark:2,chill:4,energetic:6,emotional:9,indie:2},sp:sp("mariah carey")},
+  {name:"Beyoncé",emoji:"👸",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B",bio:"ราชินีที่ไม่มีวันตก 👸 ทุก era คือ redefinition ของ Pop culture เสียงและ performance ที่ทรงพลังที่สุดในโลก",tags:["Pop","R&B","Iconic"],mood:{dark:3,chill:3,energetic:9,emotional:7,indie:3},sp:sp("beyonce")},
+  {name:"Rosé",emoji:"🌹",nat:"🇰🇷 เกาหลี",genre:"Pop",bio:"APT กับ Bruno Mars ฮิต Top 10 Billboard Year-End 2025 🌹 Solo ที่ emotional และ authentic มาก เสียงที่ delicate แต่ทรงพลัง",tags:["Pop","K-Pop","Crossover"],mood:{dark:3,chill:5,energetic:5,emotional:7,indie:5},sp:sp("rose blackpink")},
+  {name:"Lauv",emoji:"💙",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop",bio:"Indie Pop ที่ soft และ relatable ที่สุด 💙 เพลงพูดถึงความรักและ anxiety ในแบบที่คนฟัง relate ได้ทันที",tags:["Indie Pop","Soft","Relatable"],mood:{dark:3,chill:6,energetic:3,emotional:8,indie:6},sp:sp("lauv")},
+  {name:"Jeremy Zucker",emoji:"🌙",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop",bio:"Indie Pop ที่ melancholic และ introspective 🌙 comethru คือ anthem ของคนที่ feel too much เสียงที่ soft แต่ emotional มาก",tags:["Indie Pop","Melancholic","Introspective"],mood:{dark:4,chill:6,energetic:2,emotional:8,indie:7},sp:sp("jeremy zucker")},
+  {name:"Still Woozy",emoji:"🎸",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop",bio:"Indie Pop ที่ quirky และ fun 🎸 เสียงที่ catchy ฟังแล้วอยากร้องตาม บรรยากาศ chill แต่ energetic ในเวลาเดียวกัน",tags:["Indie Pop","Quirky","Fun"],mood:{dark:2,chill:7,energetic:5,emotional:5,indie:8},sp:sp("still woozy")},
+  {name:"Halsey",emoji:"🌑",nat:"🇺🇸 สหรัฐฯ",genre:"Alt Pop",bio:"Alt Pop ที่ dark และ emotional มากที่สุด 🌑 เพลงพูดถึงความเจ็บปวดและตัวตนในแบบที่ raw และ unapologetic",tags:["Alt Pop","Dark","Emotional"],mood:{dark:7,chill:3,energetic:5,emotional:8,indie:7},sp:sp("halsey")},
+,
+  {name:"Lil Uzi Vert",emoji:"👽",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Emo Rap",bio:"Emo Rap ที่ dark และ energetic มากที่สุด 👽 ผสม Hip Hop กับ Rock ในแบบที่ Gen-Z สะท้อนตัวตนได้ทันที",tags:["Hip-Hop","Emo Rap","Energetic"],mood:{dark:6,chill:3,energetic:8,emotional:5,indie:5},sp:sp("lil uzi vert")},
+  {name:"21 Savage",emoji:"🌑",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / Trap",bio:"Trap ที่ dark และ street มากที่สุด 🌑 เสียงที่ cold และ calculated ฟังแล้วรู้สึกถึงความ raw ของชีวิต",tags:["Trap","Dark","Street"],mood:{dark:8,chill:3,energetic:6,emotional:4,indie:4},sp:sp("21 savage")},
+  {name:"Playboi Carti",emoji:"🕷️",nat:"🇺🇸 สหรัฐฯ",genre:"Trap",bio:"Trap ที่ hypnotic และ atmospheric มากที่สุด 🕷️ เสียงที่ dark moody ฟังแล้วรู้สึกเหมือนอยู่ในอีกโลก",tags:["Trap","Dark","Hypnotic"],mood:{dark:9,chill:3,energetic:8,emotional:3,indie:5},sp:sp("playboi carti")},
+  {name:"Justin Timberlake",emoji:"🕺",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B",bio:"King of Pop R&B ที่ versatile ที่สุด 🕺 Mirrors คือ anthem ความรักที่ timeless เสียงที่ smooth และ funky",tags:["Pop R&B","Funky","Classic"],mood:{dark:2,chill:4,energetic:7,emotional:6,indie:3},sp:sp("justin timberlake")},
+  {name:"Rihanna",emoji:"💎",nat:"🇺🇸 สหรัฐฯ",genre:"Pop / R&B",bio:"ราชินีที่ confident และ versatile ที่สุด 💎 ทำได้ทุก genre ตั้งแต่ dancehall ถึง ballad เสียงที่ iconic",tags:["Pop R&B","Confident","Iconic"],mood:{dark:4,chill:4,energetic:7,emotional:6,indie:3},sp:sp("rihanna")},
+  {name:"Troye Sivan",emoji:"🌸",nat:"🇦🇺 ออสเตรเลีย",genre:"Indie Pop",bio:"Indie Pop ที่ introspective และ emotional มากที่สุด 🌸 เพลงพูดถึง identity และ love ในแบบที่ raw และ beautiful",tags:["Indie Pop","Introspective","Emotional"],mood:{dark:4,chill:5,energetic:4,emotional:8,indie:7},sp:sp("troye sivan")},
+  {name:"Sufjan Stevens",emoji:"❄️",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Folk",bio:"Indie Folk ที่ literary และ emotional มากที่สุด ❄️ เพลงที่ dense ด้วยความหมาย ฟังแล้วรู้สึกถึงทุก word",tags:["Indie Folk","Literary","Emotional"],mood:{dark:5,chill:6,energetic:2,emotional:9,indie:10},sp:sp("sufjan stevens")},
+  {name:"Jungle",emoji:"🌿",nat:"🇬🇧 อังกฤษ",genre:"Funk / Electronic",bio:"Funk Electronic ที่ groove ที่สุดในโลก 🌿 ทุกเพลงทำให้อยากขยับตัวทันที psychedelic vibes สุดๆ",tags:["Funk","Electronic","Groove"],mood:{dark:3,chill:6,energetic:7,emotional:4,indie:8},sp:sp("jungle band uk")},
+  {name:"Portishead",emoji:"🌑",nat:"🇬🇧 อังกฤษ",genre:"Trip-Hop",bio:"Trip-Hop ที่ dark และ haunting มากที่สุด 🌑 เสียงที่ atmospheric ฟังแล้วรู้สึกเหมือนอยู่ใน film noir ยุค 90s",tags:["Trip-Hop","Dark","Haunting"],mood:{dark:9,chill:5,energetic:2,emotional:7,indie:9},sp:sp("portishead")},
+  {name:"Mac Miller",emoji:"🎵",nat:"🇺🇸 สหรัฐฯ",genre:"Hip-Hop / R&B",bio:"Hip Hop ที่ introspective และ soulful มากที่สุด 🎵 เพลงพูดถึงการต่อสู้กับชีวิตในแบบที่ raw และ honest",tags:["Hip-Hop","Introspective","Emotional"],mood:{dark:6,chill:5,energetic:4,emotional:8,indie:7},sp:sp("mac miller")},
+  {name:"Phoebe Bridgers",emoji:"💀",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Folk",bio:"Indie Folk ที่ทำให้ร้องไห้ได้ทุกครั้ง 💀 เสียง fragile แต่ทรงพลัง เพลงที่ dark และ beautiful อย่างไม่น่าเชื่อ",tags:["Indie Folk","Dark","Emotional"],mood:{dark:8,chill:6,energetic:1,emotional:10,indie:9},sp:sp("phoebe bridgers")},
+  {name:"Bon Iver",emoji:"❄️",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Folk",bio:"Indie Folk ที่ ethereal และ introspective มากที่สุด ❄️ เสียงที่ haunting ฟังแล้วรู้สึกเหมือนอยู่ท่ามกลางป่าหิมะ",tags:["Indie Folk","Ethereal","Introspective"],mood:{dark:5,chill:7,energetic:1,emotional:8,indie:10},sp:sp("bon iver")},
+  {name:"Cigarettes After Sex",emoji:"🌑",nat:"🇺🇸 สหรัฐฯ",genre:"Ambient Pop",bio:"Ambient Pop ที่ dreamy และ nocturnal ที่สุด 🌑 ฟังแล้วรู้สึกเหมือนนั่งมองหน้าต่างตอนฝนตกดึก",tags:["Ambient Pop","Dreamy","Nocturnal"],mood:{dark:6,chill:9,energetic:1,emotional:7,indie:9},sp:sp("cigarettes after sex")},
+  {name:"Gracie Abrams",emoji:"🌙",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop",bio:"That's So True ฮิต Top 20 Billboard 2025 🌙 Indie Pop ที่ soft และ raw เพลงพูดถึงความรักอย่างจริงใจ",tags:["Indie Pop","Raw","Emotional"],mood:{dark:5,chill:5,energetic:2,emotional:9,indie:8},sp:sp("gracie abrams")},
+  {name:"Djo",emoji:"🌀",nat:"🇺🇸 สหรัฐฯ",genre:"Indie Pop / Psychedelic",bio:"End of Beginning ฮิตจาก TikTok สู่ Billboard 🌀 Indie Pop Psychedelic ที่ dreamy และ hypnotic ที่สุด",tags:["Indie Pop","Psychedelic","Viral"],mood:{dark:4,chill:7,energetic:4,emotional:7,indie:9},sp:sp("djo musician")},
+  {name:"Tyla",emoji:"💛",nat:"🇿🇦 แอฟริกาใต้",genre:"Afropop / R&B",bio:"Water ฮิต Billboard 2024 💛 Afropop ผสม R&B ในแบบที่ไม่มีใครทำได้ เสียงที่ lush และ groove ที่เป็นเอกลักษณ์",tags:["Afropop","R&B","Global"],mood:{dark:2,chill:6,energetic:7,emotional:6,indie:6},sp:sp("tyla singer")},
+  {name:"Artemas",emoji:"💫",nat:"🇬🇧 อังกฤษ",genre:"Indie Pop / Alt Pop",bio:"I Like the Way You Kiss Me ฮิตระดับโลก 💫 Indie Pop ที่ catchy และ chill เสียงที่ smooth ติดหูได้ทันที",tags:["Indie Pop","Alt Pop","Viral"],mood:{dark:2,chill:7,energetic:5,emotional:6,indie:8},sp:sp("artemas musician")},
+  {name:"Lola Young",emoji:"🔥",nat:"🇬🇧 อังกฤษ",genre:"Alt Pop",bio:"Messy ฮิต Billboard 2025 🔥 Alt Pop ที่ raw และ vulnerable มากที่สุด เสียงที่ powerful ฟังแล้วรู้สึกถึงความจริง",tags:["Alt Pop","Raw","Vulnerable"],mood:{dark:6,chill:4,energetic:4,emotional:9,indie:7},sp:sp("lola young singer")},
+  {name:"Alex Warren",emoji:"🎵",nat:"🇺🇸 สหรัฐฯ",genre:"Pop",bio:"Billboard Top New Artist 2025 ด้วย Ordinary 🎵 Pop ที่ emotional และ sincere ทุกคน relate ได้กับชีวิตธรรมดาที่สวยงาม",tags:["Pop","Emotional","Sincere"],mood:{dark:4,chill:4,energetic:5,emotional:9,indie:5},sp:sp("alex warren singer")}
+];
+
+// ============================================================
+// ARTISTS_KOREAN — 100 ศิลปินเกาหลี (K-Idol 50 + K-HipHop 50)
+// ============================================================
+var ARTISTS_KOREAN = [
+  // --- K-Idol / Girl Group / Boyband (50) ---
+  {name:"BTS",emoji:"💜",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Hip-Hop",bio:"กลุ่มที่เปลี่ยนโลก K-Pop ให้เป็นปรากฏการณ์ 💜 ดนตรีผสม Hip Hop Pop และ R&B พร้อม message ที่ทรงพลัง ฟังได้ทุก era",tags:["K-Pop","Global","Emotional"],mood:{dark:3,chill:4,energetic:8,emotional:8,indie:4},sp:sp("bts")},
+  {name:"BLACKPINK",emoji:"🖤",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Dance",bio:"K-Pop ที่ทรงอิทธิพลมากที่สุดในโลก 🖤 JUMP กลับมาฮิตทั่วโลกปี 2025 Banger ทุกเพลง แฟชั่นระดับ world-class",tags:["K-Pop","Dance","Fierce"],mood:{dark:3,chill:2,energetic:9,emotional:5,indie:2},sp:sp("blackpink")},
+  {name:"aespa",emoji:"🤖",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Synth Pop",bio:"K-Pop ที่พาเข้าไปใน metaverse 🤖 Supernova ฮิตอันดับ 2 Melon Year-End 2025 Synth Pop ที่ futuristic และ dark",tags:["K-Pop","Futuristic","Dark Pop"],mood:{dark:6,chill:2,energetic:8,emotional:5,indie:4},sp:sp("aespa")},
+  {name:"IVE",emoji:"🌟",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"IVE 4th Gen วงที่ฮิตต่อเนื่องยาวนาน 🌟 เพลง concept ที่ confident แต่ละ comeback ล้วน chart ทั้ง Melon และ Global",tags:["K-Pop","Confident","Girl Crush"],mood:{dark:2,chill:3,energetic:8,emotional:5,indie:3},sp:sp("ive kpop")},
+  {name:"NewJeans",emoji:"👖",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Y2K",bio:"Y2K กลับมาในแบบที่ไม่เคยเห็น 👖 K-Pop ที่ innocent catchy และ addictive ฟังเพลงแรกแล้วอยากฟังต่ออีก 10 เพลง",tags:["K-Pop","Y2K","Retro"],mood:{dark:2,chill:7,energetic:5,emotional:6,indie:6},sp:sp("newjeans")},
+  {name:"Stray Kids",emoji:"🐺",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Rock",bio:"K-Pop ที่ produce ตัวเองและเสียงหนักที่สุด 🐺 ผสม Rock กับ Hip Hop ใน K-Pop ในแบบที่ไม่มีใครเหมือน",tags:["K-Pop","Rock","Self-Produced"],mood:{dark:6,chill:2,energetic:9,emotional:5,indie:5},sp:sp("stray kids")},
+  {name:"SEVENTEEN",emoji:"💎",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"13 สมาชิก self-produced ทุกอย่าง 💎 วงที่ diverse ที่สุดใน K-Pop ทั้ง hip hop, performance, vocal unit",tags:["K-Pop","Self-Produced","Diverse"],mood:{dark:3,chill:4,energetic:7,emotional:6,indie:5},sp:sp("seventeen kpop")},
+  {name:"TWICE",emoji:"🍭",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"วง K-Pop ที่ fun และ cheerful ที่สุด 🍭 ทุกเพลงทำให้อารมณ์ดีทันที เป็นวงที่ consistent และ fan-loyal มากที่สุด",tags:["K-Pop","Fun","Cheerful"],mood:{dark:1,chill:4,energetic:8,emotional:5,indie:2},sp:sp("twice kpop")},
+  {name:"ENHYPEN",emoji:"🌑",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop 4th gen ที่มี concept มืดและ youthful 🌑 เพลงพูดถึง adolescence และ coming of age ในแบบที่ dark และ beautiful",tags:["K-Pop","Dark","Youthful"],mood:{dark:6,chill:3,energetic:7,emotional:6,indie:4},sp:sp("enhypen")},
+  {name:"TXT",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Alternative",bio:"Tomorrow X Together K-Pop ที่ alternative ที่สุด 🌙 เพลงพูดถึง youth และ uncertainty ในแบบที่ emotional และ introspective",tags:["K-Pop","Alternative","Emotional"],mood:{dark:6,chill:3,energetic:6,emotional:7,indie:6},sp:sp("tomorrow x together")},
+  {name:"ATEEZ",emoji:"⚓",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ theatrical และ performance-driven มากที่สุด ⚓ ทุก stage คือ ละครเวทีที่สมบูรณ์แบบ เสียงดีและ performance ยอดเยี่ยม",tags:["K-Pop","Theatrical","Intense"],mood:{dark:5,chill:2,energetic:9,emotional:5,indie:4},sp:sp("ateez")},
+  {name:"BOYNEXTDOOR",emoji:"🌿",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"Today Only I LOVE YOU ฮิตอันดับ 12 Melon 2025 🌿 K-Pop 5th gen ที่ fresh และ emotional เพลงพูดถึงความรักในแบบที่ relatable",tags:["K-Pop","Fresh","Emotional"],mood:{dark:3,chill:5,energetic:6,emotional:7,indie:5},sp:sp("boynextdoor kpop")},
+  {name:"BABYMONSTER",emoji:"👾",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"DRIP ฮิตอันดับ 28 Melon 2025 👾 K-Pop 5th gen girl group ที่ fierce และ powerful มาก 300M YouTube views",tags:["K-Pop","Fierce","Powerful"],mood:{dark:4,chill:2,energetic:9,emotional:4,indie:3},sp:sp("babymonster yg")},
+  {name:"ILLIT",emoji:"🌸",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"Magnetic ฮิต Melon 2025 และเข้า Billboard Hot 100 🌸 K-Pop 5th gen ที่ cute และ catchy ที่สุด viral ทั่วโลก",tags:["K-Pop","Cute","Viral"],mood:{dark:1,chill:5,energetic:7,emotional:5,indie:4},sp:sp("illit kpop")},
+  {name:"G-Dragon",emoji:"💎",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Hip-Hop",bio:"HOME SWEET HOME ฮิตอันดับ 2 Melon Year-End 2025 💎 King of K-Pop ผู้ set trend ทุก era ไม่มีใครเหมือน",tags:["K-Pop","Hip-Hop","Trendsetter"],mood:{dark:5,chill:4,energetic:7,emotional:5,indie:7},sp:sp("g-dragon")},
+  {name:"IU",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Indie Pop",bio:"ราชินีแห่ง K-Pop ที่ story-telling และ emotional มากที่สุด 🌙 ทุกเพลงเป็นบทกวีที่แสดงความรู้สึกได้อย่างลึกซึ้ง",tags:["K-Pop","Storytelling","Emotional"],mood:{dark:3,chill:6,energetic:3,emotional:9,indie:7},sp:sp("iu kpop")},
+  {name:"WOODZ",emoji:"🌊",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Rock",bio:"Drowning ฮิตอันดับ 1 Melon Year-End 2025 🌊 เพลงที่ viral ข้ามปีจากทหาร rock ผสม K-Pop ได้อย่างสมบูรณ์แบบ",tags:["K-Pop","Rock","Viral"],mood:{dark:6,chill:4,energetic:5,emotional:8,indie:6},sp:sp("woodz kpop")},
+  {name:"DAY6",emoji:"🎸",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Band",bio:"K-Pop Band ที่ emotional ที่สุด 🎸 เล่นเครื่องดนตรีเองทุกคน เพลงพูดถึงความรักและชีวิตอย่างลึกซึ้ง rock ที่มี heart",tags:["K-Rock","Band","Emotional"],mood:{dark:4,chill:4,energetic:6,emotional:8,indie:6},sp:sp("day6")},
+  {name:"EXO",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"The First Snow ยังติด Melon ทุกปี 🌙 วงที่ smooth และ emotional ที่สุดใน K-Pop เสียง harmony ที่สมบูรณ์แบบ",tags:["K-Pop","Smooth","Classic"],mood:{dark:3,chill:5,energetic:6,emotional:7,indie:3},sp:sp("exo kpop")},
+  {name:"NCT 127",emoji:"🤖",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ experimental และ diverse ที่สุด 🤖 ผสมทุก genre ตั้งแต่ R&B ถึง Rock ใน K-Pop ทุก comeback คือ experiment ใหม่",tags:["K-Pop","Experimental","Diverse"],mood:{dark:5,chill:3,energetic:8,emotional:5,indie:5},sp:sp("nct 127")},
+  {name:"MAMAMOO",emoji:"🌺",nat:"🇰🇷 เกาหลี",genre:"K-Pop / R&B",bio:"K-Pop ที่ soulful และ confident ที่สุด 🌺 เสียง harmony ที่ดีที่สุดใน K-Pop เพลงที่ empowering และ feel-good",tags:["K-Pop","R&B","Soulful"],mood:{dark:2,chill:4,energetic:7,emotional:6,indie:5},sp:sp("mamamoo")},
+  {name:"Red Velvet",emoji:"🍎",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop dual concept ที่ playful และ dark ในเวลาเดียวกัน 🍎 ทุก concept สมบูรณ์แบบ เสียง harmony ที่ beautiful",tags:["K-Pop","Dual Concept","Iconic"],mood:{dark:4,chill:4,energetic:7,emotional:5,indie:4},sp:sp("red velvet")},
+  {name:"SHINee",emoji:"✨",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ artistic และ timeless ที่สุด ✨ pioneer ของ K-Pop ยุค 2nd gen ที่ยังมีความ relevance จนถึงทุกวันนี้",tags:["K-Pop","Artistic","Timeless"],mood:{dark:3,chill:4,energetic:7,emotional:6,indie:5},sp:sp("shinee")},
+  {name:"BIGBANG",emoji:"💥",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Hip-Hop",bio:"ตำนาน K-Pop ที่ก่อตั้ง genre ทั้งหมด 💥 G-Dragon, T.O.P, Taeyang ล้วนเป็น icon แห่ง K-Pop ยุค 2nd gen",tags:["K-Pop","Hip-Hop","Legend"],mood:{dark:4,chill:3,energetic:7,emotional:6,indie:5},sp:sp("bigbang kpop")},
+  {name:"WINNER",emoji:"🏆",nat:"🇰🇷 เกาหลี",genre:"K-Pop / R&B",bio:"K-Pop ที่ emotional และ chill ที่สุดใน YG 🏆 เพลงพูดถึงความรักและความสูญเสียในแบบที่ deep และ melodic",tags:["K-Pop","R&B","Emotional"],mood:{dark:4,chill:5,energetic:4,emotional:8,indie:5},sp:sp("winner kpop")},
+  {name:"Taeyang",emoji:"☀️",nat:"🇰🇷 เกาหลี",genre:"K-Pop / R&B",bio:"เสียง R&B ที่ soulful และ smooth ที่สุดใน K-Pop ☀️ BIGBANG member Solo ที่ authentic และ powerful มาก",tags:["K-Pop","R&B","Soulful"],mood:{dark:3,chill:5,energetic:6,emotional:7,indie:4},sp:sp("taeyang")},
+  {name:"Jimin",emoji:"🌸",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Pop",bio:"Who ฮิต Billboard 2025 🌸 BTS member Solo ที่ artistic และ emotional มากที่สุด เพลงที่ delicate และ powerful ในเวลาเดียวกัน",tags:["K-Pop","Artistic","Emotional"],mood:{dark:4,chill:4,energetic:6,emotional:7,indie:5},sp:sp("jimin bts")},
+  {name:"Jung Kook",emoji:"🌟",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Pop R&B",bio:"Seven กับ Latto ฮิต Global 🌟 BTS member Solo ที่ versatile และ charismatic ทำได้ทุก genre ตั้งแต่ Pop ถึง R&B",tags:["K-Pop","Versatile","Charismatic"],mood:{dark:3,chill:4,energetic:7,emotional:6,indie:4},sp:sp("jungkook bts")},
+  {name:"RM",emoji:"🎨",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Indie",bio:"BTS Leader ที่ intellectual และ artistic มากที่สุด 🎨 Solo ที่ indie และ philosophical เพลงที่พูดถึงชีวิตและ identity",tags:["K-Pop","Indie","Artistic"],mood:{dark:5,chill:5,energetic:4,emotional:7,indie:8},sp:sp("rm bts")},
+  {name:"JENNIE",emoji:"💎",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Pop",bio:"like JENNIE ฮิตอันดับ 11 Melon 2025 💎 Solo ที่ confident และ charismatic มากที่สุด Style icon ของ K-Pop",tags:["K-Pop","Confident","Fashion"],mood:{dark:4,chill:4,energetic:7,emotional:5,indie:5},sp:sp("jennie blackpink")},
+  {name:"LISA",emoji:"💃",nat:"🇹🇭/🇰🇷",genre:"K-Pop / Hip-Hop",bio:"ศิลปินไทยที่ดังที่สุดในโลก 💃 BLACKPINK member ที่ dance skills ดีที่สุด Solo ที่ fierce และ global",tags:["K-Pop","Dance","Fierce"],mood:{dark:4,chill:2,energetic:9,emotional:4,indie:4},sp:sp("lisa blackpink")},
+  {name:"Oh My Girl",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ dreamy และ pure ที่สุด 🌙 เพลงที่ innocent และ beautiful ให้ความรู้สึก peaceful และ happy",tags:["K-Pop","Dreamy","Pure"],mood:{dark:1,chill:6,energetic:6,emotional:5,indie:4},sp:sp("oh my girl kpop")},
+  {name:"Girls' Generation",emoji:"👑",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"ตำนาน K-Pop ยุค 1st-2nd gen ที่ไม่มีวันถูกลืม 👑 Gee Genie Into The New World คือ classics ที่คนทุกยุครู้จัก",tags:["K-Pop","Legend","Timeless"],mood:{dark:1,chill:4,energetic:8,emotional:6,indie:2},sp:sp("girls generation")},
+  {name:"f(x)",emoji:"🌐",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Art Pop",bio:"K-Pop ที่ experimental และ art-forward มากที่สุด 🌐 concept ที่ unique เสียงที่ distinctive ไม่มีวงไหนเหมือน",tags:["K-Pop","Experimental","Art"],mood:{dark:4,chill:4,energetic:6,emotional:5,indie:7},sp:sp("f(x) kpop")},
+  {name:"2NE1",emoji:"🔥",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"ตำนาน Girl Crush K-Pop ที่ fierce ที่สุด 🔥 pioneer ของ empowering Girl Group เพลงที่ powerful จนยังฟังได้ทุกวันนี้",tags:["K-Pop","Fierce","Legend"],mood:{dark:4,chill:2,energetic:9,emotional:5,indie:4},sp:sp("2ne1")},
+  {name:"GOT7",emoji:"🦅",nat:"🇰🇷 เกาหลี",genre:"K-Pop / R&B",bio:"K-Pop ที่ versatile และ smooth ที่สุด 🦅 ผสม R&B กับ Dance ได้อย่างลงตัว ทุก member มีเอกลักษณ์ที่โดดเด่น",tags:["K-Pop","R&B","Versatile"],mood:{dark:3,chill:4,energetic:7,emotional:6,indie:4},sp:sp("got7")},
+  {name:"Monsta X",emoji:"🔱",nat:"🇰🇷 เกาหลี",genre:"K-Pop / Hip-Hop",bio:"K-Pop ที่ fierce และ hype ที่สุดสาย charisma 🔱 ผสม Hip Hop กับ Dance ได้อย่าง intense ทุกเพลงเป็น banger",tags:["K-Pop","Hip-Hop","Fierce"],mood:{dark:5,chill:2,energetic:9,emotional:4,indie:3},sp:sp("monsta x")},
+  {name:"NMIXX",emoji:"⚡",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ bold และ experimental ที่สุดจาก JYP ⚡ concept ที่ unique ผสมหลาย genre ใน track เดียว",tags:["K-Pop","Bold","Experimental"],mood:{dark:4,chill:2,energetic:8,emotional:5,indie:5},sp:sp("nmixx kpop")},
+  {name:"Super Junior",emoji:"🌟",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"ตำนาน K-Pop ยุค 2nd gen ที่ classic และ fun ที่สุด 🌟 SORRY SORRY ยังเป็น anthem K-Pop ที่ทุกคนจำได้",tags:["K-Pop","Classic","Fun"],mood:{dark:2,chill:4,energetic:7,emotional:5,indie:2},sp:sp("super junior")},
+  {name:"N.Flying",emoji:"🎸",nat:"🇰🇷 เกาหลี",genre:"K-Rock",bio:"วง Rock ใน K-Pop ที่ fun และ energetic ที่สุด 🎸 ผสม Rock กับ K-Pop ได้อย่าง authentic เล่นเครื่องดนตรีสด",tags:["K-Rock","Fun","Energetic"],mood:{dark:3,chill:3,energetic:8,emotional:5,indie:5},sp:sp("n flying kpop")},
+  {name:"CNBLUE",emoji:"🎸",nat:"🇰🇷 เกาหลี",genre:"K-Rock",bio:"K-Rock band ที่ indie ที่สุด 🎸 ผสม indie guitar sound กับ K-Pop melody ได้อย่างสมบูรณ์แบบ",tags:["K-Rock","Indie","Guitar"],mood:{dark:3,chill:5,energetic:6,emotional:6,indie:6},sp:sp("cnblue")},
+  {name:"Hearts2Hearts",emoji:"💖",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"5th Gen girl group ใหม่จาก SM CHASE และ STYLE ฮิต Melon 2025 💖 เสียงและ concept ในแบบ SM ที่ quality สูงมาก",tags:["K-Pop","New Gen","SM"],mood:{dark:2,chill:4,energetic:7,emotional:5,indie:4},sp:sp("hearts2hearts kpop")},
+  {name:"ALLDAY PROJECT",emoji:"🌈",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"FAMOUS ฮิตอันดับ 23 Melon 2025 🌈 Mixed group ใหม่ที่ vibrant และ fun มาก debut ปี 2025 แต่ฮิตทันที",tags:["K-Pop","Vibrant","Fresh"],mood:{dark:2,chill:4,energetic:7,emotional:5,indie:4},sp:sp("allday project kpop")},
+  {name:"KiiiKiii",emoji:"⚡",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"I DO ME ฮิต Melon 2025 ⚡ New girl group จาก Starship ที่ strong และ confident มาก 5th Gen ที่มาแรง",tags:["K-Pop","Girl Crush","New Gen"],mood:{dark:3,chill:2,energetic:8,emotional:4,indie:3},sp:sp("kiiiKiii kpop")},
+  {name:"WEEEKLY",emoji:"🌸",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ energetic และ bright ที่สุด 🌸 ทุกเพลงทำให้อารมณ์ดีทันที concept ที่ cheerful และ youthful",tags:["K-Pop","Energetic","Bright"],mood:{dark:1,chill:4,energetic:8,emotional:5,indie:3},sp:sp("weeekly kpop")},
+  {name:"GFRIEND",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ pure และ youthful ที่สุด 🌙 เพลงที่ emotional และ sincere เหมาะกับคนที่ชอบความ innocent ใน K-Pop",tags:["K-Pop","Pure","Emotional"],mood:{dark:2,chill:5,energetic:6,emotional:6,indie:4},sp:sp("gfriend kpop")},
+  {name:"4Minute",emoji:"⚡",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop girl group ที่ edgy และ fierce สุดๆ ⚡ Crazy เป็นเพลงที่ bold ที่สุดใน K-Pop ยุค 2nd gen",tags:["K-Pop","Fierce","Edgy"],mood:{dark:4,chill:2,energetic:9,emotional:4,indie:3},sp:sp("4minute kpop")},
+  {name:"miss A",emoji:"💫",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ fierce และ empowering จาก JYP 💫 Bad Girl Good Girl เป็น classic ที่ทุกคนจำได้ Suzy เป็น National Goddess",tags:["K-Pop","Fierce","Classic"],mood:{dark:3,chill:3,energetic:8,emotional:5,indie:3},sp:sp("miss a kpop")},
+
+  // --- K-HipHop / K-R&B (50) ---
+  {name:"Zico",emoji:"🎤",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"อันดับ 1 Rapper ที่คนเกาหลีรักมากที่สุด 🎤 Spot! กับ Jennie ฮิตระดับโลก ทำได้ทุก genre versatile มาก",tags:["K-HipHop","Versatile","Iconic"],mood:{dark:5,chill:4,energetic:7,emotional:5,indie:7},sp:sp("zico rapper")},
+  {name:"Epik High",emoji:"🦅",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"ผู้บุกเบิก Conscious Hip Hop เกาหลี 🦅 เล่น Coachella เป็น Korean act แรก เพลงที่ lyrical deep และ emotional มาก",tags:["K-HipHop","Conscious","Pioneer"],mood:{dark:6,chill:4,energetic:5,emotional:7,indie:8},sp:sp("epik high")},
+  {name:"Dynamic Duo",emoji:"🎵",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Duo ที่ witty และ lyrical ที่สุดใน K-HipHop 🎵 อันดับ 2 Rapper ที่คนเกาหลีรักมากที่สุด BAAAM คือ classic",tags:["K-HipHop","Witty","Lyrical"],mood:{dark:4,chill:5,energetic:6,emotional:5,indie:7},sp:sp("dynamic duo korea")},
+  {name:"Jay Park",emoji:"🌊",nat:"🇰🇷/🇺🇸",genre:"K-HipHop / R&B",bio:"ผู้ก่อตั้ง AOMG ที่ชื่อดัง 🌊 ผสม American Hip Hop กับ Korean R&B ได้อย่างลงตัว versatile มาก Roc Nation signee",tags:["K-HipHop","R&B","Versatile"],mood:{dark:4,chill:5,energetic:7,emotional:5,indie:6},sp:sp("jay park")},
+  {name:"pH-1",emoji:"🌿",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"Korean-American rapper ที่ emotional และ introspective มากที่สุด 🌿 เพลงพูดถึง identity และ bicultural experience อย่างลึกซึ้ง",tags:["K-HipHop","Emotional","Identity"],mood:{dark:5,chill:5,energetic:5,emotional:7,indie:7},sp:sp("ph-1 rapper")},
+  {name:"Sik-K",emoji:"🎶",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / R&B",bio:"Hip Hop R&B ที่ smooth ที่สุดใน AOMG 🎶 flow ลื่น เสียงที่ catchy ผสม trap กับ R&B ได้อย่างลงตัว",tags:["K-HipHop","Smooth","Trap"],mood:{dark:4,chill:5,energetic:6,emotional:5,indie:6},sp:sp("sik-k")},
+  {name:"DPR Live",emoji:"🎬",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / R&B",bio:"อันดับ 1 K-HipHop บน Spotify Korean Playlist 🎬 Hip Hop R&B ที่ cinematic และ emotional มากที่สุด Jasmine คือ anthem",tags:["K-HipHop","Cinematic","Emotional"],mood:{dark:5,chill:5,energetic:5,emotional:7,indie:7},sp:sp("dpr live")},
+  {name:"Simon Dominic",emoji:"😎",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"ผู้ร่วมก่อตั้ง AOMG 😎 Hip Hop ที่ cool และ lyrical มีสไตล์เฉพาะตัวชัดเจน WON & ONLY คือ classic",tags:["K-HipHop","Cool","Lyrical"],mood:{dark:5,chill:5,energetic:5,emotional:4,indie:7},sp:sp("simon dominic")},
+  {name:"Dok2",emoji:"💰",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"ราชาแห่ง Flex HipHop เกาหลี 💰 หนึ่งใน OG ที่ build ILLIONAIRE Records ขึ้นมา flow ที่ confident มาก",tags:["K-HipHop","Flex","OG"],mood:{dark:6,chill:3,energetic:7,emotional:3,indie:6},sp:sp("dok2")},
+  {name:"The Quiett",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Co-founder ILLIONAIRE Records 🌙 Hip Hop ที่ underground และ chill ที่สุด ผู้ที่มี reputation ใน K-HipHop scene มากที่สุด",tags:["K-HipHop","Underground","Chill"],mood:{dark:5,chill:6,energetic:4,emotional:4,indie:7},sp:sp("the quiett")},
+  {name:"Beenzino",emoji:"✨",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / R&B",bio:"Hip Hop ที่ stylish และ introspective ที่สุด ✨ เพลงพูดถึงชีวิตและ identity อย่างลึกซึ้ง flow ที่ unique",tags:["K-HipHop","Stylish","Introspective"],mood:{dark:4,chill:6,energetic:4,emotional:6,indie:7},sp:sp("beenzino")},
+  {name:"Loco",emoji:"😄",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ fun และ energetic ที่สุดจาก AOMG 😄 เพลงที่ catchy ฟังแล้วอารมณ์ดีทันที collaborate กับทุกคน",tags:["K-HipHop","Fun","Energetic"],mood:{dark:3,chill:5,energetic:7,emotional:5,indie:6},sp:sp("loco aomg")},
+  {name:"Gray",emoji:"🎹",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / Producer",bio:"Producer และ rapper ที่ smooth ที่สุดใน AOMG 🎹 เสียงที่ chill ผสม trap beat ที่ melodic ทำ beat ให้ทุกคนใน label",tags:["K-HipHop","Producer","Smooth"],mood:{dark:4,chill:7,energetic:4,emotional:5,indie:7},sp:sp("gray aomg")},
+  {name:"Changmo",emoji:"🌑",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Trap HipHop เกาหลีที่ dark ที่สุด 🌑 flow ที่ emotional ผสม trap beat หนักๆ ฟังแล้วรู้สึกถึงความมืด",tags:["K-HipHop","Trap","Dark"],mood:{dark:6,chill:3,energetic:7,emotional:5,indie:5},sp:sp("changmo")},
+  {name:"Big Naughty",emoji:"🌟",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / R&B",bio:"Hip Hop R&B ที่ smooth และ emotional ที่สุดในรุ่นใหม่ 🌟 เสียงที่ melodic และ heartfelt ฟังแล้ว relate ได้ทันที",tags:["K-HipHop","R&B","Emotional"],mood:{dark:4,chill:5,energetic:5,emotional:7,indie:6},sp:sp("big naughty korea")},
+  {name:"Lee Young Ji",emoji:"💪",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Female rapper ที่ bold ที่สุดใน K-HipHop 💪 ชนะ Show Me The Money ได้รับการยอมรับทั้ง mainstream และ underground",tags:["K-HipHop","Bold","Female"],mood:{dark:4,chill:4,energetic:7,emotional:5,indie:6},sp:sp("lee young ji")},
+  {name:"Jessi",emoji:"🔥",nat:"🇰🇷/🇺🇸",genre:"K-HipHop / Pop",bio:"Rapper ที่ fierce และ unapologetic ที่สุด 🔥 Nunu Nana เปลี่ยน Jessi สู่ mainstream superstar เสียง bold มาก",tags:["K-HipHop","Fierce","Bold"],mood:{dark:4,chill:2,energetic:8,emotional:4,indie:5},sp:sp("jessi rapper")},
+  {name:"Ash Island",emoji:"🖤",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / Emo Rap",bio:"Emo Rap เกาหลีที่ dark ที่สุด 🖤 Melody อันดับ 1 K-HipHop บน Spotify playlist เสียงที่ haunting และ emotional",tags:["K-HipHop","Emo Rap","Dark"],mood:{dark:8,chill:3,energetic:5,emotional:7,indie:6},sp:sp("ash island korea")},
+  {name:"Loopy",emoji:"🌊",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ melodic และ emotional ใน Show Me The Money 🌊 เสียงที่ smooth ผสม rap กับ melody ได้อย่างลงตัว",tags:["K-HipHop","Melodic","Emotional"],mood:{dark:5,chill:4,energetic:5,emotional:6,indie:6},sp:sp("loopy rapper")},
+  {name:"Kid Milli",emoji:"⚫",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Trap ที่ dark ที่สุดใน Indigo Music 🕹️ เสียงที่ intense flow ที่ technical ทุกเพลงเป็น statement ในวงการ",tags:["K-HipHop","Trap","Dark"],mood:{dark:7,chill:2,energetic:7,emotional:4,indie:6},sp:sp("kid milli")},
+  {name:"Deepflow",emoji:"🌊",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ lyrical และ introspective มากที่สุดใน Vismajor 🌊 เพลงที่ deep มีความหมายซ่อนอยู่ในทุก bar",tags:["K-HipHop","Lyrical","Introspective"],mood:{dark:6,chill:4,energetic:4,emotional:5,indie:8},sp:sp("deepflow korea")},
+  {name:"Tablo",emoji:"📚",nat:"🇰🇷/🇨🇦",genre:"K-HipHop",bio:"Epik High member ที่ literary ที่สุดใน K-HipHop 📚 เพลงที่ emotional มากจน Raw เขียนเนื้อเพลงเหมือนบทกวี",tags:["K-HipHop","Literary","Emotional"],mood:{dark:7,chill:4,energetic:4,emotional:8,indie:8},sp:sp("tablo epik high")},
+  {name:"BE'O",emoji:"🌸",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / R&B",bio:"Hip Hop R&B ที่ melodic และ emotional มากที่สุดในรุ่นใหม่ 🌸 เสียงที่ heartfelt ทุกเพลงพูดถึงความรักอย่างจริงใจ",tags:["K-HipHop","Melodic","Romantic"],mood:{dark:4,chill:5,energetic:5,emotional:7,indie:6},sp:sp("be o korea")},
+  {name:"Crush",emoji:"💜",nat:"🇰🇷 เกาหลี",genre:"K-R&B / HipHop",bio:"R&B ที่ smooth และ romantic ที่สุดใน K-HipHop scene 💜 เสียงที่ warm ทุกเพลงพูดถึงความรักในแบบที่ soulful",tags:["K-R&B","Smooth","Romantic"],mood:{dark:3,chill:6,energetic:4,emotional:7,indie:6},sp:sp("crush korea")},
+  {name:"Zion.T",emoji:"🎩",nat:"🇰🇷 เกาหลี",genre:"K-R&B / HipHop",bio:"K-R&B ที่ artistic และ unique มากที่สุด 🎩 เสียงที่ distinctive ทำเพลงในแบบที่ไม่มีใครเหมือน ทุก release คือ art",tags:["K-R&B","Artistic","Unique"],mood:{dark:4,chill:6,energetic:3,emotional:7,indie:8},sp:sp("zion t")},
+  {name:"Colde",emoji:"❄️",nat:"🇰🇷 เกาหลี",genre:"K-R&B / HipHop",bio:"R&B ที่ soft และ introspective มากที่สุด ❄️ เสียงที่ delicate ทุกเพลงพูดถึงความรักและการสูญเสียอย่างละเอียดอ่อน",tags:["K-R&B","Soft","Introspective"],mood:{dark:4,chill:6,energetic:2,emotional:8,indie:7},sp:sp("colde korea")},
+  {name:"Suran",emoji:"🌙",nat:"🇰🇷 เกาหลี",genre:"K-R&B",bio:"R&B เกาหลีที่ emotional และ soulful มากที่สุดจากผู้หญิง 🌙 เสียงที่ powerful ทุกเพลงเต็มไปด้วยความรู้สึก",tags:["K-R&B","Soulful","Emotional"],mood:{dark:4,chill:5,energetic:3,emotional:8,indie:6},sp:sp("suran korea")},
+  {name:"Nafla",emoji:"🌆",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"Korean-American rapper สาย LA style 🌆 ผสม American Trap กับ Korean flow ได้อย่างลงตัว เสียงที่ smooth",tags:["K-HipHop","LA Style","Trap"],mood:{dark:6,chill:3,energetic:7,emotional:4,indie:6},sp:sp("nafla rapper")},
+  {name:"Mino",emoji:"🎨",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / K-Pop",bio:"WINNER member ที่ versatile ที่สุด 🎨 ทำได้ทั้ง K-Pop และ K-HipHop เสียงที่ intense เพลงที่ thoughtful",tags:["K-HipHop","Versatile","Artistic"],mood:{dark:5,chill:3,energetic:7,emotional:5,indie:5},sp:sp("mino winner")},
+  {name:"DPR Ian",emoji:"🎬",nat:"🇰🇷 เกาหลี",genre:"K-HipHop / Art",bio:"Hip Hop ที่ experimental และ dark ที่สุดใน DPR family 🎬 ทุก release คือ cinematic experience ที่ unique",tags:["K-HipHop","Experimental","Dark"],mood:{dark:7,chill:4,energetic:5,emotional:5,indie:8},sp:sp("dpr ian")},
+  {name:"Punchnello",emoji:"🎤",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Conscious rapper ที่ lyrical มากที่สุดในรุ่นใหม่ 🎤 เพลงที่ thoughtful ทุก word มีความหมาย สาย Vismajor",tags:["K-HipHop","Lyrical","Conscious"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:7},sp:sp("punchnello rapper")},
+  {name:"Bewhy",emoji:"✨",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Technical rapper ที่ skill สูงที่สุดจาก Show Me The Money ✨ เพลงที่ powerful มีความเชื่อมั่นในตัวเองสูงมาก",tags:["K-HipHop","Technical","Powerful"],mood:{dark:4,chill:4,energetic:6,emotional:6,indie:6},sp:sp("bewhy korea")},
+  {name:"Hash Swan",emoji:"🌿",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ melodic และ introspective 🌿 เสียงที่ smooth ผสม trap กับ melody ได้อย่างลงตัว ฟังสบายมาก",tags:["K-HipHop","Melodic","Smooth"],mood:{dark:5,chill:5,energetic:4,emotional:6,indie:7},sp:sp("hash swan korea")},
+  {name:"Giriboy",emoji:"🎶",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ melodic witty และ unique 🎶 เสียงที่ distinctive ไม่มีใครเหมือน ทำ beat เองและ rap เอง",tags:["K-HipHop","Melodic","Witty"],mood:{dark:4,chill:5,energetic:5,emotional:6,indie:7},sp:sp("giriboy")},
+  {name:"Verbal Jint",emoji:"📖",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Pioneer ของ K-HipHop ที่ rhyme scheme ดีที่สุด 📖 เปลี่ยนวิธีการ rap ภาษาเกาหลีทั้งหมด ยุค old school icon",tags:["K-HipHop","Pioneer","Lyrical"],mood:{dark:5,chill:4,energetic:5,emotional:5,indie:8},sp:sp("verbal jint")},
+  {name:"Tiger JK",emoji:"🐯",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"ผู้วางรากฐาน K-HipHop ตั้งแต่ยุค 90s 🐯 เป็น pioneer ที่สำคัญที่สุดใน Korean Hip Hop history ร่วมกับ Epik High",tags:["K-HipHop","Pioneer","Legend"],mood:{dark:5,chill:4,energetic:6,emotional:6,indie:7},sp:sp("tiger jk")},
+  {name:"C JAMM",emoji:"🎵",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Lyrical rapper ที่ versatile ที่สุดจาก Just Music 🎵 เพลงที่ thoughtful ผสม lyrical bars กับ trap ได้อย่างลงตัว",tags:["K-HipHop","Lyrical","Versatile"],mood:{dark:5,chill:4,energetic:6,emotional:5,indie:6},sp:sp("c jamm korea")},
+  {name:"Lil Boi",emoji:"💪",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Confident rapper จาก Geeks 💪 เพลงที่ hype energetic ฟังแล้วรู้สึกมั่นใจและมีพลัง",tags:["K-HipHop","Confident","Hype"],mood:{dark:5,chill:3,energetic:7,emotional:4,indie:6},sp:sp("lil boi rapper")},
+  {name:"Coogie",emoji:"😎",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ smooth และ confident 😎 เสียงที่ polished flow ที่ stylish ฟังแล้วรู้สึก cool ทันที",tags:["K-HipHop","Smooth","Stylish"],mood:{dark:4,chill:5,energetic:6,emotional:4,indie:7},sp:sp("coogie korea")},
+  {name:"Yumdda",emoji:"🌑",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Trap underground ที่ dark ที่สุดใน K-HipHop 🌑 เสียงที่ intense underground rapper ที่ scene เกาหลีนับถือ",tags:["K-HipHop","Trap","Underground"],mood:{dark:7,chill:2,energetic:7,emotional:4,indie:6},sp:sp("yumdda korea")},
+  {name:"Okasian",emoji:"🌊",nat:"🇰🇷/🇨🇦",genre:"K-HipHop",bio:"Korean-Canadian rapper flow ที่ melodic ที่สุด 🌊 ผสม Canadian R&B กับ K-HipHop ได้อย่างลงตัว เสียงที่ smooth",tags:["K-HipHop","Melodic","Smooth"],mood:{dark:5,chill:5,energetic:6,emotional:5,indie:6},sp:sp("okasian rapper")},
+  {name:"Junoflo",emoji:"🌐",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Hip Hop ที่ cool stylish ไม่มีใครเหมือน 🌐 เสียงที่ distinctive ทำเพลงในแบบที่ unique มี fanbase ที่ loyal",tags:["K-HipHop","Cool","Stylish"],mood:{dark:4,chill:5,energetic:6,emotional:5,indie:6},sp:sp("junoflo")},
+  {name:"Paloalto",emoji:"🏆",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Veteran rapper ผู้ก่อตั้ง Hi-Lite Records 🏆 เพลงที่ conscious underground ได้รับการนับถือจาก K-HipHop scene ทั้งหมด",tags:["K-HipHop","Veteran","Underground"],mood:{dark:5,chill:5,energetic:5,emotional:5,indie:7},sp:sp("paloalto rapper")},
+  {name:"Nucksal",emoji:"🎤",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"Veteran rapper ที่ lyrical ที่สุดจาก Vismajor 🎤 เพลงที่ deep มีความหมายซ่อนอยู่ในทุก bar ได้รับการนับถือสูง",tags:["K-HipHop","Lyrical","Veteran"],mood:{dark:5,chill:4,energetic:6,emotional:5,indie:7},sp:sp("nucksal rapper")},
+  {name:"Swings",emoji:"⚡",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"ราชาแห่ง Hype และ Confidence ใน K-HipHop ⚡ เสียงที่ intense กดดัน ฟังแล้วรู้สึกถึงพลังงานที่ท่วมท้น",tags:["K-HipHop","Hype","Intense"],mood:{dark:6,chill:2,energetic:8,emotional:4,indie:5},sp:sp("swings rapper korea")},
+  {name:"Flowsik",emoji:"🌀",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"Technical rapper Korean-American ที่ flow เร็วที่สุด 🌀 เพลงที่ intense ทุก bar คือ showcase ของ technical skill",tags:["K-HipHop","Technical","Intense"],mood:{dark:6,chill:3,energetic:7,emotional:4,indie:6},sp:sp("flowsik rapper")},
+  {name:"MKIT Rain",emoji:"🌧️",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"LA-based Korean Hip Hop collective 🌧️ ผสม LA trap style กับ Korean lyrics ได้อย่างลงตัว เสียงที่ urban และ chill",tags:["K-HipHop","LA Vibes","Collective"],mood:{dark:6,chill:3,energetic:7,emotional:4,indie:6},sp:sp("mkit rain")},
+  {name:"Dok2 x The Quiett",emoji:"👑",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"ILLIONAIRE Records คู่หู ราชาแห่ง Flex และ Underground 👑 ผสม hype กับ chill ได้ในทุก collaboration",tags:["K-HipHop","ILLIONAIRE","Iconic"],mood:{dark:6,chill:4,energetic:6,emotional:4,indie:6},sp:sp("illionaire records")},
+,
+  {name:"ASTRO",emoji:"🌟",nat:"🇰🇷 เกาหลี",genre:"K-Pop",bio:"K-Pop ที่ bright และ hopeful ที่สุด 🌟 ทุกเพลงให้ความรู้สึก uplifting EUNWOO เป็นหนึ่งใน visual icons ของ K-Pop",tags:["K-Pop","Bright","Hopeful"],mood:{dark:1,chill:5,energetic:7,emotional:6,indie:4},sp:sp("astro kpop")},
+  {name:"CNBLUE",emoji:"🎸",nat:"🇰🇷 เกาหลี",genre:"K-Rock",bio:"K-Rock band ที่ indie ที่สุด 🎸 ผสม indie guitar sound กับ K-Pop melody ได้อย่างสมบูรณ์แบบ",tags:["K-Rock","Indie","Guitar"],mood:{dark:3,chill:5,energetic:6,emotional:6,indie:6},sp:sp("cnblue")},
+  {name:"Dok2 x The Quiett",emoji:"👑",nat:"🇰🇷 เกาหลี",genre:"K-HipHop",bio:"ILLIONAIRE Records คู่หู ราชาแห่ง Flex และ Underground 👑 ผสม hype กับ chill ได้ในทุก collaboration",tags:["K-HipHop","ILLIONAIRE","Iconic"],mood:{dark:6,chill:4,energetic:6,emotional:4,indie:6},sp:sp("illionaire records")},
+  {name:"MKIT Rain",emoji:"🌧️",nat:"🇰🇷/🇺🇸",genre:"K-HipHop",bio:"LA-based Korean Hip Hop collective 🌧️ ผสม LA trap style กับ Korean lyrics ได้อย่างลงตัว เสียงที่ urban",tags:["K-HipHop","LA Vibes","Collective"],mood:{dark:6,chill:3,energetic:7,emotional:4,indie:6},sp:sp("mkit rain")}
+];
+// QUESTIONS — Gen-Z friendly, relatable
+// ============================================================
+var QUESTIONS = [
+  {
+    q:'ตอนนี้ความรู้สึกคุณเป็นยังไง? 💭',
+    opts:[
+      {emoji:'😔',text:'เหนื่อยและหนักใจ',sub:'แค่อยากฟังเพลงแล้วนอนอยู่กับมัน',w:{dark:3,chill:2,energetic:-2,emotional:3,indie:1}},
+      {emoji:'⚡',text:'เอเนอร์จี้มาเต็ม',sub:'อยากเปิดเพลงดังๆ และไม่สนโลก',w:{dark:-1,chill:-2,energetic:4,emotional:0,indie:0}},
+      {emoji:'😌',text:'สบายใจ จิตใจโอเค',sub:'วันนี้ก็ผ่านไปได้ ไม่มีอะไรมาก',w:{dark:-2,chill:4,energetic:-1,emotional:0,indie:1}},
+      {emoji:'🌀',text:'คิดเยอะ ใจลอย',sub:'มีเรื่องให้คิดเยอะใจฟุ้งซ่าน',w:{dark:1,chill:1,energetic:-1,emotional:3,indie:2}},
+    ]
+  },
+  {
+    q:'คุณชอบฟังเพลงช่วงเวลาไหนที่สุด? 🎧',
+    opts:[
+      {emoji:'🌅',text:'ตอนเช้า ระหว่างเตรียมตัวทำงาน',sub:'เพราะเชื่อว่าเพลงที่ดีจะช่วย kick start วันใหม่ได้',w:{dark:-2,chill:2,energetic:3,emotional:1,indie:1}},
+      {emoji:'🚗',text:'ระหว่างเดินทาง หรือฟังตอนรถติด',sub:'เพลงช่วยเปลี่ยนช่วงที่เบื่อให้สนุกได้',w:{dark:2,chill:3,energetic:2,emotional:2,indie:2}},
+      {emoji:'🏃',text:'ตอนออกกำลังกาย',sub:'ฟังเพื่อเพิ่ม Motivative มีเป้่าหมายในการออกกำลังกาย',w:{dark:-1,chill:-2,energetic:5,emotional:0,indie:0}},
+      {emoji:'🌙',text:'ดึกๆ ตอนอยู่คนเดียว',sub:'เพลงเป็นเพื่อนที่ดีที่สุดตอนนั้น',w:{dark:3,chill:3,energetic:-2,emotional:3,indie:2}},
+    ]
+  },
+  {
+    q:'ช่วงนี้คุณเป็นยังไงบ้าง? 🌊',
+    opts:[
+      {emoji:'💔',text:'ช่วงฮีลจิตฮีลใจ',sub:'อกหัก เสียใจ เหนื่อย ท้อจากอะไรบางอย่าง',w:{dark:2,chill:2,energetic:-2,emotional:4,indie:1}},
+      {emoji:'🔥',text:'กำลังใจเต็ม 100%',sub:'มีเป้าหมาย มี Motivate เต็มร้อย',w:{dark:-1,chill:0,energetic:4,emotional:1,indie:1}},
+      {emoji:'🌊',text:'จิตใจล่องลอย',sub:'เหม่อ ลอย ใจไม่อยู่กับเนื้อกับตัว',w:{dark:1,chill:3,energetic:-1,emotional:2,indie:3}},
+      {emoji:'🌟',text:'มีความสุขสุด ๆ',sub:'ทุกอย่างกำลังลงตัว ไปได้เรื่อย ๆ',w:{dark:-2,chill:3,energetic:2,emotional:3,indie:0}},
+    ]
+  },
+  {
+    q:'คุณชอบฟังเพลงแนวไหน ณ ตอนนี้? 🎸',
+    opts:[
+      {emoji:'🤘',text:'Rock / Metal',sub:'มันส์ ๆ ริฟโหด ๆ ฟังจนหัวโยก',w:{dark:3,chill:-2,energetic:5,emotional:2,indie:2}},
+      {emoji:'🌊',text:'Indie / Alternative',sub:'เบา ๆ ฟังสบาย ปล่อยใจจอย ๆ',w:{dark:1,chill:4,energetic:0,emotional:2,indie:5}},
+      {emoji:'🎤',text:'Hip Hop / R&B',sub:'Groove ดี จังหวะโดน Flow ไหลลื่น',w:{dark:2,chill:2,energetic:4,emotional:1,indie:2}},
+      {emoji:'⚡',text:'EDM / Electronic',sub:'Drop หนัก BPM สูง อยากจะโดดโยก',w:{dark:1,chill:-1,energetic:5,emotional:0,indie:1}},
+    ]
+  },
+  {
+    q:'ถ้าวันนี้เป็นสี จะเป็นสีอะไร? 🎨',
+    opts:[
+      {emoji:'⚫',text:'ดำ — ลึก เงียบ และซับซ้อน',sub:'มีพลังซ่อนอยู่ข้างใน',w:{dark:4,chill:2,energetic:0,emotional:1,indie:3}},
+      {emoji:'🟡',text:'เหลือง — สดใส มีพลัง อยากแชร์',sub:'อยากทำให้คนอื่นรู้สึกดีด้วย',w:{dark:-3,chill:0,energetic:4,emotional:1,indie:0}},
+      {emoji:'🔵',text:'น้ำเงิน — สงบ ฝัน คิดเยอะ',sub:'กำลังนึกถึงบางคน หรือบางอย่าง',w:{dark:1,chill:3,energetic:-1,emotional:3,indie:2}},
+      {emoji:'🩷',text:'ชมพู — อบอุ่น รัก สดใส',sub:'อยากดูแลคนอื่น รู้สึกอบอุ่น',w:{dark:-2,chill:2,energetic:2,emotional:3,indie:0}},
+    ]
+  },
+];
+
+// ============================================================
+// PERSONALITIES — with emoji and friendly language
+// ============================================================
+var PERSONALITIES = [
+  {name:'จิตวิญญาณราตรี 🌙',emoji:'🌑',desc:'คุณชอบความเงียบ และโลกภายในของคุณนั้นลึกมากๆ 🌌 คนอื่นอาจมองไม่เห็น แต่ดนตรีเข้าใจคุณเสมอ — ทุก note ที่ดังขึ้นคือภาษาที่ไม่ต้องอธิบายให้ใครฟัง',quote:'"บางคืนที่เงียบที่สุด คือบทเพลงที่ดังที่สุดในใจ 🎵"',condition:function(s){return s.dark>=8}},
+  {name:'นักฝันผู้เงียบงัน ☁️',emoji:'☁️',desc:'คุณมีโลกภายในที่สวยงามและซับซ้อนกว่าที่คนอื่นเห็น 🌸 ชอบสังเกต จินตนาการ และเพลงคือพื้นที่ที่คุณ escape ไปได้อย่างสมบูรณ์แบบ',quote:'"ดนตรีคือภาษาของคนที่มีความรู้สึกมากเกินจะพูดออกมาได้ ✨"',condition:function(s){return s.indie>=8&&s.chill>=6}},
+  {name:'พลังงานไม่มีวันหมด ⚡',emoji:'⚡',desc:'คุณคือพลังงานที่ทำให้ห้องสว่างขึ้นเมื่อเดินเข้ามา 🔥 อยากใช้ชีวิตให้เต็มที่ทุกวัน และดนตรีสำหรับคุณคือ fuel ที่เติมพลังให้ไปต่อได้เสมอ',quote:'"เพลงดังคือวิธีบอกโลกว่า — เฮ้ ฉันยังอยู่ที่นี่! 🎤"',condition:function(s){return s.energetic>=10}},
+  {name:'คนที่รู้สึกลึกกว่าคนอื่น 💙',emoji:'💙',desc:'Emotional intelligence ของคุณสูงมากๆ 🌊 คุณรับรู้ความรู้สึกทุกอย่างอย่างละเอียด บางทีก็รู้สึกว่าคนอื่นไม่เข้าใจ แต่เพลงเข้าใจคุณเสมอ — ทุกครั้ง',quote:'"คุณไม่ได้อ่อนแอนะ คุณแค่รู้สึกมากกว่าคนส่วนใหญ่ 💙"',condition:function(s){return s.emotional>=10}},
+  {name:'Chill Master 🌿',emoji:'🌿',desc:'คุณพบสมดุลในชีวิตที่คนอื่นตามหา 😌 ไม่ได้ไม่แคร์ แต่รู้ว่าอะไรสำคัญจริงๆ เพลงสำหรับคุณคือ soundtrack ที่ทำให้วันธรรมดาๆ รู้สึกดีขึ้นได้',quote:'"วันที่ดีเริ่มจากเพลงที่ใช่ และกาแฟหนึ่งแก้ว ☕🎵"',condition:function(s){return s.chill>=10}},
+  {name:'Free Spirit 🦋',emoji:'🦋',desc:'คุณไม่ได้อยู่ใน box ของใคร 🌈 มีสไตล์เป็นตัวเองชัดเจน และดนตรีสำหรับคุณต้องมีความ authentic ไม่ยอมรับของที่ทำมาแค่เพื่อ trend เท่านั้น',quote:'"เพลงที่ดีที่สุดคือเพลงที่ทำให้รู้สึกว่า — นี่แหละ ฉัน 🦋"',condition:function(s){return s.indie>=9}},
+  {name:'นักสู้ที่ยังยืนอยู่ 🔥',emoji:'🔥',desc:'คุณผ่านอะไรบางอย่างมาและยังยืนอยู่ที่นี่ 💪 เพลงสำหรับคุณคือ fuel ที่ทำให้ลุกขึ้นและเดินต่อได้ทุกครั้ง ทุกเพลงที่ฟังซ้ำคือบทพิสูจน์ว่าคุณแข็งแกร่ง',quote:'"ทุกครั้งที่ฟังเพลงนี้ซ้ำ แปลว่าคุณผ่านมันมาได้อีกครั้งแล้ว 🔥"',condition:function(s){return s.emotional>=7&&s.energetic>=6}},
+  {name:'นักสังเกตผู้เงียบขรึม 🌌',emoji:'🌌',desc:'คุณเป็นคนที่มองเห็นสิ่งที่คนอื่นมองข้าม ✨ ฟังเพลงอย่างตั้งใจและรู้สึกถึงทุก note ดนตรีสำหรับคุณคือประสบการณ์ ไม่ใช่แค่ background noise',quote:'"ดนตรีที่ดีทำให้เวลาหยุดนิ่ง — แม้แค่ 3 นาที ⏸️🎶"',condition:function(s){return true}},
+];
+
+// ============================================================
+// PLAYLIST DATA
+// ============================================================
+var PL_DATA = [
+  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง ไฟดิม เพลงเบา',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
+  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
+  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยที่ทุกคนฟังอยู่ตอนนี้',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
+  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยที่ฟังได้ทุกวัน',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
+  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง ให้เพลงจัดการ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
+  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิมที่ไม่มีวันเก่า',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
+  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีทไทย flow เต็มๆ',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
+  {emoji:'😢',name:'Sad Songs',desc:'เพลงเศร้าภาษาสากล ร้องด้วยกันเลย',lang:'GL สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
+  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลกที่ทุกคนรู้จัก',lang:'GL สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
+  {emoji:'😌',name:'Chill Vibes',desc:'Relax โหมดเปิด brain ปิด',lang:'GL สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
+  {emoji:'🏃',name:'Workout Hits',desc:'BPM สูง พลังงานพุ่ง ห้ามหยุด',lang:'GL สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
+  {emoji:'🌙',name:'Late Night Playlist',desc:'ดึกๆ คนเดียว เพลงเพื่อน',lang:'GL สากล',url:'https://open.spotify.com/search/late night playlist/playlists'},
+  {emoji:'🎹',name:'Lo-fi Beats',desc:'Beats to study · relax · exist',lang:'GL สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
+  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ที่ลื่นหูมากๆ',lang:'GL สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
+  {emoji:'⚡',name:'EDM Bangers',desc:'Drop ที่ทำให้สะเทือนทั้งห้อง',lang:'GL สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
+  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์ที่ไม่เคยเก่า',lang:'GL สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
+  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต ฟังแล้วติด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
+  {emoji:'💜',name:'K-Pop Sad Songs',desc:'เพลงเกาหลีเศร้า feel ลึกมาก',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
+  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ไม่หยุด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
+  {emoji:'🐉',name:'C-Pop Hits',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
+  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ ต้องขยับตาม',lang:'LA ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
+  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ที่หยุดฟังไม่ได้',lang:'LA ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
+  {emoji:'🤖',name:'French Electronic',desc:'French House · Techno · ฝรั่งเศส',lang:'FR ฝรั่งเศส',url:'https://open.spotify.com/search/french electronic house playlist/playlists'},
+  {emoji:'🌑',name:'Dark Pop',desc:'Moody · Cinematic · เหมือนอยู่ในหนัง',lang:'GL สากล',url:'https://open.spotify.com/search/dark pop playlist/playlists'},
+];
+
+// ============================================================
+// QUIZ STATE
+// ============================================================
+var selectedLang=null,currentQ=0,answers=[],moodScore={dark:0,chill:0,energetic:0,emotional:0,indie:0};
+
+function selectLang(el){
+  document.querySelectorAll('.lang-card').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected');selectedLang=el.dataset.lang;
+  document.getElementById('langStartBtn').classList.add('show');
+}
+function startQuiz(){
+  if(!selectedLang)return;
+  currentQ=0;answers=[];moodScore={dark:0,chill:0,energetic:0,emotional:0,indie:0};
+  document.getElementById('langScreen').style.display='none';
+  document.getElementById('quizScreen').classList.add('active');
+  renderQuestion();
+}
+function renderQuestion(){
+  var q=QUESTIONS[currentQ];
+  document.getElementById('progressText').textContent=(currentQ+1)+' / '+QUESTIONS.length;
+  document.getElementById('qLabel').textContent='คำถามที่ '+(currentQ+1);
+  document.getElementById('qText').textContent=q.q;
+  var dots=document.getElementById('quizDots');
+  if(dots){
+    dots.innerHTML=QUESTIONS.map(function(_,i){
+      var done=answers[i]!==undefined;
+      var current=i===currentQ;
+      var bg=current?'var(--purple)':done?'rgba(167,139,250,0.5)':'rgba(255,255,255,0.12)';
+      var size=current?'12px':'8px';
+      var cursor=done||i<=currentQ?'pointer':'default';
+      return '<div onclick="jumpTo('+i+')" style="width:'+size+';height:'+size+';border-radius:50%;background:'+bg+';transition:all 0.3s;cursor:'+cursor+';flex-shrink:0"></div>';
+    }).join('');
+  }
+  var back=document.getElementById('backBtn');
+  if(back) back.style.visibility=currentQ>0?'visible':'hidden';
+  document.getElementById('qOptions').innerHTML=q.opts.map(function(o,i){
+    var isSelected=answers[currentQ]===i;
+    return '<div class="quiz-opt'+(isSelected?' selected':'')+'" data-idx="'+i+'" onclick="selectOpt(this,'+i+')"><span class="quiz-opt-emoji">'+o.emoji+'</span><div class="quiz-opt-text">'+o.text+'</div><div class="quiz-opt-sub">'+o.sub+'</div></div>';
+  }).join('');
+  var nb=document.getElementById('nextBtn');
+  if(answers[currentQ]!==undefined){nb.classList.add('show');}
+  else{nb.classList.remove('show');}
+  var isLast=currentQ===QUESTIONS.length-1;
+  nb.textContent=isLast?'ดูผลลัพธ์ ✨':'ถัดไป →';
+}
+function jumpTo(idx){
+  var maxReached=0;
+  answers.forEach(function(_,i){maxReached=i+1;});
+  if(idx<=maxReached){currentQ=idx;renderQuestion();}
+}
+function selectOpt(el,idx){
+  document.querySelectorAll('.quiz-opt').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');answers[currentQ]=idx;
+  document.getElementById('nextBtn').classList.add('show');
+  renderQuestion();
+}
+function prevQuestion(){
+  if(currentQ>0){currentQ--;renderQuestion();}
+}
+function skipQuestion(){
+  if(currentQ<QUESTIONS.length-1){
+    if(answers[currentQ]===undefined) answers[currentQ]=-1;
+    currentQ++;renderQuestion();
+  }
+}
+function nextQuestion(){
+  if(answers[currentQ]===undefined){
+    var opts=document.getElementById('qOptions');
+    opts.style.animation='none';void opts.offsetWidth;
+    opts.style.animation='shake 0.3s ease';
+    return;
+  }
+
+  // ไม่บวกคะแนนตรงนี้แล้ว เพราะจะทำให้คะแนนซ้ำเมื่อย้อนกลับมาแก้คำตอบ
+  // คะแนนจริงจะถูกคำนวณใหม่ทั้งหมดใน calculateMoodScore() ตอน showResult()
+  if(currentQ===QUESTIONS.length-1){
+    var unanswered=[];
+    for(var i=0;i<QUESTIONS.length;i++){
+      if(answers[i]===undefined||answers[i]===-1){unanswered.push(i+1);}
+    }
+    if(unanswered.length>0){
+      alert('ยังตอบไม่ครบนะ 😊 ยังเหลือคำถามข้อที่ '+unanswered.join(', ')+' — กลับไปตอบให้ครบก่อนแล้วค่อยดูผลลัพธ์ได้เลย!');
+      currentQ=unanswered[0]-1;
+      renderQuestion();
+      return;
+    }
+    showLoading();
+    return;
+  }
+
+  currentQ++;
+  renderQuestion();
+}
+var loadingTimer=null;
+var loadingTextTimer=null;
+function startBlackholeLoading(){
+  var sub=document.getElementById('loadingSub');
+  var title=document.getElementById('loadingTitle');
+  var langMap={thai:'เพลงไทย',intl:'เพลงสากล',korean:'เพลงเกาหลี'};
+  var steps=[
+    'ดูดรวมคำตอบทั้ง 5 ข้อเข้าสู่ blackhole... 📝',
+    'แปลง mood เป็นพลังงานดนตรี: chill · emotional · indie · energetic ✨',
+    'ค้นหาศิลปินในจักรวาล '+(langMap[selectedLang]||'ดนตรี')+' ที่ vibe ใกล้คุณที่สุด 🎤',
+    'คำนวณ personality และ match score ก่อนปล่อยผลลัพธ์ 🎯'
+  ];
+  var i=0;
+  if(title) title.textContent='กำลังเปิดจักรวาลเพลงของคุณ... 🌌';
+  if(sub) sub.textContent=steps[0];
+  clearInterval(loadingTextTimer);
+  loadingTextTimer=setInterval(function(){
+    i=(i+1)%steps.length;
+    if(!sub) return;
+    sub.style.opacity='0';
+    setTimeout(function(){sub.textContent=steps[i];sub.style.opacity='1';},180);
+  },850);
+}
+function stopBlackholeLoading(){clearInterval(loadingTextTimer);loadingTextTimer=null;clearTimeout(loadingTimer);loadingTimer=null;}
+function showLoading(){
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('loadingScreen').classList.add('active');
+  startBlackholeLoading();
+  loadingTimer=setTimeout(showResult,3900);
+}
+
+// ============================================================
+// RESULT HELPERS — คำนวณคะแนนใหม่จากคำตอบทุกครั้ง
+// ป้องกันคะแนนซ้ำเมื่อผู้ใช้กดย้อนกลับ/แก้คำตอบ
+// ============================================================
+function calculateMoodScore(){
+  var score={dark:0,chill:0,energetic:0,emotional:0,indie:0};
+  for(var i=0;i<QUESTIONS.length;i++){
+    var ans=answers[i];
+    if(ans===undefined||ans===-1) continue;
+    var opt=QUESTIONS[i]&&QUESTIONS[i].opts&&QUESTIONS[i].opts[ans];
+    if(!opt||!opt.w) continue;
+    Object.keys(opt.w).forEach(function(k){score[k]=(score[k]||0)+opt.w[k];});
+  }
+  moodScore=score;
+  return score;
+}
+
+// ============================================================
+// SHOW RESULT — ใช้ database ใหม่ 300 ศิลปิน
+// ============================================================
+function showResult(){
+  stopBlackholeLoading();
+  document.getElementById('loadingScreen').classList.remove('active');
+  document.getElementById('resultScreen').classList.add('active');
+  var s=calculateMoodScore();
+
+  // เลือก database ตาม language ที่เลือก
+  // thai → ARTISTS_THAI, intl → ARTISTS_INTL, korean → ARTISTS_KOREAN
+  // ถ้า db เดียวน้อยเกินไปก็ merge กัน top results
+  var db;
+  if(selectedLang==='thai') db=ARTISTS_THAI;
+  else if(selectedLang==='korean') db=ARTISTS_KOREAN;
+  else db=ARTISTS_INTL;
+
+  // สำคัญ: กรองช่องว่าง/ข้อมูลไม่ครบใน Array ก่อนคำนวณ
+  // เดิม database มี empty slot เช่น ARTISTS_THAI[65], ARTISTS_INTL[81], ARTISTS_KOREAN[96]
+  // เมื่อ sort แล้ว empty slot ถูกดันไปท้าย Array ทำให้ scored[scored.length-1] เป็น undefined
+  // และ showResult() พังที่ .score ก่อน render รายชื่อศิลปิน
+  db=(db||[]).filter(function(a){
+    return a&&a.name&&a.mood&&typeof a.mood==='object';
+  });
+
+  if(!db.length){
+    document.getElementById('topMatchCard').innerHTML='<div class="artist-bio">ยังไม่มีฐานข้อมูลศิลปินสำหรับหมวดนี้ ลองเลือกภาษาใหม่อีกครั้งนะครับ</div>';
+    document.getElementById('otherCards').innerHTML='';
+    return;
+  }
+
+  // --- Scoring: คำนวณ cosine-like distance กับ mood profile ---
+  // normalize moodScore ก่อน (raw scores จาก quiz อาจ range ต่างกัน)
+  var dims=['dark','chill','energetic','emotional','indie'];
+  var normFactor=10; // artist mood 0-10, quiz score อาจสูงกว่า scale ลง
+  function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+
+  var scored=db.map(function(a){
+    var score=0;
+    dims.forEach(function(d){
+      var userVal=clamp((s[d]||0)+5,0,10); // shift +5 เพราะ quiz เริ่มจาก 0
+      var artistVal=a.mood[d]||0;
+      var diff=Math.abs(userVal-artistVal);
+      score+=(10-diff);
+    });
+    return{a:a,score:score};
+  });
+  scored.sort(function(a,b){return b.score-a.score;});
+
+  // --- เพิ่ม randomness เล็กน้อยใน top 10 เพื่อให้ผลหลากหลาย ---
+  // สลับ top 10 เล็กน้อยเพื่อกัน always show same artist เมื่อ score ใกล้กัน
+  var top10=scored.slice(0,10);
+  var rest=scored.slice(10);
+  // shuffle เฉพาะกลุ่มที่ score ใกล้กัน (±2 จาก top)
+  var topScore=top10[0].score;
+  var nearTop=top10.filter(function(x){return topScore-x.score<=4;});
+  var farTop=top10.filter(function(x){return topScore-x.score>4;});
+  // shuffle nearTop เพื่อให้ได้ผลต่างในแต่ละครั้ง
+  for(var i=nearTop.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=nearTop[i];nearTop[i]=nearTop[j];nearTop[j]=tmp;
+  }
+  scored=[].concat(nearTop,farTop,rest);
+
+  // --- % match ---
+  var maxS=scored[0].score,minS=scored[scored.length-1].score;
+  var topBase=Math.round(78+Math.random()*10); // 78-88%
+  function pct(sc,isTop){
+    if(isTop) return topBase;
+    var ratio=(sc-minS)/(scored[0].score-minS||1);
+    var base=Math.round(topBase-8-(1-ratio)*22);
+    var jitter=Math.floor(Math.random()*5)-2;
+    return Math.min(topBase-3,Math.max(40,base+jitter));
+  }
+
+  var persona=PERSONALITIES[PERSONALITIES.length-1];
+  for(var pi=0;pi<PERSONALITIES.length-1;pi++){if(PERSONALITIES[pi].condition(s)){persona=PERSONALITIES[pi];break;}}
+
+  document.getElementById('resEmoji').textContent=persona.emoji;
+  document.getElementById('resType').textContent='บุคลิกภาพดนตรีของคุณ 🎵';
+  document.getElementById('resName').textContent=persona.name;
+  document.getElementById('resDesc').textContent=persona.desc;
+  document.getElementById('resQuote').textContent=persona.quote;
+
+  var top=scored[0].a,topPct=pct(scored[0].score,true);
+  document.getElementById('topMatchCard').innerHTML=
+    '<div class="match-pct-row"><div class="match-pct-num">'+topPct+'%</div><div class="match-pct-info"><div class="match-pct-label">match score 🎯</div><div class="match-pct-bar"><div class="match-pct-fill" id="topBar" style="width:0%"></div></div></div></div>'+
+    '<div class="artist-row"><div class="artist-img" id="topImg">'+top.emoji+'</div><div class="artist-info"><div class="artist-name">'+esc(top.name)+'</div><div class="artist-tags"><span class="atag nat">'+esc(top.nat)+'</span><span class="atag">'+esc(top.genre)+'</span>'+(top.tags||[]).slice(0,2).map(function(t){return'<span class="atag">'+esc(t)+'</span>';}).join('')+'</div></div></div>'+
+    '<div class="artist-bio">'+esc(top.bio)+'</div>'+
+    '<a class="btn-spotify" href="'+top.sp+'" target="_blank" rel="noopener" onclick="trySpotify(\''+esc(top.name)+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>🎵 เปิด Playlist ใน Spotify</a>';
+  setTimeout(function(){var b=document.getElementById('topBar');if(b)b.style.width=topPct+'%';},300);
+  if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
+
+  // --- Others: แสดง 5 คนถัดไป (index 1-5) ---
+  var othersHtml='';
+  scored.slice(1,6).forEach(function(item,i){
+    var a=item.a,p=pct(item.score);
+    othersHtml+='<a class="other-card" href="'+a.sp+'" target="_blank" rel="noopener" style="animation-delay:'+(i*0.08)+'s">'+
+      '<div class="other-pct">'+p+'%</div>'+
+      '<div class="other-info"><div class="other-name">'+a.emoji+' '+esc(a.name)+'</div><div class="other-genre">'+esc(a.nat)+' · '+esc(a.genre)+'</div></div>'+
+      '<div class="other-sp"><svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>Playlist</div>'+
+    '</a>';
+  });
+  document.getElementById('otherCards').innerHTML=othersHtml;
+  document.getElementById('resultScreen').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function resetQuiz(){
+  currentQ=0;answers=[];moodScore={dark:0,chill:0,energetic:0,emotional:0,indie:0};selectedLang=null;
+  ['resultScreen','loadingScreen'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('langScreen').style.display='';
+  document.querySelectorAll('.lang-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('langStartBtn').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+// ============================================================
+// SHUFFLE PLAYLIST
+// ============================================================
+var plQueue=[];
+function buildPlQueue(){var a=PL_DATA.map(function(_,i){return i;});for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function plNext(){if(!plQueue.length)plQueue=buildPlQueue();return plQueue.pop();}
+function doPlShuffle(){
+  var btn=document.getElementById('plShuffleBtn');if(btn)btn.style.opacity='0.7';
+  setTimeout(function(){
+    if(btn)btn.style.opacity='1';
+    var pl=PL_DATA[plNext()];
+    var lm={'TH เพลงไทย':'🇹🇭 เพลงไทย','HH Hip Hop ไทย':'🎤 Hip Hop ไทย','GL สากล':'🌍 สากล','KR K-Pop':'🇰🇷 K-Pop','CN C-Pop':'🇨🇳 C-Pop','LA ละติน':'🌎 ละติน','FR ฝรั่งเศส':'🇫🇷 ฝรั่งเศส'};
+    document.getElementById('plEmoji').textContent=pl.emoji;
+    document.getElementById('plCat').textContent=lm[pl.lang]||pl.lang;
+    document.getElementById('plName').textContent=pl.name;
+    document.getElementById('plDesc').textContent=pl.desc;
+    document.getElementById('plLink').href=pl.url;
+    var r=document.getElementById('plResult');r.style.display='block';r.style.animation='none';void r.offsetWidth;r.style.animation='fadeUp 0.4s ease';
+  },380);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+async function loadWiki(title,elId,fallback){
+  try{var r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));if(!r.ok)return;var d=await r.json();if(d.thumbnail&&d.thumbnail.source){var el=document.getElementById(elId);if(el)el.innerHTML='<img src="'+d.thumbnail.source+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';}}catch(e){}
+}
+function trySpotify(name){
+  var f=document.createElement('iframe');f.style.display='none';document.body.appendChild(f);
+  f.src='spotify:search:this is '+name;setTimeout(function(){try{document.body.removeChild(f);}catch(e){}},1500);
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function switchTab(tab){
+  var tabs={home:'pageHome',quiz:'pageQuiz',playlist:'pagePlaylist'};
+  Object.keys(tabs).forEach(function(k){
+    var page=document.getElementById(tabs[k]);
+    var isActive=k===tab;
+    page.classList.toggle('active',isActive);
+    page.classList.remove('reveal-page');
+    if(isActive){void page.offsetWidth;page.classList.add('reveal-page');}
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){switchTab('home');}
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.classList.remove('booting');
+  document.body.classList.add('ready');
+  document.getElementById('plShuffleBtn').addEventListener('click',doPlShuffle);
+  document.getElementById('plAgainBtn').addEventListener('click',doPlShuffle);
+});
+</script>
+</body>
+</html>
