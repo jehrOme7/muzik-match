@@ -1,6 +1,6 @@
 {
   "name": "muzik-match",
   "version": "1.0.0",
-  "description": "หาเพลงและศิลปินที่ใกล้เคียงด้วย AI",
+  "description": "Muzik Personality Matching ระบบสุ่ม Playlist เพลงที่ใช่ตามตัวตนของคุณ",
   "private": true
 }
