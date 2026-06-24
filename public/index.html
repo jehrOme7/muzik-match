@@ -113,13 +113,52 @@ nav{position:sticky;top:0;z-index:100;background:rgba(13,10,26,0.85);backdrop-fi
 
 /* loading */
 .loading-screen{display:none;text-align:center;padding:60px 0}
-.loading-screen.active{display:block}
-.loading-waveform{display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:24px;height:50px}
-.lw-bar{width:5px;border-radius:5px;background:linear-gradient(to top,var(--purple2),var(--pink));animation:wave 1s ease-in-out infinite}
-.lw-bar:nth-child(1){height:20px;animation-delay:0s}.lw-bar:nth-child(2){height:35px;animation-delay:0.1s}.lw-bar:nth-child(3){height:50px;animation-delay:0.2s}.lw-bar:nth-child(4){height:35px;animation-delay:0.3s}.lw-bar:nth-child(5){height:20px;animation-delay:0.4s}.lw-bar:nth-child(6){height:40px;animation-delay:0.5s}.lw-bar:nth-child(7){height:25px;animation-delay:0.6s}
-@keyframes wave{0%,100%{transform:scaleY(0.4);opacity:0.4}50%{transform:scaleY(1);opacity:1}}
-.loading-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
-.loading-sub{font-size:14px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif}
+
+
+/* ===== ENTRANCE GIMMICK — soft cinematic fade-in ===== */
+@keyframes softReveal{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(8px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes navReveal{from{opacity:0;transform:translateY(-14px);filter:blur(8px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes textShine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes cardFloatIn{from{opacity:0;transform:translateY(26px) scale(.96);filter:blur(10px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+body.booting nav{opacity:0}
+body.ready nav{animation:navReveal .75s cubic-bezier(.16,1,.3,1) both}
+body.ready .landing-eyebrow{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .12s both}
+body.ready .landing h1{animation:softReveal .9s cubic-bezier(.16,1,.3,1) .24s both}
+body.ready .landing h1 .g{background-size:200% auto;animation:textShine 5.5s ease-in-out infinite alternate}
+body.ready .landing-desc{animation:softReveal .9s cubic-bezier(.16,1,.3,1) .38s both}
+body.ready .mode-card{animation:cardFloatIn .8s cubic-bezier(.16,1,.3,1) both}
+body.ready .mode-card:nth-child(1){animation-delay:.55s}
+body.ready .mode-card:nth-child(2){animation-delay:.68s}
+body.ready .how-label{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .86s both}
+body.ready .how-title{animation:softReveal .8s cubic-bezier(.16,1,.3,1) .98s both}
+body.ready .how-step{animation:cardFloatIn .75s cubic-bezier(.16,1,.3,1) both}
+body.ready .how-step:nth-child(1){animation-delay:1.12s}
+body.ready .how-step:nth-child(2){animation-delay:1.24s}
+body.ready .how-step:nth-child(3){animation-delay:1.36s}
+.page.active.reveal-page .lang-screen,.page.active.reveal-page .pl-wrap,.page.active.reveal-page .quiz-wrap{animation:softReveal .65s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ===== BLACKHOLE LOADING — result processing gimmick ===== */
+.loading-screen.active{display:block;position:relative;overflow:hidden;padding:46px 0 54px;border-radius:28px}
+.loading-screen.active::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,rgba(124,58,237,.22),transparent 28%),radial-gradient(circle at 50% 50%,rgba(244,114,182,.11),transparent 42%);pointer-events:none;animation:bhBgPulse 2.4s ease-in-out infinite}
+.blackhole-loader{position:relative;width:min(420px,88vw);height:300px;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.bh-glow{position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.34) 0%,rgba(124,58,237,.18) 34%,transparent 68%);filter:blur(16px);animation:bhGlow 1.9s ease-in-out infinite alternate}
+.bh-core{position:absolute;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 48% 43%,#05040d 0 38%,#090617 46%,#000 70%);box-shadow:0 0 0 10px rgba(13,10,26,.7),0 0 46px rgba(124,58,237,.7),inset 0 0 28px rgba(0,0,0,.95);z-index:4;animation:bhBreath 1.45s ease-in-out infinite}
+.bh-core::after{content:'';position:absolute;inset:-18px;border-radius:50%;border:1px solid rgba(244,114,182,.42);filter:blur(.4px);animation:bhSpin 1.2s linear infinite}
+.bh-ring{position:absolute;border-radius:50%;border:1px solid transparent;background:conic-gradient(from 0deg,transparent,rgba(167,139,250,.78),rgba(244,114,182,.68),rgba(29,185,84,.35),transparent);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));filter:drop-shadow(0 0 14px rgba(167,139,250,.55));z-index:3}
+.bh-ring.r1{width:236px;height:92px;transform:rotate(-14deg);animation:bhSpin 1.8s linear infinite}
+.bh-ring.r2{width:276px;height:118px;transform:rotate(18deg);animation:bhSpinReverse 2.35s linear infinite}
+.bh-ring.r3{width:310px;height:142px;opacity:.5;transform:rotate(-33deg);animation:bhSpin 3s linear infinite}
+.bh-chip{position:absolute;z-index:5;padding:7px 12px;border-radius:999px;background:rgba(26,23,48,.86);border:1px solid rgba(255,255,255,.13);color:rgba(240,238,255,.78);font-size:12px;font-weight:700;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.25),0 0 18px rgba(124,58,237,.14);animation:bhSuck 3.4s cubic-bezier(.52,.02,.22,1) infinite both;white-space:nowrap}
+.bh-chip.c1{top:24px;left:24px;animation-delay:0s}.bh-chip.c2{top:42px;right:20px;animation-delay:.25s}.bh-chip.c3{left:4px;bottom:78px;animation-delay:.5s}.bh-chip.c4{right:0;bottom:92px;animation-delay:.75s}.bh-chip.c5{top:138px;left:30px;animation-delay:1s}.bh-chip.c6{right:54px;bottom:34px;animation-delay:1.25s}.bh-chip.c7{top:10px;left:43%;animation-delay:1.5s}.bh-chip.c8{bottom:10px;left:38%;animation-delay:1.75s}
+.loading-title{position:relative;z-index:2;font-size:22px;font-weight:900;color:var(--text);margin-bottom:9px;letter-spacing:-0.02em;background:linear-gradient(90deg,var(--purple),var(--pink),var(--green),var(--purple));background-size:220% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:textShine 3.8s ease-in-out infinite}
+.loading-sub{position:relative;z-index:2;font-size:14px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;min-height:26px;transition:opacity .25s ease}
+.loading-progress{position:relative;z-index:2;max-width:360px;height:6px;margin:20px auto 0;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.loading-progress span{display:block;height:100%;width:40%;border-radius:999px;background:linear-gradient(90deg,var(--purple2),var(--pink),var(--green));animation:bhProgress 1.35s ease-in-out infinite}
+@keyframes bhSpin{to{rotate:360deg}}@keyframes bhSpinReverse{to{rotate:-360deg}}@keyframes bhGlow{from{transform:scale(.92);opacity:.65}to{transform:scale(1.08);opacity:1}}@keyframes bhBreath{0%,100%{transform:scale(.94)}50%{transform:scale(1.06)}}@keyframes bhBgPulse{0%,100%{opacity:.62}50%{opacity:1}}@keyframes bhProgress{0%{transform:translateX(-110%);width:36%}55%{width:58%}100%{transform:translateX(290%);width:36%}}@keyframes bhSuck{0%{opacity:0;transform:translate(0,0) scale(.72);filter:blur(5px)}16%{opacity:1;filter:blur(0)}62%{opacity:1;transform:translate(calc((50vw - 50%) * .02),0) scale(1)}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.18);filter:blur(6px)}}
+.bh-chip.c1{--tx:155px;--ty:112px}.bh-chip.c2{--tx:-145px;--ty:96px}.bh-chip.c3{--tx:168px;--ty:-42px}.bh-chip.c4{--tx:-160px;--ty:-46px}.bh-chip.c5{--tx:118px;--ty:10px}.bh-chip.c6{--tx:-74px;--ty:-98px}.bh-chip.c7{--tx:0;--ty:124px}.bh-chip.c8{--tx:18px;--ty:-122px}
+@media(max-width:600px){.blackhole-loader{height:260px}.bh-chip{font-size:11px;padding:6px 10px}.bh-ring.r3{display:none}}
+
 
 /* result */
 .result-screen{display:none}
@@ -204,7 +243,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 }
 </style>
 </head>
-<body>
+<body class="booting">
 <div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
 
 <nav>
@@ -273,9 +312,22 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <button class="quiz-next-btn" id="nextBtn" onclick="nextQuestion()">ถัดไป →</button>
   </div>
   <div id="loadingScreen" class="loading-screen">
-    <div class="loading-waveform"><div class="lw-bar"></div><div class="lw-bar"></div><div class="lw-bar"></div><div class="lw-bar"></div><div class="lw-bar"></div><div class="lw-bar"></div><div class="lw-bar"></div></div>
-    <div class="loading-title">กำลังวิเคราะห์อารมณ์ของคุณ... 🔮</div>
-    <div class="loading-sub">หาเพลงที่ match ที่สุดให้คุณอยู่นะ รอแปปนึง ✨</div>
+    <div class="blackhole-loader" aria-hidden="true">
+      <div class="bh-glow"></div>
+      <div class="bh-ring r3"></div><div class="bh-ring r2"></div><div class="bh-ring r1"></div>
+      <div class="bh-core"></div>
+      <span class="bh-chip c1">🎭 Personality</span>
+      <span class="bh-chip c2">🎧 แนวเพลง</span>
+      <span class="bh-chip c3">✨ Mood</span>
+      <span class="bh-chip c4">🎤 ศิลปิน</span>
+      <span class="bh-chip c5">📝 คำตอบ</span>
+      <span class="bh-chip c6">🌌 Vibe</span>
+      <span class="bh-chip c7">🇹🇭 TH</span>
+      <span class="bh-chip c8">🎶 Playlist</span>
+    </div>
+    <div class="loading-title" id="loadingTitle">กำลังเปิดจักรวาลเพลงของคุณ... 🌌</div>
+    <div class="loading-sub" id="loadingSub">Blackhole กำลังดูดรวมคำตอบ แนวเพลง ศิลปิน และ personality ✨</div>
+    <div class="loading-progress"><span></span></div>
   </div>
   <div id="resultScreen" class="result-screen">
     <div class="persona-card"><span class="persona-emoji-wrap" id="resEmoji">🎵</span><div class="persona-type" id="resType"></div><div class="persona-name" id="resName"></div><div class="persona-desc" id="resDesc"></div><div class="persona-quote" id="resQuote"></div></div>
@@ -847,10 +899,35 @@ function nextQuestion(){
   currentQ++;
   renderQuestion();
 }
+var loadingTimer=null;
+var loadingTextTimer=null;
+function startBlackholeLoading(){
+  var sub=document.getElementById('loadingSub');
+  var title=document.getElementById('loadingTitle');
+  var langMap={thai:'เพลงไทย',intl:'เพลงสากล',korean:'เพลงเกาหลี'};
+  var steps=[
+    'ดูดรวมคำตอบทั้ง 5 ข้อเข้าสู่ blackhole... 📝',
+    'แปลง mood เป็นพลังงานดนตรี: chill · emotional · indie · energetic ✨',
+    'ค้นหาศิลปินในจักรวาล '+(langMap[selectedLang]||'ดนตรี')+' ที่ vibe ใกล้คุณที่สุด 🎤',
+    'คำนวณ personality และ match score ก่อนปล่อยผลลัพธ์ 🎯'
+  ];
+  var i=0;
+  if(title) title.textContent='กำลังเปิดจักรวาลเพลงของคุณ... 🌌';
+  if(sub) sub.textContent=steps[0];
+  clearInterval(loadingTextTimer);
+  loadingTextTimer=setInterval(function(){
+    i=(i+1)%steps.length;
+    if(!sub) return;
+    sub.style.opacity='0';
+    setTimeout(function(){sub.textContent=steps[i];sub.style.opacity='1';},180);
+  },850);
+}
+function stopBlackholeLoading(){clearInterval(loadingTextTimer);loadingTextTimer=null;clearTimeout(loadingTimer);loadingTimer=null;}
 function showLoading(){
   document.getElementById('quizScreen').classList.remove('active');
   document.getElementById('loadingScreen').classList.add('active');
-  setTimeout(showResult,2400);
+  startBlackholeLoading();
+  loadingTimer=setTimeout(showResult,3900);
 }
 
 // ============================================================
@@ -874,6 +951,7 @@ function calculateMoodScore(){
 // SHOW RESULT — ใช้ database ใหม่ 300 ศิลปิน
 // ============================================================
 function showResult(){
+  stopBlackholeLoading();
   document.getElementById('loadingScreen').classList.remove('active');
   document.getElementById('resultScreen').classList.add('active');
   var s=calculateMoodScore();
@@ -1018,11 +1096,19 @@ function trySpotify(name){
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function switchTab(tab){
   var tabs={home:'pageHome',quiz:'pageQuiz',playlist:'pagePlaylist'};
-  Object.keys(tabs).forEach(function(k){document.getElementById(tabs[k]).classList.toggle('active',k===tab);});
+  Object.keys(tabs).forEach(function(k){
+    var page=document.getElementById(tabs[k]);
+    var isActive=k===tab;
+    page.classList.toggle('active',isActive);
+    page.classList.remove('reveal-page');
+    if(isActive){void page.offsetWidth;page.classList.add('reveal-page');}
+  });
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome(){switchTab('home');}
 document.addEventListener('DOMContentLoaded',function(){
+  document.body.classList.remove('booting');
+  document.body.classList.add('ready');
   document.getElementById('plShuffleBtn').addEventListener('click',doPlShuffle);
   document.getElementById('plAgainBtn').addEventListener('click',doPlShuffle);
 });
