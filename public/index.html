@@ -157,6 +157,33 @@ body.ready .how-step:nth-child(3){animation-delay:1.36s}
 .loading-progress span{display:block;height:100%;width:40%;border-radius:999px;background:linear-gradient(90deg,var(--purple2),var(--pink),var(--green));animation:bhProgress 1.35s ease-in-out infinite}
 @keyframes bhSpin{to{rotate:360deg}}@keyframes bhSpinReverse{to{rotate:-360deg}}@keyframes bhGlow{from{transform:scale(.92);opacity:.65}to{transform:scale(1.08);opacity:1}}@keyframes bhBreath{0%,100%{transform:scale(.94)}50%{transform:scale(1.06)}}@keyframes bhBgPulse{0%,100%{opacity:.62}50%{opacity:1}}@keyframes bhProgress{0%{transform:translateX(-110%);width:36%}55%{width:58%}100%{transform:translateX(290%);width:36%}}@keyframes bhSuck{0%{opacity:0;transform:translate(0,0) scale(.72);filter:blur(5px)}16%{opacity:1;filter:blur(0)}62%{opacity:1;transform:translate(calc((50vw - 50%) * .02),0) scale(1)}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.18);filter:blur(6px)}}
 .bh-chip.c1{--tx:155px;--ty:112px}.bh-chip.c2{--tx:-145px;--ty:96px}.bh-chip.c3{--tx:168px;--ty:-42px}.bh-chip.c4{--tx:-160px;--ty:-46px}.bh-chip.c5{--tx:118px;--ty:10px}.bh-chip.c6{--tx:-74px;--ty:-98px}.bh-chip.c7{--tx:0;--ty:124px}.bh-chip.c8{--tx:18px;--ty:-122px}
+
+
+/* ===== MOBILE PERFORMANCE TUNING ===== */
+@media(max-width:600px){
+  html{scroll-behavior:auto}
+  body{background:#0d0a1a}
+  .orb{filter:blur(34px);animation:none;opacity:.58;transform:translateZ(0)}
+  .orb1{width:360px;height:360px;top:-120px;left:-120px}
+  .orb2{width:280px;height:280px;top:40px;right:-120px}
+  .orb3{display:none}
+  .page,.persona-card,.top-card,.other-card,.pl-result,.mode-card,.how-step{will-change:auto;backface-visibility:hidden}
+  .persona-emoji-wrap{animation:none}
+  .ready .landing-eyebrow,.ready .landing h1,.ready .landing-desc,.ready .mode-card,.ready .how-label,.ready .how-title,.ready .how-step,.reveal-page{animation-duration:.45s!important;filter:none!important}
+  .top-card::before,.persona-card::before,.loading-screen.active::before{opacity:.45}
+  .bh-particle,.bh-chip{animation-duration:2.4s!important}
+  .other-card:hover,.mode-card:hover,.quiz-opt:hover,.lang-card:hover,.btn-spotify:hover,.other-sp:hover{transform:none}
+  .result-screen.active{contain:layout paint}
+  .artist-img img{transform:translateZ(0)}
+}
+
+@media(max-width:600px) and (prefers-reduced-motion:no-preference){
+  .other-card{animation:fadeUp .28s ease both}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
 @media(max-width:600px){.blackhole-loader{height:260px}.bh-chip{font-size:11px;padding:6px 10px}.bh-ring.r3{display:none}}
 
 
@@ -267,7 +294,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
         <div class="mode-card-icon">🎲</div>
         <div class="mode-card-title">ShufflePlaylist</div>
         <div class="mode-card-sub">ไม่อยากคิดเยอะ? กดปุ่มเดียว รับ playlist สุ่มจาก Spotify ทันที ครอบคลุมทุก mood ทุกภาษา 🌍</div>
-        <span class="mode-card-badge">🎲 กดสุ่มได้เลย</span>
+        <span class="mode-card-badge">🎲 สุ่มได้เลย · ฟรี</span>
       </div>
     </div>
   </div>
@@ -376,7 +403,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 // ============================================================
 
 // ---- helper เพื่อสร้าง Spotify search URL ----
-function sp(name){ return 'https://open.spotify.com/search/this%20is%20'+encodeURIComponent(name)+'/playlists'; }
+function sp(name){ return spotifyWebSearchUrl(name); }
 
 // ============================================================
 // ARTISTS_THAI — 100 ศิลปิน (Pop · Rock · HipHop · Country · Luk Thung)
@@ -1036,7 +1063,7 @@ function showResult(){
     '<div class="match-pct-row"><div class="match-pct-num">'+topPct+'%</div><div class="match-pct-info"><div class="match-pct-label">match score 🎯</div><div class="match-pct-bar"><div class="match-pct-fill" id="topBar" style="width:0%"></div></div></div></div>'+
     '<div class="artist-row"><div class="artist-img" id="topImg">'+top.emoji+'</div><div class="artist-info"><div class="artist-name">'+esc(top.name)+'</div><div class="artist-tags"><span class="atag nat">'+esc(top.nat)+'</span><span class="atag">'+esc(top.genre)+'</span>'+(top.tags||[]).slice(0,2).map(function(t){return'<span class="atag">'+esc(t)+'</span>';}).join('')+'</div></div></div>'+
     '<div class="artist-bio">'+esc(top.bio)+'</div>'+
-    '<a class="btn-spotify" href="'+top.sp+'" target="_blank" rel="noopener" onclick="trySpotify(\''+esc(top.name)+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>🎵 เปิด Playlist ใน Spotify</a>';
+    '<a class="btn-spotify" href="'+spotifyWebSearchUrl(top.name)+'" target="_blank" rel="noopener" onclick="return openSpotifySearch(event, this, \''+jsStr(top.name)+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>🎵 เปิด This Is ใน Spotify</a>';
   setTimeout(function(){var b=document.getElementById('topBar');if(b)b.style.width=topPct+'%';},300);
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
@@ -1044,10 +1071,10 @@ function showResult(){
   var othersHtml='';
   scored.slice(1,6).forEach(function(item,i){
     var a=item.a,p=pct(item.score);
-    othersHtml+='<a class="other-card" href="'+a.sp+'" target="_blank" rel="noopener" style="animation-delay:'+(i*0.08)+'s">'+
+    othersHtml+='<a class="other-card" href="'+spotifyWebSearchUrl(a.name)+'" target="_blank" rel="noopener" onclick="return openSpotifySearch(event, this, \''+jsStr(a.name)+'\')" style="animation-delay:'+(i*0.08)+'s">'+
       '<div class="other-pct">'+p+'%</div>'+
       '<div class="other-info"><div class="other-name">'+a.emoji+' '+esc(a.name)+'</div><div class="other-genre">'+esc(a.nat)+' · '+esc(a.genre)+'</div></div>'+
-      '<div class="other-sp"><svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>Playlist</div>'+
+      '<div class="other-sp"><svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>This Is</div>'+
     '</a>';
   });
   document.getElementById('otherCards').innerHTML=othersHtml;
@@ -1089,10 +1116,32 @@ function doPlShuffle(){
 async function loadWiki(title,elId,fallback){
   try{var r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));if(!r.ok)return;var d=await r.json();if(d.thumbnail&&d.thumbnail.source){var el=document.getElementById(elId);if(el)el.innerHTML='<img src="'+d.thumbnail.source+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';}}catch(e){}
 }
-function trySpotify(name){
-  var f=document.createElement('iframe');f.style.display='none';document.body.appendChild(f);
-  f.src='spotify:search:this is '+name;setTimeout(function(){try{document.body.removeChild(f);}catch(e){}},1500);
+function spotifyQuery(name){return 'this is '+String(name||'').trim();}
+function spotifyWebSearchUrl(name){return 'https://open.spotify.com/search/'+encodeURIComponent(spotifyQuery(name));}
+function spotifyAppSearchUri(name){return 'spotify:search:'+encodeURIComponent(spotifyQuery(name));}
+function openSpotifySearch(event, el, name){
+  if(event) event.preventDefault();
+  var webUrl=spotifyWebSearchUrl(name);
+  var appUri=spotifyAppSearchUri(name);
+  var opened=false;
+  var fallbackTimer=null;
+  function markOpened(){opened=true;if(fallbackTimer) clearTimeout(fallbackTimer);}
+  window.addEventListener('pagehide',markOpened,{once:true});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)markOpened();},{once:true});
+
+  // เปิดจาก user gesture โดยตรง เพื่อให้ browser แสดง popup ขออนุญาตเปิด Spotify app ได้
+  window.location.href=appUri;
+
+  // ถ้าเครื่องไม่มี app หรือ browser ไม่อนุญาต ให้ fallback ไป Spotify Web Search query เดียวกัน
+  fallbackTimer=setTimeout(function(){
+    if(!opened){
+      if(el) el.href=webUrl;
+      window.open(webUrl,'_blank','noopener');
+    }
+  },900);
+  return false;
 }
+function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function switchTab(tab){
   var tabs={home:'pageHome',quiz:'pageQuiz',playlist:'pagePlaylist'};
