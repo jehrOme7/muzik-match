@@ -1,0 +1,91 @@
+--- /mnt/data/index.html	2026-06-24 08:19:29.301866827 +0000
++++ /mnt/data/index_fixed.html	2026-06-24 08:21:16.941366707 +0000
+@@ -826,21 +826,16 @@
+     opts.style.animation='shake 0.3s ease';
+     return;
+   }
++
++  // ไม่บวกคะแนนตรงนี้แล้ว เพราะจะทำให้คะแนนซ้ำเมื่อย้อนกลับมาแก้คำตอบ
++  // คะแนนจริงจะถูกคำนวณใหม่ทั้งหมดใน calculateMoodScore() ตอน showResult()
+   if(currentQ===QUESTIONS.length-1){
+-    if(answers[currentQ]!==-1){
+-      var w=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+-      Object.keys(w).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w[k];});
+-    }
+     var unanswered=[];
+     for(var i=0;i<QUESTIONS.length;i++){
+       if(answers[i]===undefined||answers[i]===-1){unanswered.push(i+1);}
+     }
+     if(unanswered.length>0){
+       alert('ยังตอบไม่ครบนะ 😊 ยังเหลือคำถามข้อที่ '+unanswered.join(', ')+' — กลับไปตอบให้ครบก่อนแล้วค่อยดูผลลัพธ์ได้เลย!');
+-      if(answers[currentQ]!==-1){
+-        var w2=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+-        Object.keys(w2).forEach(function(k){moodScore[k]=(moodScore[k]||0)-w2[k];});
+-      }
+       currentQ=unanswered[0]-1;
+       renderQuestion();
+       return;
+@@ -848,10 +843,7 @@
+     showLoading();
+     return;
+   }
+-  if(answers[currentQ]!==-1){
+-    var w3=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+-    Object.keys(w3).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w3[k];});
+-  }
++
+   currentQ++;
+   renderQuestion();
+ }
+@@ -862,12 +854,29 @@
+ }
+ 
+ // ============================================================
++// RESULT HELPERS — คำนวณคะแนนใหม่จากคำตอบทุกครั้ง
++// ป้องกันคะแนนซ้ำเมื่อผู้ใช้กดย้อนกลับ/แก้คำตอบ
++// ============================================================
++function calculateMoodScore(){
++  var score={dark:0,chill:0,energetic:0,emotional:0,indie:0};
++  for(var i=0;i<QUESTIONS.length;i++){
++    var ans=answers[i];
++    if(ans===undefined||ans===-1) continue;
++    var opt=QUESTIONS[i]&&QUESTIONS[i].opts&&QUESTIONS[i].opts[ans];
++    if(!opt||!opt.w) continue;
++    Object.keys(opt.w).forEach(function(k){score[k]=(score[k]||0)+opt.w[k];});
++  }
++  moodScore=score;
++  return score;
++}
++
++// ============================================================
+ // SHOW RESULT — ใช้ database ใหม่ 300 ศิลปิน
+ // ============================================================
+ function showResult(){
+   document.getElementById('loadingScreen').classList.remove('active');
+   document.getElementById('resultScreen').classList.add('active');
+-  var s=moodScore;
++  var s=calculateMoodScore();
+ 
+   // เลือก database ตาม language ที่เลือก
+   // thai → ARTISTS_THAI, intl → ARTISTS_INTL, korean → ARTISTS_KOREAN
+@@ -877,6 +886,20 @@
+   else if(selectedLang==='korean') db=ARTISTS_KOREAN;
+   else db=ARTISTS_INTL;
+ 
++  // สำคัญ: กรองช่องว่าง/ข้อมูลไม่ครบใน Array ก่อนคำนวณ
++  // เดิม database มี empty slot เช่น ARTISTS_THAI[65], ARTISTS_INTL[81], ARTISTS_KOREAN[96]
++  // เมื่อ sort แล้ว empty slot ถูกดันไปท้าย Array ทำให้ scored[scored.length-1] เป็น undefined
++  // และ showResult() พังที่ .score ก่อน render รายชื่อศิลปิน
++  db=(db||[]).filter(function(a){
++    return a&&a.name&&a.mood&&typeof a.mood==='object';
++  });
++
++  if(!db.length){
++    document.getElementById('topMatchCard').innerHTML='<div class="artist-bio">ยังไม่มีฐานข้อมูลศิลปินสำหรับหมวดนี้ ลองเลือกภาษาใหม่อีกครั้งนะครับ</div>';
++    document.getElementById('otherCards').innerHTML='';
++    return;
++  }
++
+   // --- Scoring: คำนวณ cosine-like distance กับ mood profile ---
+   // normalize moodScore ก่อน (raw scores จาก quiz อาจ range ต่างกัน)
+   var dims=['dark','chill','energetic','emotional','indie'];
