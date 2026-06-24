@@ -1,18 +1,77 @@
+// /api/youtube.js — secured version
 // ค้นหา YouTube video ID จากชื่อเพลง โดยไล่ priority:
 // official mv > official audio > official lyrics video > lyrics video
 // กรอง Shorts และคลิปแสดงสดออก โดยไม่ต้องใช้ YouTube API key
 
+const WINDOW_MS = 60 * 1000;
+const MAX_REQ_PER_WINDOW = 60;
+const buckets = new Map();
+
+function setSecurityHeaders(res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+}
+
+function getClientId(req) {
+  return (
+    req.headers['x-forwarded-for'] ||
+    req.headers['x-real-ip'] ||
+    req.socket?.remoteAddress ||
+    'unknown'
+  ).toString().split(',')[0].trim();
+}
+
+function rateLimit(req, res) {
+  const now = Date.now();
+  const id = getClientId(req);
+  const bucket = buckets.get(id) || { start: now, count: 0 };
+  if (now - bucket.start > WINDOW_MS) {
+    bucket.start = now;
+    bucket.count = 0;
+  }
+  bucket.count += 1;
+  buckets.set(id, bucket);
+
+  if (buckets.size > 1000) {
+    for (const [key, value] of buckets) {
+      if (now - value.start > WINDOW_MS * 2) buckets.delete(key);
+    }
+  }
+
+  if (bucket.count > MAX_REQ_PER_WINDOW) {
+    res.status(429).json({ error: 'too many requests' });
+    return false;
+  }
+  return true;
+}
+
+function cleanQuery(value) {
+  return String(value || '')
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 module.exports = async function handler(req, res) {
-  const query = (req.query?.q || '').toString().trim();
+  setSecurityHeaders(res);
+
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!rateLimit(req, res)) return;
+
+  const query = cleanQuery(req.query?.q);
   if (!query) {
     return res.status(400).json({ error: 'missing query' });
   }
+  if (query.length > 120) {
+    return res.status(400).json({ error: 'query too long' });
+  }
 
-  // คำที่ห้ามเอา (ไม่ว่าจะค้นด้วย term ไหน)
   const avoidKeywords = ['reaction', 'cover', 'live performance', 'fancam', 'tiktok', 'shorts', 'sped up', 'slowed'];
 
   async function searchYoutube(searchTerm) {
-    // sp=EgIQAQ%3D%3D = filter "Videos only" (ตัด Shorts/Playlists/Channels)
     const url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(searchTerm) + '&sp=EgIQAQ%253D%253D';
     const r = await fetch(url, {
       headers: {
@@ -45,32 +104,29 @@ module.exports = async function handler(req, res) {
   function lengthToSeconds(str) {
     if (!str) return 0;
     const parts = str.split(':').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
-    if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
-    if (parts.length === 2) return parts[0]*60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
     return 0;
   }
 
-  // เลือกวิดีโอที่ดีที่สุดจากผลค้นหา 1 ชุด (คืน null ถ้าไม่มีตัวที่เหมาะ)
   function pickBest(videos) {
     const scored = videos.map(v => {
       const t = (v.title || '').toLowerCase();
       let score = 0;
       for (const k of avoidKeywords) if (t.includes(k)) score -= 6;
       const secs = lengthToSeconds(v.lengthStr);
-      if (secs > 0 && secs < 70) score -= 6;       // ตัด short
-      if (secs > 720) score -= 3;                   // คลิปยาวผิดปกติ
-      if (secs >= 120 && secs <= 420) score += 1;   // เพลงความยาวปกติ
+      if (secs > 0 && secs < 70) score -= 6;
+      if (secs > 720) score -= 3;
+      if (secs >= 120 && secs <= 420) score += 1;
       return { ...v, score };
     });
     scored.sort((a, b) => b.score - a.score);
-    // เอาเฉพาะตัวที่ไม่ติดลบมาก (กันกรณีทั้งชุดเป็น short/live)
     const best = scored[0];
     if (!best || best.score <= -6) return null;
     return best.id;
   }
 
   try {
-    // ไล่ค้นตาม priority — เจอแล้วหยุดทันที
     const tiers = [
       `${query} official mv`,
       `${query} official music video`,
@@ -93,4 +149,4 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     return res.status(200).json({ videoId: null });
   }
-}
+};

@@ -1,15 +1,140 @@
+// /api/search.js — secured version
+// Backend proxy for Gemini. Keep API keys only in Vercel Environment Variables.
+
+const WINDOW_MS = 60 * 1000;
+const MAX_REQ_PER_WINDOW = 30;
+const buckets = new Map();
+
+function setSecurityHeaders(res) {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+}
+
+function getClientId(req) {
+  return (
+    req.headers['x-forwarded-for'] ||
+    req.headers['x-real-ip'] ||
+    req.socket?.remoteAddress ||
+    'unknown'
+  ).toString().split(',')[0].trim();
+}
+
+function rateLimit(req, res) {
+  const now = Date.now();
+  const id = getClientId(req);
+  const bucket = buckets.get(id) || { start: now, count: 0 };
+  if (now - bucket.start > WINDOW_MS) {
+    bucket.start = now;
+    bucket.count = 0;
+  }
+  bucket.count += 1;
+  buckets.set(id, bucket);
+
+  // lightweight cleanup for long-lived server instances
+  if (buckets.size > 1000) {
+    for (const [key, value] of buckets) {
+      if (now - value.start > WINDOW_MS * 2) buckets.delete(key);
+    }
+  }
+
+  if (bucket.count > MAX_REQ_PER_WINDOW) {
+    res.status(429).json({ error: 'มีการใช้งานถี่เกินไป กรุณาลองใหม่อีกครั้งในสักครู่' });
+    return false;
+  }
+  return true;
+}
+
+function isAllowedOrigin(req) {
+  const allowed = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  // If not configured, stay same-origin friendly and do not emit permissive CORS.
+  if (!allowed.length) return true;
+
+  const origin = req.headers.origin;
+  // Non-browser/server-to-server requests may have no Origin.
+  if (!origin) return true;
+  return allowed.includes(origin);
+}
+
+function cleanQuery(value) {
+  return String(value || '')
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function safeString(value, maxLen) {
+  return String(value || '').replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, maxLen);
+}
+
+function safeTags(tags) {
+  return Array.isArray(tags) ? tags.slice(0, 5).map(t => safeString(t, 30)).filter(Boolean) : [];
+}
+
+function normalizeArtistResponse(parsed) {
+  const artists = Array.isArray(parsed.artists) ? parsed.artists.slice(0, 5).map(a => ({
+    name: safeString(a && a.name, 80),
+    genre: safeString(a && a.genre, 80),
+    why: safeString(a && a.why, 260),
+    tags: safeTags(a && a.tags),
+    wiki: safeString(a && a.wiki, 120),
+    country: safeString(a && a.country, 2).toUpperCase()
+  })).filter(a => a.name) : [];
+
+  return {
+    identified: safeString(parsed.identified, 120),
+    bio: safeString(parsed.bio, 360),
+    nationality: safeString(parsed.nationality, 80),
+    artists
+  };
+}
+
+function normalizeSongResponse(parsed) {
+  const songs = Array.isArray(parsed.songs) ? parsed.songs.slice(0, 6).map(s => ({
+    name: safeString(s && s.name, 100),
+    artist: safeString(s && s.artist, 100),
+    why: safeString(s && s.why, 260),
+    tags: safeTags(s && s.tags)
+  })).filter(s => s.name || s.artist) : [];
+
+  return {
+    identified: safeString(parsed.identified, 140),
+    songs
+  };
+}
+
 module.exports = async function handler(req, res) {
+  setSecurityHeaders(res);
+
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const query = ((req.body && req.body.query) || '').toString().trim();
-  const mode  = ((req.body && req.body.mode)  || 'artist').toString();
+  if (!isAllowedOrigin(req)) {
+    return res.status(403).json({ error: 'Origin not allowed' });
+  }
 
+  if (!rateLimit(req, res)) return;
+
+  const contentType = String(req.headers['content-type'] || '');
+  if (contentType && !contentType.includes('application/json')) {
+    return res.status(415).json({ error: 'Content-Type must be application/json' });
+  }
+
+  const query = cleanQuery(req.body && req.body.query);
+  const mode = cleanQuery((req.body && req.body.mode) || 'artist').toLowerCase();
+
+  if (!['artist', 'song'].includes(mode)) {
+    return res.status(400).json({ error: 'mode ไม่ถูกต้อง' });
+  }
   if (!query) return res.status(400).json({ error: 'กรุณาพิมพ์ชื่อศิลปินหรือเพลง' });
   if (query.length > 100) return res.status(400).json({ error: 'ข้อความยาวเกินไป' });
 
-  var keys = [
+  const keys = [
     process.env.GEMINI_API_KEY,
     process.env.GEMINI_API_KEY_2,
     process.env.GEMINI_API_KEY_3,
@@ -17,11 +142,11 @@ module.exports = async function handler(req, res) {
 
   if (!keys.length) return res.status(500).json({ error: 'ระบบยังไม่ได้ตั้งค่า API key' });
 
-  var prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
+  const prompt = mode === 'song' ? buildSongPrompt(query) : buildArtistPrompt(query);
 
-  for (var ki = 0; ki < keys.length; ki++) {
+  for (let ki = 0; ki < keys.length; ki++) {
     try {
-      var geminiRes = await fetch(
+      const geminiRes = await fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + keys[ki],
         {
           method: 'POST',
@@ -39,12 +164,12 @@ module.exports = async function handler(req, res) {
       }
 
       if (!geminiRes.ok) {
-        var errData = await geminiRes.json().catch(function(){ return {}; });
-        return res.status(500).json({ error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status) });
+        const errData = await geminiRes.json().catch(() => ({}));
+        return res.status(502).json({ error: 'AI error: ' + ((errData.error && errData.error.message) || geminiRes.status) });
       }
 
-      var data = await geminiRes.json();
-      var text = (
+      const data = await geminiRes.json();
+      let text = (
         data.candidates &&
         data.candidates[0] &&
         data.candidates[0].content &&
@@ -53,26 +178,24 @@ module.exports = async function handler(req, res) {
         data.candidates[0].content.parts[0].text
       ) || '';
 
-      // clean markdown
       text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
 
-      // extract JSON
-      var start = text.indexOf('{');
-      var end   = text.lastIndexOf('}');
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
       if (start === -1 || end === -1) {
-        console.log('No JSON, retrying next key. text:', text.slice(0,100));
+        console.log('No JSON, retrying next key. text:', text.slice(0, 100));
         continue;
       }
       text = text.slice(start, end + 1);
 
       try {
-        var parsed = JSON.parse(text);
-        return res.status(200).json(parsed);
+        const parsed = JSON.parse(text);
+        const normalized = mode === 'song' ? normalizeSongResponse(parsed) : normalizeArtistResponse(parsed);
+        return res.status(200).json(normalized);
       } catch (parseErr) {
         console.log('Parse error:', parseErr.message);
         continue;
       }
-
     } catch (fetchErr) {
       console.log('Fetch error:', fetchErr.message);
       continue;
