@@ -494,37 +494,48 @@ function skipQuestion(){
   }
 }
 function nextQuestion(){
+  // ตรวจสอบว่าข้อปัจจุบันถูกตอบแล้ว (ไม่ใช่ undefined = ยังไม่ตอบ)
   if(answers[currentQ]===undefined){
-    // แจ้งเตือนถ้ายังไม่ตอบ
     var opts=document.getElementById('qOptions');
     opts.style.animation='none';void opts.offsetWidth;
     opts.style.animation='shake 0.3s ease';
     return;
   }
-  // บวก weight สำหรับข้อที่ตอบ (ไม่ใช่ skip)
-  if(answers[currentQ]!==-1){
-    var w=QUESTIONS[currentQ].opts[answers[currentQ]].w;
-    Object.keys(w).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w[k];});
-  }
-  if(currentQ<QUESTIONS.length-1){
-    currentQ++;
-    renderQuestion();
-  } else {
-    // อยู่ข้อสุดท้ายแล้ว — ตรวจสอบทุกข้อก่อน
+
+  // ถ้าเป็นข้อสุดท้าย — ตรวจสอบทุกข้อก่อนเลย (ทั้ง undefined และ -1 ที่ skip)
+  if(currentQ===QUESTIONS.length-1){
+    // บวก weight ข้อปัจจุบันก่อน (ถ้าไม่ได้ skip)
+    if(answers[currentQ]!==-1){
+      var w=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+      Object.keys(w).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w[k];});
+    }
+    // หาข้อที่ยังไม่ตอบ: undefined = ยังไม่เคยเข้า, -1 = กด skip แล้วยังไม่ตอบ
     var unanswered=[];
     for(var i=0;i<QUESTIONS.length;i++){
-      if(answers[i]===undefined){unanswered.push(i+1);}
+      if(answers[i]===undefined||answers[i]===-1){unanswered.push(i+1);}
     }
     if(unanswered.length>0){
-      // แสดง alert และย้อนไปข้อที่ยังไม่ตอบ
-      var msg='ยังไม่ได้ตอบคำถามข้อที่ '+unanswered.join(', ')+' เลยนะ\nกลับไปตอบให้ครบก่อนแล้วค่อยดูผลได้เลย 😊';
-      alert(msg);
+      alert('ยังตอบไม่ครบนะ 😊 ยังเหลือคำถามข้อที่ '+unanswered.join(', ')+' — กลับไปตอบให้ครบก่อนแล้วค่อยดูผลลัพธ์ได้เลย!');
+      // ย้อนกลับไป reset weight ที่เพิ่งบวกไป แล้วกลับไปข้อแรกที่ยังไม่ตอบ
+      if(answers[currentQ]!==-1){
+        var w2=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+        Object.keys(w2).forEach(function(k){moodScore[k]=(moodScore[k]||0)-w2[k];});
+      }
       currentQ=unanswered[0]-1;
       renderQuestion();
       return;
     }
     showLoading();
+    return;
   }
+
+  // ข้อที่ไม่ใช่ข้อสุดท้าย — บวก weight แล้วไปข้อถัดไป
+  if(answers[currentQ]!==-1){
+    var w3=QUESTIONS[currentQ].opts[answers[currentQ]].w;
+    Object.keys(w3).forEach(function(k){moodScore[k]=(moodScore[k]||0)+w3[k];});
+  }
+  currentQ++;
+  renderQuestion();
 }
 function showLoading(){
   document.getElementById('quizScreen').classList.remove('active');
