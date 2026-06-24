@@ -252,7 +252,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <p>เลือกก่อนเลย แล้วเราจะ match ศิลปินให้ตรงที่สุด 🎯</p>
     <div class="lang-cards">
       <div class="lang-card" data-lang="thai" onclick="selectLang(this)"><span class="lang-emoji">🇹🇭</span><div class="lang-title">เพลงไทย</div><div class="lang-sub">ศิลปินไทย ทุกแนว ทุกสไตล์</div></div>
-      <div class="lang-card" data-lang="intl" onclick="selectLang(this)"><span class="lang-emoji">🌍</span><div class="lang-title">เพลงสากล</div><div class="lang-sub">Pop · K-Pop · Hip Hop · C-Pop · Latina และอื่นๆ</div></div>
+      <div class="lang-card" data-lang="intl" onclick="selectLang(this)"><span class="lang-emoji">🌍</span><div class="lang-title">เพลงสากล</div><div class="lang-sub">Pop · K-Pop · Hip Hop · Latina และอื่นๆ</div></div>
     </div>
     <button class="lang-start-btn" id="langStartBtn" onclick="startQuiz()">เริ่ม Quiz เลย! →</button>
     <button class="back-home-btn" onclick="goHome()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(240,238,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='rgba(167,139,250,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(240,238,255,0.4)'">← กลับหน้าหลัก</button>
@@ -332,39 +332,39 @@ var ARTISTS_INTL = JSON.parse('[{"id": "teddyswims", "name": "Teddy Swims", "emo
 // ============================================================
 var QUESTIONS = [
   {
-    q:'ตอนนี้ความรู้สึกคุณอยู่ที่ไหน? 💭',
+    q:'ตอนนี้ความรู้สึกคุณเป็นยังไง? 💭',
     opts:[
       {emoji:'😔',text:'เหนื่อยและหนักใจ',sub:'แค่อยากฟังเพลงแล้วนอนอยู่กับมัน',w:{dark:3,chill:2,energetic:-2,emotional:3,indie:1}},
-      {emoji:'⚡',text:'พลังงานเต็มถัง',sub:'อยากเปิดเพลงดังๆ และเอาชนะทุกอย่าง',w:{dark:-1,chill:-2,energetic:4,emotional:0,indie:0}},
-      {emoji:'😌',text:'สบายใจ โอเคดี',sub:'วันนี้ก็ผ่านไปได้ ไม่มีอะไรมาก',w:{dark:-2,chill:4,energetic:-1,emotional:0,indie:1}},
-      {emoji:'🌀',text:'คิดเยอะ ใจลอย',sub:'มีเรื่องค้างในหัวที่ยังคิดไม่ออก',w:{dark:1,chill:1,energetic:-1,emotional:3,indie:2}},
+      {emoji:'⚡',text:'เอเนอร์จี้มาเต็ม',sub:'อยากเปิดเพลงดังๆ และไม่สนโลก',w:{dark:-1,chill:-2,energetic:4,emotional:0,indie:0}},
+      {emoji:'😌',text:'สบายใจ จิตใจโอเค',sub:'วันนี้ก็ผ่านไปได้ ไม่มีอะไรมาก',w:{dark:-2,chill:4,energetic:-1,emotional:0,indie:1}},
+      {emoji:'🌀',text:'คิดเยอะ ใจลอย',sub:'มีเรื่องให้คิดเยอะใจฟุ้งซ่าน',w:{dark:1,chill:1,energetic:-1,emotional:3,indie:2}},
     ]
   },
   {
-    q:'คุณฟังเพลงในโมเมนต์ไหนบ่อยที่สุด? 🎧',
+    q:'คุณชอบฟังเพลงช่วงเวลาไหนที่สุด? 🎧',
     opts:[
-      {emoji:'🌅',text:'เช้าๆ ระหว่างเตรียมตัว',sub:'เพลงช่วย kick start วันใหม่ได้',w:{dark:-2,chill:2,energetic:3,emotional:1,indie:1}},
-      {emoji:'🚗',text:'ระหว่างเดินทาง หรือรถติด',sub:'เพลงช่วยให้ทนนั่งรอได้',w:{dark:2,chill:3,energetic:2,emotional:2,indie:2}},
-      {emoji:'🏃',text:'ตอนออกกำลังกาย',sub:'เพลงช่วยให้ไม่หยุดกลางคัน',w:{dark:-1,chill:-2,energetic:5,emotional:0,indie:0}},
-      {emoji:'🌙',text:'ดึกๆ คนเดียว',sub:'เพลงเป็นเพื่อนที่ดีที่สุดตอนนั้น',w:{dark:3,chill:3,energetic:-2,emotional:3,indie:2}},
+      {emoji:'🌅',text:'ตอนเช้า ระหว่างเตรียมตัวทำงาน',sub:'เพราะเชื่อว่าเพลงที่ดีจะช่วย kick start วันใหม่ได้',w:{dark:-2,chill:2,energetic:3,emotional:1,indie:1}},
+      {emoji:'🚗',text:'ระหว่างเดินทาง หรือฟังตอนรถติด',sub:'เพลงช่วยเปลี่ยนช่วงที่เบื่อให้สนุกได้',w:{dark:2,chill:3,energetic:2,emotional:2,indie:2}},
+      {emoji:'🏃',text:'ตอนออกกำลังกาย',sub:'ฟังเพื่อเพิ่ม Motivative มีเป้่าหมายในการออกกำลังกาย',w:{dark:-1,chill:-2,energetic:5,emotional:0,indie:0}},
+      {emoji:'🌙',text:'ดึกๆ ตอนอยู่คนเดียว',sub:'เพลงเป็นเพื่อนที่ดีที่สุดตอนนั้น',w:{dark:3,chill:3,energetic:-2,emotional:3,indie:2}},
     ]
   },
   {
-    q:'ช่วงนี้ชีวิตรู้สึกยังไง? 🌊',
+    q:'ช่วงนี้คุณเป็นยังไงบ้าง? 🌊',
     opts:[
-      {emoji:'💔',text:'กำลังฟื้นจากบางอย่าง',sub:'อกหัก เสียใจ หรือเหนื่อยจากอะไรบางอย่าง',w:{dark:2,chill:2,energetic:-2,emotional:4,indie:1}},
-      {emoji:'🔥',text:'กำลัง grind อย่างหนัก',sub:'มีเป้าหมาย และกำลังไปให้ถึง',w:{dark:-1,chill:0,energetic:4,emotional:1,indie:1}},
-      {emoji:'🌊',text:'ลอยๆ ยังหา direction อยู่',sub:'งงๆ กับตัวเอง อยู่ระหว่างทาง',w:{dark:1,chill:3,energetic:-1,emotional:2,indie:3}},
-      {emoji:'🌟',text:'ช่วงดีมาก มีความสุข',sub:'ทุกอย่างลงตัว รู้สึกอบอุ่น',w:{dark:-2,chill:3,energetic:2,emotional:3,indie:0}},
+      {emoji:'💔',text:'ช่วงฮีลจิตฮีลใจ',sub:'อกหัก เสียใจ เหนื่อย ท้อจากอะไรบางอย่าง',w:{dark:2,chill:2,energetic:-2,emotional:4,indie:1}},
+      {emoji:'🔥',text:'กำลังใจเต็ม 100%',sub:'มีเป้าหมาย มี Motivate เต็มร้อย',w:{dark:-1,chill:0,energetic:4,emotional:1,indie:1}},
+      {emoji:'🌊',text:'จิตใจล่องลอย',sub:'เหม่อ ลอย ใจไม่อยู่กับเนื้อกับตัว',w:{dark:1,chill:3,energetic:-1,emotional:2,indie:3}},
+      {emoji:'🌟',text:'มีความสุขสุด ๆ',sub:'ทุกอย่างกำลังลงตัว ไปได้เรื่อย ๆ',w:{dark:-2,chill:3,energetic:2,emotional:3,indie:0}},
     ]
   },
   {
-    q:'แนวเพลงที่ตอนนี้ใจอยากฟังมากที่สุดคืออะไร? 🎸',
+    q:'คุณชอบฟังเพลงแนวไหน ณ ตอนนี้? 🎸',
     opts:[
-      {emoji:'🤘',text:'Rock / Metal ปลุกพลัง',sub:'กีต้าร์หนัก เสียงดัง ปลุกจิตวิญญาณ',w:{dark:3,chill:-2,energetic:5,emotional:2,indie:2}},
-      {emoji:'🌊',text:'Indie / Alternative ฟังสบาย',sub:'เบาๆ ลื่นๆ เหมาะทุกบรรยากาศ',w:{dark:1,chill:4,energetic:0,emotional:2,indie:5}},
-      {emoji:'🎤',text:'Hip Hop / R&B มันส์ๆ',sub:'Groove จังหวะดี flow ติดหู',w:{dark:2,chill:2,energetic:4,emotional:1,indie:2}},
-      {emoji:'⚡',text:'EDM / Electronic จังหวะพุ่ง',sub:'Drop หนัก BPM สูง หัวสั่น',w:{dark:1,chill:-1,energetic:5,emotional:0,indie:1}},
+      {emoji:'🤘',text:'Rock / Metal',sub:'มันส์ ๆ ริฟโหด ๆ ฟังจนหัวโยก',w:{dark:3,chill:-2,energetic:5,emotional:2,indie:2}},
+      {emoji:'🌊',text:'Indie / Alternative',sub:'เบา ๆ ฟังสบาย ปล่อยใจจอย ๆ',w:{dark:1,chill:4,energetic:0,emotional:2,indie:5}},
+      {emoji:'🎤',text:'Hip Hop / R&B',sub:'Groove ดี จังหวะโดน Flow ไหลลื่น',w:{dark:2,chill:2,energetic:4,emotional:1,indie:2}},
+      {emoji:'⚡',text:'EDM / Electronic',sub:'Drop หนัก BPM สูง อยากจะโดดโยก',w:{dark:1,chill:-1,energetic:5,emotional:0,indie:1}},
     ]
   },
   {
