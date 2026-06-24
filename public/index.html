@@ -1117,7 +1117,33 @@ function doPlShuffle(){
 // HELPERS
 // ============================================================
 async function loadWiki(title,elId,fallback){
-  try{var r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));if(!r.ok)return;var d=await r.json();if(d.thumbnail&&d.thumbnail.source){var el=document.getElementById(elId);if(el)el.innerHTML='<img src="'+d.thumbnail.source+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';}}catch(e){}
+  try{
+    var r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title), {credentials:'omit'});
+    if(!r.ok)return;
+    var d=await r.json();
+    var src=d&&d.thumbnail&&d.thumbnail.source;
+    if(!src)return;
+
+    // Security: อย่า inject URL จาก external API ด้วย innerHTML
+    // ตรวจว่าเป็น HTTPS image จาก Wikimedia จริง แล้วสร้าง <img> ด้วย DOM API แทน
+    var u=new URL(src, window.location.href);
+    var allowedHost=/(^|\.)wikimedia\.org$/i.test(u.hostname) || u.hostname==='upload.wikimedia.org';
+    if(u.protocol!=='https:' || !allowedHost) return;
+
+    var el=document.getElementById(elId);
+    if(!el)return;
+    var img=document.createElement('img');
+    img.src=u.href;
+    img.alt='';
+    img.loading='lazy';
+    img.referrerPolicy='no-referrer';
+    img.style.width='100%';
+    img.style.height='100%';
+    img.style.objectFit='cover';
+    img.style.borderRadius='inherit';
+    el.textContent='';
+    el.appendChild(img);
+  }catch(e){}
 }
 function spotifyQuery(name){return 'this is '+String(name||'').trim();}
 function spotifyWebSearchUrl(name){return spotifyGenericWebSearchUrl(spotifyQuery(name), false);}
