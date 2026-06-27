@@ -318,6 +318,16 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .chart-row-btn-sp:hover{background:rgba(29,185,84,.2)}
 .chart-row-btn-apple{background:rgba(255,255,255,.06);color:var(--text2)}
 .chart-row-btn-apple:hover{background:rgba(255,255,255,.1)}
+.chart-listen-yt{background:#ff0033;color:#fff;border:1px solid rgba(255,255,255,.08);box-shadow:0 4px 18px rgba(255,0,51,.24)}
+.chart-listen-yt:hover{background:#cc0029;color:#fff;transform:translateY(-1px);box-shadow:0 7px 24px rgba(255,0,51,.34)}
+.chart-row-btn-yt{background:#ff0033;color:#fff}
+.chart-row-btn-yt:hover{background:#cc0029;color:#fff;transform:translateY(-1px)}
+.chart-mv-section{margin:16px 0 18px;padding:14px;border-radius:18px;background:rgba(255,0,51,.06);border:1px solid rgba(255,0,51,.18)}
+.chart-mv-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.chart-mv-title{font-size:13px;font-weight:800;color:#fff;line-height:1.35}
+.chart-mv-sub{font-size:11px;color:rgba(240,238,255,.48);font-family:'Noto Sans Thai',sans-serif;margin-top:2px}
+.chart-mv-badge{font-size:10px;font-weight:800;color:#fff;background:#ff0033;border-radius:999px;padding:4px 10px;white-space:nowrap}
+
 /* loading/error */
 .chart-loading{text-align:center;padding:40px 0;color:var(--text3);font-size:14px}
 .chart-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
@@ -381,8 +391,6 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   .da-actions{flex-direction:column}
 }
 
-.chart-row-btn-yt{background:rgba(255,0,0,.1);color:#ff4444}
-.chart-row-btn-yt:hover{background:rgba(255,0,0,.2)}
 </style>
 </head>
 <body class="booting">
@@ -562,7 +570,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <div class="chart-page-wrap">
   <div class="chart-page-eyebrow">📊 TOP HIT ติด CHARTS</div>
   <h1>เพลง TOP HIT<br/><span class="g">ที่น่าฟังตอนนี้</span></h1>
-  <p class="chart-page-sub">อ้างอิง Top 20 จาก iTunes · ฝังไว้ในเว็บเพื่อโหลดไว · กดฟังได้ทันทีใน Spotify 🎧</p>
+  <p class="chart-page-sub">อ้างอิง Top 20 จาก iTunes · กดฟังได้ทันทีใน Spotify YouTube Apple Music 🎧</p>
   <div id="chartPageContent"></div>
   <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
 </div>
@@ -1437,8 +1445,8 @@ function chartSpotifyWeb(title, artist) {
 }
 
 // ============================================================
-// STATIC CHART DATABASE — อ้างอิง iTunes Top 20 แล้วฝังไว้ในเว็บ
-// ข้อมูลนี้เป็น Snapshot จาก iTunes US Top Songs แล้วฝังไว้ในเว็บ
+// STATIC CHART DATABASE — อ้างอิง iTunes Top 20
+// ข้อมูลนี้เป็น Snapshot จาก iTunes US Top Songs
 // ไม่ fetch iTunes / ไม่เรียก /api/charts ตอนผู้ใช้เปิดหน้า ทำให้ Charts แสดงผลทันที
 // วิธีอัปเดต: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง จากนั้นอัปโหลดไฟล์ใหม่
 // artwork ใส่ค่าว่างได้ ระบบจะดึงรูปศิลปินจาก Wikipedia แบบ async หลังจาก list แสดงแล้ว
@@ -1452,140 +1460,180 @@ var STATIC_CHART_SONGS = [
     "title": "Choosin' Texas",
     "artist": "Ella Langley",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Choosin%27%20Texas%20Ella%20Langley"
+    "appleUrl": "https://music.apple.com/us/search?term=Choosin%27%20Texas%20Ella%20Langley",
+    "youtubeId": "nUsrYVxrDwI",
+    "youtubeLabel": "Official Video"
   },
   {
     "rank": 2,
     "title": "Look at My Life",
     "artist": "Gracie Abrams",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Look%20at%20My%20Life%20Gracie%20Abrams"
+    "appleUrl": "https://music.apple.com/us/search?term=Look%20at%20My%20Life%20Gracie%20Abrams",
+    "youtubeId": "2YSnCqHXMGY",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 3,
     "title": "Marry You Again",
     "artist": "Dan + Shay",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Marry%20You%20Again%20Dan%20%2B%20Shay"
+    "appleUrl": "https://music.apple.com/us/search?term=Marry%20You%20Again%20Dan%20%2B%20Shay",
+    "youtubeId": "g62EHIjxDks",
+    "youtubeLabel": "Official Audio"
   },
   {
     "rank": 4,
     "title": "Another Drink",
     "artist": "Marshmello & Kelsea Ballerini",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Another%20Drink%20Marshmello%20%26%20Kelsea%20Ballerini"
+    "appleUrl": "https://music.apple.com/us/search?term=Another%20Drink%20Marshmello%20%26%20Kelsea%20Ballerini",
+    "youtubeId": "UW1UKhrQphI",
+    "youtubeLabel": "Official Visualizer"
   },
   {
     "rank": 5,
     "title": "The Time Of My Life",
     "artist": "Benson Boone",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=The%20Time%20Of%20My%20Life%20Benson%20Boone"
+    "appleUrl": "https://music.apple.com/us/search?term=The%20Time%20Of%20My%20Life%20Benson%20Boone",
+    "youtubeId": "ptlsli-QXXc",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 6,
     "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
     "artist": "Taylor Swift",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=I%20Knew%20It%2C%20I%20Knew%20You%20%28From%20%22Toy%20Story%205%22%29%20Taylor%20Swift"
+    "appleUrl": "https://music.apple.com/us/search?term=I%20Knew%20It%2C%20I%20Knew%20You%20%28From%20%22Toy%20Story%205%22%29%20Taylor%20Swift",
+    "youtubeId": "hDU4GB1PTxc",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 7,
     "title": "Let Him In Anyway",
     "artist": "Blake Shelton",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Let%20Him%20In%20Anyway%20Blake%20Shelton"
+    "appleUrl": "https://music.apple.com/us/search?term=Let%20Him%20In%20Anyway%20Blake%20Shelton",
+    "youtubeId": "K0aRuR_bA4k",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 8,
     "title": "Hands Up",
     "artist": "Jelly Roll",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Hands%20Up%20Jelly%20Roll"
+    "appleUrl": "https://music.apple.com/us/search?term=Hands%20Up%20Jelly%20Roll",
+    "youtubeId": "6DPkDnUL1so",
+    "youtubeLabel": "Official Audio"
   },
   {
     "rank": 9,
     "title": "Be Her",
     "artist": "Ella Langley",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Be%20Her%20Ella%20Langley"
+    "appleUrl": "https://music.apple.com/us/search?term=Be%20Her%20Ella%20Langley",
+    "youtubeId": "Dg47eNL_Usw",
+    "youtubeLabel": "Official Video"
   },
   {
     "rank": 10,
     "title": "Dancing On My Own",
     "artist": "Robyn",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Dancing%20On%20My%20Own%20Robyn"
+    "appleUrl": "https://music.apple.com/us/search?term=Dancing%20On%20My%20Own%20Robyn",
+    "youtubeId": "CcNo07Xp8aQ",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 11,
     "title": "Divine Intervention",
     "artist": "The Rolling Stones",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Divine%20Intervention%20The%20Rolling%20Stones"
+    "appleUrl": "https://music.apple.com/us/search?term=Divine%20Intervention%20The%20Rolling%20Stones",
+    "youtubeId": "3mUf_DGhygA",
+    "youtubeLabel": "Official Audio"
   },
   {
     "rank": 12,
     "title": "Jealous Lover",
     "artist": "The Rolling Stones",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Jealous%20Lover%20The%20Rolling%20Stones"
+    "appleUrl": "https://music.apple.com/us/search?term=Jealous%20Lover%20The%20Rolling%20Stones",
+    "youtubeId": "tV-PWFpSR4c",
+    "youtubeLabel": "Official Lyric Video"
   },
   {
     "rank": 13,
     "title": "If I Don't Leave I'm Gonna Stay",
     "artist": "Carly Pearce & Riley Green",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=If%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%20Carly%20Pearce%20%26%20Riley%20Green"
+    "appleUrl": "https://music.apple.com/us/search?term=If%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%20Carly%20Pearce%20%26%20Riley%20Green",
+    "youtubeId": "puwLnJ7bb9o",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 14,
     "title": "Made It A Memory",
     "artist": "Luke Bryan",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Made%20It%20A%20Memory%20Luke%20Bryan"
+    "appleUrl": "https://music.apple.com/us/search?term=Made%20It%20A%20Memory%20Luke%20Bryan",
+    "youtubeId": "pG2jHH9_1co",
+    "youtubeLabel": "Official Audio Video"
   },
   {
     "rank": 15,
     "title": "Watch It Burn",
     "artist": "Katy Perry",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Watch%20It%20Burn%20Katy%20Perry"
+    "appleUrl": "https://music.apple.com/us/search?term=Watch%20It%20Burn%20Katy%20Perry",
+    "youtubeId": "YzUs8ohSB3w",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 16,
     "title": "We Go Back (feat. Michael McDonald)",
     "artist": "Keith Urban",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=We%20Go%20Back%20%28feat.%20Michael%20McDonald%29%20Keith%20Urban"
+    "appleUrl": "https://music.apple.com/us/search?term=We%20Go%20Back%20%28feat.%20Michael%20McDonald%29%20Keith%20Urban",
+    "youtubeId": "ssC-ReImg9Y",
+    "youtubeLabel": "Official Lyric Video"
   },
   {
     "rank": 17,
     "title": "Cowgirl",
     "artist": "Shaboozey",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Cowgirl%20Shaboozey"
+    "appleUrl": "https://music.apple.com/us/search?term=Cowgirl%20Shaboozey",
+    "youtubeId": "u0g8elvennQ",
+    "youtubeLabel": "Official Video"
   },
   {
     "rank": 18,
     "title": "RUN IT",
     "artist": "Stray Kids",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=RUN%20IT%20Stray%20Kids"
+    "appleUrl": "https://music.apple.com/us/search?term=RUN%20IT%20Stray%20Kids",
+    "youtubeId": "Q7IFjVUUb_E",
+    "youtubeLabel": "M/V"
   },
   {
     "rank": 19,
     "title": "Play Dead",
     "artist": "ICE NINE KILLS",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Play%20Dead%20ICE%20NINE%20KILLS"
+    "appleUrl": "https://music.apple.com/us/search?term=Play%20Dead%20ICE%20NINE%20KILLS",
+    "youtubeId": "7WpxyUbltqw",
+    "youtubeLabel": "Official Music Video"
   },
   {
     "rank": 20,
     "title": "Boston",
     "artist": "STELLA LEFTY",
     "artwork": "",
-    "appleUrl": "https://music.apple.com/us/search?term=Boston%20STELLA%20LEFTY"
+    "appleUrl": "https://music.apple.com/us/search?term=Boston%20STELLA%20LEFTY",
+    "youtubeId": "v2ttAph6PhM",
+    "youtubeLabel": "Lyric Video"
   }
 ];
 
@@ -1720,7 +1768,42 @@ function renderChartTeaser(songs) {
   hydrateChartWikipediaImages();
 }
 
-// ---- FULL CHART PAGE (20 songs + #1 YouTube MV) ----
+
+function chartYoutubeUrl(s) {
+  return s && s.youtubeId ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(s.youtubeId) : '';
+}
+function chartYoutubeEmbedUrl(id, autoplay) {
+  return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?rel=0&modestbranding=1' + (autoplay ? '&autoplay=1' : '');
+}
+function renderChartMVPlayer(s) {
+  if (!s || !s.youtubeId) return '';
+  var label = esc((s.title || '') + ' — ' + (s.artist || ''));
+  return '<div class="chart-mv-section" id="chartMvBox">' +
+    '<div class="chart-mv-head">' +
+      '<div><div class="chart-mv-title" id="chartMvTitle">🎬 MV เพลง TOP CHARTS: ' + label + '</div>' +
+      '<div class="chart-mv-sub">Official YouTube · เล่นในหน้านี้ได้เลย ไม่ต้องค้นหาใหม่</div></div>' +
+      '<span class="chart-mv-badge">YouTube</span>' +
+    '</div>' +
+    '<div class="chart-yt-wrap" id="chartMvWrap">' +
+      '<iframe src="' + chartYoutubeEmbedUrl(s.youtubeId, false) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
+    '</div>' +
+  '</div>';
+}
+function playChartMV(e, id, title, artist) {
+  if (e) e.preventDefault();
+  if (!id) return false;
+  var wrap = document.getElementById('chartMvWrap');
+  var titleEl = document.getElementById('chartMvTitle');
+  if (wrap) {
+    wrap.innerHTML = '<iframe src="' + chartYoutubeEmbedUrl(id, true) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  }
+  if (titleEl) titleEl.textContent = '🎬 MV เพลง TOP CHARTS: ' + title + ' — ' + artist;
+  var box = document.getElementById('chartMvBox');
+  if (box) box.scrollIntoView({behavior:'smooth', block:'center'});
+  return false;
+}
+
+// ---- FULL CHART PAGE (20 songs + MV player) ----
 var ytVideoId = null;
 var ytLoaded = false;
 
@@ -1729,9 +1812,8 @@ function renderChartPage(songs) {
   if (!el || !songs.length) return;
   var s1 = songs[0];
   var ranks = ['🥇','🥈','🥉'];
-  var ytSearch1 = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s1.title + ' ' + s1.artist + ' official mv');
 
-  // hero #1 — ไม่มี YT embed แต่มีปุ่ม YouTube
+  var ytHeroUrl = chartYoutubeUrl(s1);
   var heroHtml = '<div class="chart-hero-card">' +
     '<div class="chart-hero-badge">🥇 #1 iTunes US Chart</div>' +
     '<div class="chart-hero-body">' +
@@ -1742,26 +1824,25 @@ function renderChartPage(songs) {
         '<div class="chart-hero-tags">' +
           '<span class="chart-hero-tag">🏆 อันดับ 1</span>' +
           '<span class="chart-hero-tag">TOP HIT ติด CHARTS</span>' +
+          (s1.youtubeLabel ? '<span class="chart-hero-tag">' + esc(s1.youtubeLabel) + '</span>' : '') +
         '</div>' +
       '</div>' +
     '</div>' +
+    renderChartMVPlayer(s1) +
     '<div class="chart-listen-btns">' +
       '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
-      '<a class="chart-listen-btn chart-listen-yt" href="' + ytSearch1 + '" target="_blank" rel="noopener">' +
-        YT_ICON + ' YouTube MV' +
-      '</a>' +
+      (ytHeroUrl ? '<a class="chart-listen-btn chart-listen-yt" href="' + esc(ytHeroUrl) + '" target="_blank" rel="noopener">' + YT_ICON + ' YouTube MV</a>' : '') +
     '</div>' +
   '</div>';
 
-  // rank list 1-20 (ทุกเพลง)
-  var listHtml = '<div class="chart-rank-label">อันดับ 1–20</div><div class="chart-list">';
+  var listHtml = '<div class="chart-rank-label">อันดับ 1–20 · เลือกเพลงเพื่อเล่น MV ในหน้านี้</div><div class="chart-list">';
   songs.forEach(function(s, i) {
     var rank = ranks[i] || ('#' + s.rank);
     var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
-    var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv');
+    var ytUrl = chartYoutubeUrl(s);
     listHtml += '<div class="chart-row">' +
       '<div class="' + cls + '">' + rank + '</div>' +
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
@@ -1769,7 +1850,7 @@ function renderChartPage(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        '<a class="chart-row-btn chart-row-btn-yt" href="' + ytUrl + '" target="_blank" rel="noopener" title="YouTube MV">' + YT_ICON + '</a>' +
+        (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" onclick="return playChartMV(event,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
       '</div></div>';
   });
   listHtml += '</div>';
