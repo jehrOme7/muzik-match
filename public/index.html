@@ -1498,9 +1498,9 @@ function openSpotifyUrl(event, el, url, query, type){
   }
 
   var appLikelyOpened = false;
-  var spotifyTab = null;
   var fallbackTimer = null;
   var cleanupTimer = null;
+  var appFrame = null;
 
   function cleanup(){
     window.removeEventListener('blur', markAppLikelyOpened);
@@ -1508,55 +1508,57 @@ function openSpotifyUrl(event, el, url, query, type){
     document.removeEventListener('visibilitychange', onVisibilityChange);
     if(fallbackTimer) clearTimeout(fallbackTimer);
     if(cleanupTimer) clearTimeout(cleanupTimer);
+    if(appFrame && appFrame.parentNode){
+      setTimeout(function(){
+        try{ if(appFrame && appFrame.parentNode) appFrame.parentNode.removeChild(appFrame); }catch(e){}
+      }, 800);
+    }
   }
   function markAppLikelyOpened(){
     appLikelyOpened = true;
     cleanup();
-    // ถ้า browser เปิด tab ว่างไว้หลังส่งผู้ใช้ไป app ให้พยายามปิดเพื่อลดความรก
-    try{
-      if(spotifyTab && !spotifyTab.closed){ spotifyTab.close(); }
-    }catch(e){}
   }
-  function onVisibilityChange(){ if(document.hidden) markAppLikelyOpened(); }
+  function onVisibilityChange(){
+    if(document.hidden) markAppLikelyOpened();
+  }
 
   window.addEventListener('blur', markAppLikelyOpened, {once:true});
   window.addEventListener('pagehide', markAppLikelyOpened, {once:true});
   document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
 
-  // เปิดใน tab ใหม่เท่านั้น: ห้ามเปลี่ยนหน้าเว็บ Muzik Match ปัจจุบัน
-  // 1) ลองเปิด Spotify app ด้วย URI scheme ใน tab ใหม่
-  // 2) ถ้าไม่มี app/ไม่ตอบสนอง ค่อยเปลี่ยน tab เดิมนั้นไปเป็น Spotify web
+  // App-first โดยไม่เปลี่ยนหน้าเว็บหลัก:
+  // ลองยิง spotify: URI จาก iframe ที่ซ่อนอยู่ก่อน เพื่อให้ browser เปิด Spotify app
+  // ถ้า app ไม่เปิด/หน้าไม่ blur จึง fallback เป็น Spotify web ใน new tab เท่านั้น
   try{
-    spotifyTab = window.open('about:blank', '_blank');
-    if(spotifyTab){
-      try{ spotifyTab.opener = null; }catch(e){}
-      spotifyTab.location.href = appUri;
-    }else{
-      // popup ถูก block: อย่างน้อย fallback web ยังต้องเป็น new tab ไม่ใช่หน้าเดิม
-      window.open(webUrl, '_blank', 'noopener');
-      cleanup();
-      return false;
-    }
+    appFrame = document.createElement('iframe');
+    appFrame.style.display = 'none';
+    appFrame.style.width = '0';
+    appFrame.style.height = '0';
+    appFrame.style.border = '0';
+    appFrame.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(appFrame);
+    appFrame.src = appUri;
   }catch(e){
-    window.open(webUrl, '_blank', 'noopener');
-    cleanup();
-    return false;
+    try{
+      var appLink = document.createElement('a');
+      appLink.href = appUri;
+      appLink.target = '_blank';
+      appLink.rel = 'noopener';
+      appLink.style.display = 'none';
+      document.body.appendChild(appLink);
+      appLink.click();
+      setTimeout(function(){ try{ document.body.removeChild(appLink); }catch(e){} }, 500);
+    }catch(e2){}
   }
 
   fallbackTimer = setTimeout(function(){
     if(!appLikelyOpened && document.visibilityState !== 'hidden'){
       cleanup();
-      try{
-        if(spotifyTab && !spotifyTab.closed){
-          spotifyTab.location.href = webUrl;
-        }else{
-          window.open(webUrl, '_blank', 'noopener');
-        }
-      }catch(e){ window.open(webUrl, '_blank', 'noopener'); }
+      window.open(webUrl, '_blank', 'noopener');
     }
-  }, 1700);
+  }, 2200);
 
-  cleanupTimer = setTimeout(cleanup, 5000);
+  cleanupTimer = setTimeout(cleanup, 6000);
   return false;
 }
 function openSpotifyDeepLink(event, el, query, webUrl, type){
