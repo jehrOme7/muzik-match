@@ -609,7 +609,69 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 // วิธีใช้: แทนที่ทุกอย่างระหว่าง <script> ถึง // QUESTIONS
 // ============================================================
 
-// ---- helper เพื่อสร้าง Spotify search URL ----
+// ---- Spotify direct "This Is" playlist links ----
+// ใส่เฉพาะลิงก์ที่เจอว่าเป็น playlist ตรงของ Spotify จริง
+var SPOTIFY_DIRECT_PLAYLISTS = {
+  "Ella Langley": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO3U8HPt",
+  "Gracie Abrams": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2Cuzya",
+  "Dan + Shay": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO4tMsQE",
+  "Marshmello": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO3Adu8w",
+  "Kelsea Ballerini": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2fAyZy",
+  "Benson Boone": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO19EnPq",
+  "Taylor Swift": "https://open.spotify.com/playlist/37i9dQZF1DX5KpP2LN299J",
+  "Blake Shelton": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO1543g4",
+  "Jelly Roll": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO0Crktg",
+  "Robyn": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO45rDuE",
+  "The Rolling Stones": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO19s0CZ",
+  "Carly Pearce": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2C1Hr5",
+  "Riley Green": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO1DTJEE",
+  "Luke Bryan": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO0i5HdS",
+  "Katy Perry": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO3Jefw4",
+  "Keith Urban": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO0dB8Gc",
+  "Shaboozey": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO23Vfpd",
+  "Stray Kids": "https://open.spotify.com/playlist/37i9dQZF1DWWqjEVD8TBr9",
+  "ICE NINE KILLS": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2Xw214",
+  "Ice Nine Kills": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2Xw214",
+  "STELLA LEFTY": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO3HPD73",
+  "Billie Eilish": "https://open.spotify.com/playlist/37i9dQZF1DX6cg4h2PoN9y",
+  "BTS": "https://open.spotify.com/playlist/37i9dQZF1DX08mhnhv6g9b",
+  "BLACKPINK": "https://open.spotify.com/playlist/37i9dQZF1DX8kP0ioXjxIA",
+  "The Weeknd": "https://open.spotify.com/playlist/37i9dQZF1DX6bnzK9KPvrz",
+  "Ed Sheeran": "https://open.spotify.com/playlist/37i9dQZF1DWWxPM4nWdhyI",
+  "Ariana Grande": "https://open.spotify.com/playlist/37i9dQZF1DX1PfYnYcpw8w",
+  "Justin Bieber": "https://open.spotify.com/playlist/37i9dQZF1DXc2aPBXGmXrt",
+  "Bruno Mars": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO03DwPK",
+  "Lady Gaga": "https://open.spotify.com/playlist/37i9dQZF1DXc7FZ2VBjaeT",
+  "Dua Lipa": "https://open.spotify.com/playlist/37i9dQZF1DX3fRquEp6m8D",
+  "Coldplay": "https://open.spotify.com/playlist/37i9dQZF1DXaQm3ZVg9Z2X",
+  "Imagine Dragons": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO2YqUuI",
+  "Post Malone": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO1aBeik",
+  "Drake": "https://open.spotify.com/playlist/37i9dQZF1DX7QOv5kjbU68",
+  "Eminem": "https://open.spotify.com/playlist/37i9dQZF1DZ06evO4gTUOY"
+};
+
+function spotifyDirectPlaylistValue(name) {
+  var raw = String(name || '').trim();
+  if (!raw) return '';
+  var candidates = [raw];
+  var cleaned = raw.replace(/^this\s+is\s+/i, '').trim();
+  if (cleaned && cleaned !== raw) candidates.push(cleaned);
+  cleaned.split(/\s*&\s*|\s*,\s*|\s+feat\.?\s+|\s+featuring\s+/i).forEach(function(part){
+    part = String(part || '').trim();
+    if (part) candidates.push(part);
+  });
+  for (var i = 0; i < candidates.length; i++) {
+    var k = candidates[i];
+    if (SPOTIFY_DIRECT_PLAYLISTS[k]) return SPOTIFY_DIRECT_PLAYLISTS[k];
+  }
+  var lower = candidates.map(function(x){ return String(x).toLowerCase(); });
+  for (var key in SPOTIFY_DIRECT_PLAYLISTS) {
+    if (lower.indexOf(String(key).toLowerCase()) !== -1) return SPOTIFY_DIRECT_PLAYLISTS[key];
+  }
+  return '';
+}
+
+// ---- helper เพื่อสร้าง Spotify direct playlist URL ก่อน แล้วค่อย fallback เป็น search ----
 function sp(name){ return spotifyWebSearchUrl(name); }
 
 // ============================================================
@@ -1014,30 +1076,46 @@ var PERSONALITIES = [
 // PLAYLIST DATA
 // ============================================================
 var PL_DATA = [
-  {emoji:'😢',name:'เพลงไทยเศร้า',desc:'ร้องไห้คนเดียวในห้อง ไฟดิม เพลงเบา',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยเศร้า/playlists'},
-  {emoji:'🥰',name:'เพลงรักไทย',desc:'อบอุ่นหัวใจ ฟังกับคนพิเศษ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงรักไทย/playlists'},
-  {emoji:'🔥',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยที่ทุกคนฟังอยู่ตอนนี้',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทยฮิต/playlists'},
-  {emoji:'🎸',name:'สตริงไทย Alternative',desc:'Rock / Alternative ไทยที่ฟังได้ทุกวัน',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/สตริงไทย alternative/playlists'},
-  {emoji:'🌿',name:'เพลงไทย Chill',desc:'ผ่อนคลาย ลืมทุกอย่าง ให้เพลงจัดการ',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/เพลงไทย chill/playlists'},
-  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้ดั้งเดิมที่ไม่มีวันเก่า',lang:'TH เพลงไทย',url:'https://open.spotify.com/search/ลูกทุ่ง/playlists'},
-  {emoji:'🔥',name:'Hip Hop ไทย',desc:'Underground ไทย สตรีทไทย flow เต็มๆ',lang:'HH Hip Hop ไทย',url:'https://open.spotify.com/search/hip hop ไทย/playlists'},
-  {emoji:'😢',name:'Sad Songs',desc:'เพลงเศร้าภาษาสากล ร้องด้วยกันเลย',lang:'GL สากล',url:'https://open.spotify.com/search/sad songs playlist/playlists'},
-  {emoji:'🔥',name:'Pop Hits',desc:'เพลงป็อปฮิตทั่วโลกที่ทุกคนรู้จัก',lang:'GL สากล',url:'https://open.spotify.com/search/pop hits 2024/playlists'},
-  {emoji:'😌',name:'Chill Vibes',desc:'Relax โหมดเปิด brain ปิด',lang:'GL สากล',url:'https://open.spotify.com/search/chill vibes playlist/playlists'},
-  {emoji:'🏃',name:'Workout Hits',desc:'BPM สูง พลังงานพุ่ง ห้ามหยุด',lang:'GL สากล',url:'https://open.spotify.com/search/workout hits playlist/playlists'},
-  {emoji:'🌙',name:'Late Night Playlist',desc:'ดึกๆ คนเดียว เพลงเพื่อน',lang:'GL สากล',url:'https://open.spotify.com/search/late night playlist/playlists'},
-  {emoji:'🎹',name:'Lo-fi Beats',desc:'Beats to study · relax · exist',lang:'GL สากล',url:'https://open.spotify.com/search/lofi hip hop beats/playlists'},
-  {emoji:'🎷',name:'R&B Soul',desc:'Smooth grooves ที่ลื่นหูมากๆ',lang:'GL สากล',url:'https://open.spotify.com/search/rnb soul playlist/playlists'},
-  {emoji:'⚡',name:'EDM Bangers',desc:'Drop ที่ทำให้สะเทือนทั้งห้อง',lang:'GL สากล',url:'https://open.spotify.com/search/edm bangers playlist/playlists'},
-  {emoji:'🤘',name:'Rock Classics',desc:'Guitar riffs สายฮาร์ดคอร์ที่ไม่เคยเก่า',lang:'GL สากล',url:'https://open.spotify.com/search/rock classics playlist/playlists'},
-  {emoji:'✨',name:'K-Pop Hits',desc:'เกาหลีฮิต ท็อปชาร์ต ฟังแล้วติด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop hits playlist/playlists'},
-  {emoji:'💜',name:'K-Pop Sad Songs',desc:'เพลงเกาหลีเศร้า feel ลึกมาก',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop sad songs/playlists'},
-  {emoji:'🕺',name:'K-Pop Dance',desc:'Dance K-Pop มันส์ไม่หยุด',lang:'KR K-Pop',url:'https://open.spotify.com/search/kpop dance playlist/playlists'},
-  {emoji:'🐉',name:'C-Pop Hits',desc:'เพลงจีนฮิต ท็อปชาร์ต',lang:'CN C-Pop',url:'https://open.spotify.com/search/chinese pop cpop playlist/playlists'},
-  {emoji:'💃',name:'Latin Pop Hits',desc:'ละตินฮิต สนุกสุดๆ ต้องขยับตาม',lang:'LA ละติน',url:'https://open.spotify.com/search/latin pop hits playlist/playlists'},
-  {emoji:'🎺',name:'Reggaeton',desc:'Reggaeton banger ที่หยุดฟังไม่ได้',lang:'LA ละติน',url:'https://open.spotify.com/search/reggaeton playlist/playlists'},
-  {emoji:'🤖',name:'French Electronic',desc:'French House · Techno · ฝรั่งเศส',lang:'FR ฝรั่งเศส',url:'https://open.spotify.com/search/french electronic house playlist/playlists'},
-  {emoji:'🌑',name:'Dark Pop',desc:'Moody · Cinematic · เหมือนอยู่ในหนัง',lang:'GL สากล',url:'https://open.spotify.com/search/dark pop playlist/playlists'},
+  // อารมณ์
+  {emoji:'😢',name:'เพลงเศร้า',desc:'ร้องไห้คนเดียวในห้อง',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DX3YSRoSdA634'},
+  {emoji:'🥰',name:'เพลงรัก',desc:'อบอุ่นหัวใจทุกช่วงเวลา',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M'},
+  {emoji:'🔥',name:'มันส์ระเบิด',desc:'พลังงานพุ่ง ฮาย vibes',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DXdxcBWuJkbcy'},
+  {emoji:'😌',name:'ผ่อนคลาย Chill',desc:'ลืมทุกอย่าง ปล่อยใจ',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO'},
+  {emoji:'😤',name:'หัวใจสลาย',desc:'เจ็บปวด อกหัก เข้าใจ',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DX3rxVfibe1L0'},
+  {emoji:'😤',name:'โกรธมาก',desc:'ระบาย ปล่อยออกมาเลย',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DXdxcBWuJkbcy'},
+  {emoji:'🤔',name:'คิดมาก',desc:'Melancholy โหยหาอดีต',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DX1s9knjP51Oa'},
+  {emoji:'🌈',name:'Happy Vibes',desc:'ยิ้มได้ทั้งวัน เฮฮา',lang:'อารมณ์',url:'https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTmlC'},
+  // กิจกรรม
+  {emoji:'🌙',name:'ก่อนนอน',desc:'นอนหลับสบาย ฝันดี',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DWZd79rJ6a7lp'},
+  {emoji:'☀️',name:'ตื่นเช้า',desc:'เริ่มวันใหม่ด้วยพลังงาน',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX1g0iEXLFycr'},
+  {emoji:'🏃',name:'วิ่งออกกำลังกาย',desc:'BPM สูง ไม่หยุด',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP'},
+  {emoji:'💪',name:'ยิม / Workout',desc:'Pump it up ไม่ยอมแพ้',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX70RN3TfWWJh'},
+  {emoji:'🚗',name:'ขับรถเที่ยว',desc:'เปิดกระจก ลมพัด',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DXaXB8fQg7xof'},
+  {emoji:'📚',name:'อ่านหนังสือ / ทำงาน',desc:'โฟกัส ไม่วอกแวก',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX8NTLI2TtZa6'},
+  {emoji:'🍳',name:'ทำอาหาร',desc:'ครัวสนุก เพลงแบ็กกราวนด์',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DWUACcBjzMgRP'},
+  {emoji:'🎉',name:'ปาร์ตี้',desc:'Dance floor ไม่หยุด',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DXaXB8fQg7xof'},
+  {emoji:'🧘',name:'โยคะ / Meditation',desc:'สงบ ผ่อนคลาย mindful',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX9uKNf5jGX6m'},
+  {emoji:'🌊',name:'ริมทะเล',desc:'ลมทะเล รีแล็กซ์สุดๆ',lang:'กิจกรรม',url:'https://open.spotify.com/playlist/37i9dQZF1DX4PP3DA4J0N8'},
+  // แนวเพลง
+  {emoji:'🎷',name:'R&B / Soul',desc:'Smooth grooves ลื่นหู',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX4SBhb3fqCJd'},
+  {emoji:'🎸',name:'Indie Pop',desc:'Alternative vibes คูล',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX2sUQwD7tbmL'},
+  {emoji:'🎹',name:'Lo-fi Hip Hop',desc:'Beats to study/relax',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4eVxkAT'},
+  {emoji:'🎤',name:'Hip Hop / Rap',desc:'ท่าทาง สตาย สตรีท',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd'},
+  {emoji:'⚡',name:'Electronic / EDM',desc:'Drop สะเทือนหัวใจ',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX4dyzvuaRJ0n'},
+  {emoji:'🤘',name:'Rock',desc:'Guitar riffs สายฮาร์ดคอร์',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DWXRqgorJj26U'},
+  {emoji:'🎺',name:'Jazz',desc:'Smooth เย็น คลาสสิก',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DXbITWG1ZJKYt'},
+  {emoji:'🎻',name:'Classical',desc:'ฟังแบบมีรสนิยม',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DWWEJlAGA9gs0'},
+  {emoji:'🌿',name:'Acoustic / Folk',desc:'กีต้าร์โปร่ง เรียบง่าย',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX4E3UdUs7fUx'},
+  {emoji:'🌙',name:'K-Pop',desc:'เกาหลีฮิต ท็อปชาร์ต',lang:'แนวเพลง',url:'https://open.spotify.com/playlist/37i9dQZF1DX9tPFwDMOaN1'},
+  // เพลงไทย
+  {emoji:'💚',name:'เพลงไทยฮิต',desc:'Top charts เพลงไทยตอนนี้',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX1tPSm3rhMzN'},
+  {emoji:'🎙️',name:'สตริงไทย',desc:'Rock / Alternative ไทย',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX0pH2SQMRXnC'},
+  {emoji:'🎵',name:'ลูกทุ่ง',desc:'สุ้มเสียงไทยแท้',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX4osfzoSQBCK'},
+  {emoji:'🌙',name:'เพลงไทยเศร้า',desc:'น้ำตาจะไหล ฟังคนเดียว',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX3YSRoSdA634'},
+  {emoji:'🔥',name:'Thai Hip Hop',desc:'Underground ไทย สตรีท',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX1tPSm3rhMzN'},
+  {emoji:'🌊',name:'Indie ไทย',desc:'Alternative ไทย ฟีลดี',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX0pH2SQMRXnC'},
+  {emoji:'💕',name:'เพลงรักไทย',desc:'ฟังกับคนพิเศษ',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M'},
+  {emoji:'🎤',name:'T-Pop / ลูกกรุง',desc:'ไทยป็อปสมัยใหม่',lang:'เพลงไทย',url:'https://open.spotify.com/playlist/37i9dQZF1DX1tPSm3rhMzN'},
 ];
 
 // ============================================================
@@ -1314,7 +1392,9 @@ function doPlShuffle(){
     document.getElementById('plDesc').textContent=pl.desc;
     var plSearch=playlistSearchQuery(pl);
     var plLink=document.getElementById('plLink');
-    plLink.href=spotifyPlaylistWebSearchUrl(plSearch);
+    var plDirect=isSpotifyPlaylistUrl(pl.url) ? pl.url : '';
+    plLink.href=plDirect || spotifyPlaylistWebSearchUrl(plSearch);
+    plLink.dataset.spotifyUrl=plLink.href;
     plLink.dataset.spotifyQuery=plSearch;
     var r=document.getElementById('plResult');r.style.display='block';r.style.animation='none';void r.offsetWidth;r.style.animation='fadeUp 0.4s ease';
   },380);
@@ -1353,15 +1433,22 @@ async function loadWiki(title,elId,fallback){
   }catch(e){}
 }
 function spotifyQuery(name){return 'this is '+String(name||'').trim();}
-function spotifyWebSearchUrl(name){return spotifyGenericWebSearchUrl(spotifyQuery(name), false);}
-function spotifyAppSearchUri(name){return spotifyGenericAppSearchUri(spotifyQuery(name));}
+function spotifyWebSearchUrl(name){
+  var direct = spotifyDirectPlaylistValue(name);
+  return direct || spotifyGenericWebSearchUrl(spotifyQuery(name), true);
+}
+function spotifyAppSearchUri(name){return spotifyWebSearchUrl(name);}
 function spotifyGenericWebSearchUrl(query, playlistOnly){
   var url='https://open.spotify.com/search/'+encodeURIComponent(String(query||'').trim());
   return playlistOnly ? url+'/playlists' : url;
 }
-function spotifyGenericAppSearchUri(query){return 'spotify:search:'+encodeURIComponent(String(query||'').trim());}
-function spotifyPlaylistWebSearchUrl(query){return spotifyGenericWebSearchUrl(query, true);}
-function spotifyPlaylistAppSearchUri(query){return spotifyGenericAppSearchUri(query);}
+function spotifyGenericAppSearchUri(query){return spotifyGenericWebSearchUrl(query, false);}
+function spotifyPlaylistWebSearchUrl(query){
+  var direct = spotifyDirectPlaylistValue(query);
+  return direct || spotifyGenericWebSearchUrl(query, true);
+}
+function spotifyPlaylistAppSearchUri(query){return spotifyPlaylistWebSearchUrl(query);}
+function isSpotifyPlaylistUrl(url){return /^https:\/\/open\.spotify\.com\/playlist\//i.test(String(url||''));}
 function playlistSearchQuery(pl){
   if(!pl) return 'playlist';
   if(pl.search) return pl.search;
@@ -1372,56 +1459,25 @@ function playlistSearchQuery(pl){
   return String(pl.name||'playlist').trim();
 }
 function openSpotifySearch(event, el, name){
-  return openSpotifyDeepLink(event, el, spotifyQuery(name), spotifyWebSearchUrl(name), 'artist');
+  return openSpotifyUrl(event, el, spotifyWebSearchUrl(name));
 }
 function openSpotifyPlaylist(event, el){
+  var direct = (el&&el.dataset&&el.dataset.spotifyUrl) ? el.dataset.spotifyUrl : '';
   var query=(el&&el.dataset&&el.dataset.spotifyQuery) ? el.dataset.spotifyQuery : 'playlist';
-  return openSpotifyDeepLink(event, el, query, spotifyPlaylistWebSearchUrl(query), 'playlist');
+  return openSpotifyUrl(event, el, direct || spotifyPlaylistWebSearchUrl(query));
+}
+function openSpotifyUrl(event, el, url){
+  if(event) event.preventDefault();
+  url = String(url || '').trim() || 'https://open.spotify.com/';
+  if(el) el.href = url;
+  // ใช้ Spotify Universal Link ตัวเดียว ให้ระบบเลือกเปิด app เอง ถ้ามี app; ถ้าไม่มีจะเปิดเว็บ
+  window.location.href = url;
+  return false;
 }
 function openSpotifyDeepLink(event, el, query, webUrl, type){
-  if(event) event.preventDefault();
   query=String(query||'').trim() || (type==='playlist'?'playlist':'music');
   webUrl=webUrl || spotifyGenericWebSearchUrl(query, type==='playlist');
-  var appUri=spotifyGenericAppSearchUri(query);
-  var appLikelyOpened=false;
-  var fallbackTimer=null;
-  var cleanupTimer=null;
-
-  function cleanup(){
-    window.removeEventListener('blur', markAppLikelyOpened);
-    window.removeEventListener('pagehide', markAppLikelyOpened);
-    document.removeEventListener('visibilitychange', onVisibilityChange);
-    if(fallbackTimer) clearTimeout(fallbackTimer);
-    if(cleanupTimer) clearTimeout(cleanupTimer);
-  }
-  function markAppLikelyOpened(){
-    appLikelyOpened=true;
-    cleanup();
-  }
-  function onVisibilityChange(){
-    if(document.hidden) markAppLikelyOpened();
-  }
-
-  window.addEventListener('blur', markAppLikelyOpened, {once:true});
-  window.addEventListener('pagehide', markAppLikelyOpened, {once:true});
-  document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
-
-  if(el) el.href=webUrl;
-
-  // เรียกจาก user gesture โดยตรง เพื่อให้ browser แสดง popup ขออนุญาตเปิด Spotify app
-  window.location.href=appUri;
-
-  // fallback เฉพาะกรณีไม่มีสัญญาณว่า browser เปิด permission/app แล้วจริง ๆ
-  fallbackTimer=setTimeout(function(){
-    if(!appLikelyOpened && document.visibilityState !== 'hidden' && document.hasFocus && document.hasFocus()){
-      cleanup();
-      window.location.href=webUrl;
-    }
-  },1800);
-
-  // กัน listener ค้างไว้ ถ้า user เห็น popup แล้วปิด/กด cancel โดยไม่เข้า app
-  cleanupTimer=setTimeout(function(){cleanup();},6000);
-  return false;
+  return openSpotifyUrl(event, el, webUrl);
 }
 function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -1438,7 +1494,7 @@ var APPLE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height
 var YT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M23.5 6.2s-.2-1.7-.9-2.4c-.9-.9-1.9-.9-2.4-1C16.8 2.5 12 2.5 12 2.5h0s-4.8 0-8.2.3c-.5.1-1.5.1-2.4 1-.7.7-.9 2.4-.9 2.4S0 8.1 0 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.7.9 2.4c.9.9 2.1.9 2.6 1 1.9.2 8.1.3 8.1.3s4.8 0 8.2-.3c.5-.1 1.5-.1 2.4-1 .7-.7.9-2.4.9-2.4s.2-1.9.2-3.8V10c.2-1.9 0-3.8 0-3.8zM9.5 14.5v-7l6.3 3.5-6.3 3.5z"/></svg>';
 
 function chartSpotifyUrl(title, artist) {
-  return 'spotify:search:' + encodeURIComponent(title + ' ' + artist);
+  return chartSpotifyWeb(title, artist);
 }
 function chartSpotifyWeb(title, artist) {
   return 'https://open.spotify.com/search/' + encodeURIComponent(title + ' ' + artist) + '/tracks';
@@ -1692,7 +1748,7 @@ function hydrateChartWikipediaImages() {
   var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-loaded])'));
   if (!nodes.length) return;
 
-  var cacheKey = 'mm_chart_wiki_img_v3';
+  var cacheKey = 'mm_chart_wiki_img_v4';
   var cache = {};
   try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}') || {}; } catch(e) { cache = {}; }
 
@@ -1729,27 +1785,103 @@ function hydrateChartWikipediaImages() {
     return alias[n] || n.replace(/ /g, '_');
   }
 
-  function fetchWikiImage(name) {
-    var title = wikiTitle(name);
-    var restUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title);
-    var apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&pithumbsize=400&origin=*&titles=' + encodeURIComponent(title);
+  function wikiCandidates(name) {
+    var n = String(name || '').trim();
+    var clean = n.split(' & ')[0].split(' feat.')[0].split(' featuring ')[0].trim();
+    var alias = {
+      'Dan + Shay': ['Dan_+_Shay', 'Dan + Shay'],
+      'ICE NINE KILLS': ['Ice_Nine_Kills', 'Ice Nine Kills'],
+      'STELLA LEFTY': ['STELLA_LEFTY', 'Stella Lefty'],
+      'Marshmello': ['Marshmello'],
+      'Kelsea Ballerini': ['Kelsea_Ballerini'],
+      'Ella Langley': ['Ella Langley'],
+      'Gracie Abrams': ['Gracie Abrams'],
+      'Benson Boone': ['Benson Boone'],
+      'Taylor Swift': ['Taylor Swift'],
+      'Blake Shelton': ['Blake Shelton'],
+      'Jelly Roll': ['Jelly Roll (singer)', 'Jelly Roll'],
+      'Robyn': ['Robyn', 'Robyn (singer)'],
+      'The Rolling Stones': ['The Rolling Stones'],
+      'Carly Pearce': ['Carly Pearce'],
+      'Riley Green': ['Riley Green'],
+      'Luke Bryan': ['Luke Bryan'],
+      'Katy Perry': ['Katy Perry'],
+      'Keith Urban': ['Keith Urban'],
+      'Shaboozey': ['Shaboozey'],
+      'Stray Kids': ['Stray Kids']
+    };
+    var arr = [];
+    function add(x){ x = String(x || '').trim(); if (x && arr.indexOf(x) === -1) arr.push(x); }
+    (alias[n] || []).forEach(add);
+    (alias[clean] || []).forEach(add);
+    add(n);
+    add(clean);
+    add(clean + ' singer');
+    add(clean + ' musician');
+    return arr;
+  }
 
-    return fetch(restUrl)
-      .then(function(r){ return r.ok ? r.json() : null; })
+  function safeWikiThumb(src) {
+    if (!src) return '';
+    try {
+      var u = new URL(src, window.location.href);
+      var allowedHost = /(^|\.)wikimedia\.org$/i.test(u.hostname) || u.hostname === 'upload.wikimedia.org';
+      return (u.protocol === 'https:' && allowedHost) ? u.href : '';
+    } catch(e) { return ''; }
+  }
+
+  function fetchJsonWithTimeout(url, ms) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, ms || 4500) : null;
+    return fetch(url, { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
+      .then(function(r){ if (timer) clearTimeout(timer); return r.ok ? r.json() : null; })
+      .catch(function(){ if (timer) clearTimeout(timer); return null; });
+  }
+
+  function fetchWikiExact(title) {
+    var pageTitle = String(title || '').replace(/ /g, '_');
+    var restUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(pageTitle);
+    var apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&pithumbsize=500&origin=*&titles=' + encodeURIComponent(title);
+    return fetchJsonWithTimeout(restUrl, 4200)
       .then(function(d){
-        if (d && d.thumbnail && d.thumbnail.source) return d.thumbnail.source;
-        return fetch(apiUrl)
-          .then(function(r){ return r.ok ? r.json() : null; })
-          .then(function(j){
-            if (!j || !j.query || !j.query.pages) return '';
-            var pages = j.query.pages;
-            for (var k in pages) {
-              if (pages[k] && pages[k].thumbnail && pages[k].thumbnail.source) return pages[k].thumbnail.source;
-            }
-            return '';
-          });
+        var src = d && d.thumbnail && d.thumbnail.source;
+        if (safeWikiThumb(src)) return safeWikiThumb(src);
+        return fetchJsonWithTimeout(apiUrl, 4200).then(function(j){
+          if (!j || !j.query || !j.query.pages) return '';
+          var pages = j.query.pages;
+          for (var k in pages) {
+            var thumb = pages[k] && pages[k].thumbnail && pages[k].thumbnail.source;
+            if (safeWikiThumb(thumb)) return safeWikiThumb(thumb);
+          }
+          return '';
+        });
       });
   }
+
+  function fetchWikiSearch(name) {
+    var search = String(name || '').trim();
+    var url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=' + encodeURIComponent(search) + '&gsrlimit=5&prop=pageimages&pithumbsize=500';
+    return fetchJsonWithTimeout(url, 5000).then(function(j){
+      if (!j || !j.query || !j.query.pages) return '';
+      var pages = Object.keys(j.query.pages).map(function(k){ return j.query.pages[k]; });
+      pages.sort(function(a,b){ return (a.index || 999) - (b.index || 999); });
+      for (var i=0;i<pages.length;i++) {
+        var thumb = pages[i] && pages[i].thumbnail && pages[i].thumbnail.source;
+        if (safeWikiThumb(thumb)) return safeWikiThumb(thumb);
+      }
+      return '';
+    });
+  }
+
+  function fetchWikiImage(name) {
+    var candidates = wikiCandidates(name);
+    var chain = Promise.resolve('');
+    candidates.forEach(function(c){
+      chain = chain.then(function(src){ return src || fetchWikiExact(c); });
+    });
+    return chain.then(function(src){ return src || fetchWikiSearch(name); });
+  }
+
 
   var names = [];
   nodes.forEach(function(node){
@@ -1757,10 +1889,11 @@ function hydrateChartWikipediaImages() {
     if (!name) return;
     node.setAttribute('data-wiki-loaded','loading');
     if (cache[name]) applyToName(name, cache[name]);
-    else if (names.indexOf(name) === -1) names.push(name);
+    // ยัง fetch ซ้ำเบา ๆ ได้เพื่อแก้กรณี cache เก่า/รูปเดิมเสีย
+    if (names.indexOf(name) === -1) names.push(name);
   });
 
-  names.slice(0, 20).forEach(function(name){
+  names.slice(0, 50).forEach(function(name){
     fetchWikiImage(name)
       .then(function(src){
         if (!src) throw new Error('no wiki image');
@@ -1792,7 +1925,7 @@ function renderChartTeaser(songs) {
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event, this,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
         (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" onclick="switchTab(\'chart\');setTimeout(function(){playChartMV(null,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')},80);return false;" title="YouTube MV">' + YT_ICON + '</a>' : '') +
       '</div></div>';
@@ -1865,7 +1998,7 @@ function renderChartPage(songs) {
     '</div>' +
     renderChartMVPlayer(s1) +
     '<div class="chart-listen-btns">' +
-      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
+      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event, this,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
@@ -1883,7 +2016,7 @@ function renderChartPage(songs) {
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event, this,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
         (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" onclick="return playChartMV(event,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
       '</div></div>';
@@ -1974,15 +2107,8 @@ function doLoadYT() {
 }
 
 // ---- Spotify URI handler (บัค #3 — เปิด app ก่อน fallback web) ----
-function openSpotify(e, webUrl) {
-  e.preventDefault();
-  // ลอง URI scheme เพื่อเปิด app
-  var uri = e.currentTarget.href;
-  window.location.href = uri;
-  // fallback ไป web หลัง 1.5s ถ้า app ไม่ตอบ
-  setTimeout(function(){
-    window.open(webUrl, '_blank');
-  }, 1500);
+function openSpotify(e, el, webUrl) {
+  return openSpotifyUrl(e, el || (e && e.currentTarget), webUrl || (el && el.href));
 }
 
 // ---- Load chart data once on init ----
