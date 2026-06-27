@@ -1637,7 +1637,7 @@ function renderChartPage(songs) {
     '<div id="ytWrap" class="chart-yt-wrap">' +
       '<div class="chart-yt-placeholder" id="ytPlaceholder" onclick="loadYT()">' +
         '<div class="chart-yt-play-btn"><svg viewBox="0 0 24 24" fill="white" width="28" height="28"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' +
-        '<div class="chart-yt-label">▶ กดดู MV — ' + esc(s1.title) + ' · ' + esc(s1.artist) + '</div>' +
+        '<div class="chart-yt-label" id="ytLabel">▶ กดดู MV — ' + esc(s1.title) + ' · ' + esc(s1.artist) + '</div>' +
       '</div>' +
     '</div>' +
     // listen buttons
@@ -1673,16 +1673,57 @@ function renderChartPage(songs) {
 }
 
 function fetchYoutubeId(query) {
+  // อัปเดต label แสดงสถานะ
+  var lbl = document.getElementById('ytLabel');
+  if (lbl) lbl.textContent = '⏳ กำลังค้นหา MV...';
+  var ph = document.getElementById('ytPlaceholder');
+  if (ph) ph.style.cursor = 'wait';
+
+  // timeout 6s — ถ้าไม่เจอ แสดง fallback link ไป YouTube search
+  var ytDone = false;
+  var ytTimer = setTimeout(function() {
+    if (!ytDone) {
+      ytDone = true;
+      var ytSearchUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query + ' official mv');
+      if (lbl) lbl.textContent = '▶ ดู MV บน YouTube';
+      if (ph) {
+        ph.style.cursor = 'pointer';
+        ph.onclick = function() { window.open(ytSearchUrl, '_blank'); };
+      }
+    }
+  }, 6000);
+
   fetch('/api/youtube?q=' + encodeURIComponent(query + ' official mv'))
     .then(function(r){ return r.json(); })
     .then(function(d){
+      if (ytDone) return;
+      clearTimeout(ytTimer);
+      ytDone = true;
       if (d.videoId) {
         ytVideoId = d.videoId;
-        var lbl = document.getElementById('ytPlaceholder');
-        if (lbl) lbl.style.cursor = 'pointer';
+        if (lbl) lbl.textContent = '▶ กดดู MV';
+        if (ph) ph.style.cursor = 'pointer';
+      } else {
+        // ไม่เจอ video → fallback link
+        var ytSearchUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query + ' official mv');
+        if (lbl) lbl.textContent = '▶ ดู MV บน YouTube';
+        if (ph) {
+          ph.style.cursor = 'pointer';
+          ph.onclick = function() { window.open(ytSearchUrl, '_blank'); };
+        }
       }
     })
-    .catch(function(){});
+    .catch(function(){
+      if (ytDone) return;
+      clearTimeout(ytTimer);
+      ytDone = true;
+      var ytSearchUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query + ' official mv');
+      if (lbl) lbl.textContent = '▶ ดู MV บน YouTube';
+      if (ph) {
+        ph.style.cursor = 'pointer';
+        ph.onclick = function() { window.open(ytSearchUrl, '_blank'); };
+      }
+    });
 }
 
 function loadYT() {
@@ -1725,14 +1766,17 @@ function openSpotify(e, webUrl) {
 // ---- Load chart data once on init ----
 // chart state: 'idle' | 'loading' | 'ok' | 'fail'
 var chartState = 'idle';
-function initChart() {
-  // ถ้า ok อยู่แล้ว ไม่ต้อง fetch ใหม่ แต่ render ถ้า DOM พร้อม
+var chartReadyCbs = []; // callbacks รอเมื่อ chart โหลดเสร็จ
+function initChart(onReady) {
+  if (onReady) chartReadyCbs.push(onReady);
+  // ถ้า ok อยู่แล้ว render ทันที
   if (chartState === 'ok' && chartData && chartData.length) {
     renderChartTeaser(chartData);
     renderChartPage(chartData);
+    if (onReady) onReady(chartData);
     return;
   }
-  // ถ้ากำลัง loading อยู่ ไม่ต้อง fetch ซ้ำ
+  // ถ้ากำลัง loading อยู่ รอ callback เมื่อเสร็จ (ไม่ต้อง fetch ซ้ำ)
   if (chartState === 'loading') return;
   chartState = 'loading';
   // แสดง loading state
@@ -1755,6 +1799,9 @@ function initChart() {
     chartState = 'ok';
     renderChartTeaser(songs);
     renderChartPage(songs);
+    // เรียก callbacks ที่รออยู่
+    var cbs = chartReadyCbs.splice(0);
+    cbs.forEach(function(fn){ try { fn(songs); } catch(e){} });
   });
 }
 function retryChart() {
@@ -1786,7 +1833,12 @@ function switchTab(tab) {
   // เรียก initChart ทุกครั้งที่เข้าหน้า chart หรือ home
   // initChart จะ handle state เองว่าต้อง fetch ใหม่หรือแค่ re-render
   if (tab === 'chart' || tab === 'home') {
-    setTimeout(initChart, 50); // delay เล็กน้อยให้ DOM render ก่อน
+    setTimeout(function() {
+      initChart(tab === 'chart' ? function(songs) {
+        // ensure chart page content renders after tab is active
+        renderChartPage(songs);
+      } : null);
+    }, 50);
   }
   // reset YT เมื่อออกจากหน้า chart
   if (tab !== 'chart') { ytLoaded = false; }
