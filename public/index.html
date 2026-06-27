@@ -392,7 +392,24 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 }
 
 
-/* ===== SHARE FEATURE ===== */
+/* ===== SHARE BANNER FEATURE ===== */
+.share-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+.share-modal{background:#1a1730;border:1px solid rgba(167,139,250,.25);border-radius:24px;padding:24px;width:100%;max-width:400px;animation:fadeUp .3s ease}
+.share-modal-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-.02em}
+.share-modal-sub{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;margin-bottom:18px;line-height:1.6}
+.share-preview-wrap{border-radius:14px;overflow:hidden;margin-bottom:18px;border:1px solid rgba(255,255,255,.08)}
+.share-preview-wrap canvas{display:block;width:100%;height:auto}
+.share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.share-action-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;border:none;text-decoration:none}
+.share-dl{background:linear-gradient(135deg,var(--purple2),#9333ea);color:white;grid-column:1/-1}
+.share-dl:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.4)}
+.share-x{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);color:var(--text)}
+.share-x:hover{background:rgba(0,0,0,.6)}
+.share-fb{background:rgba(24,119,242,.15);border:1px solid rgba(24,119,242,.3);color:#4f9cf9}
+.share-fb:hover{background:rgba(24,119,242,.25)}
+.share-copy{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text2);grid-column:1/-1;font-size:12px}
+.share-modal-close{width:100%;padding:11px;background:none;border:1px solid rgba(255,255,255,.08);border-radius:10px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:2px}
+.share-modal-close:hover{border-color:rgba(255,255,255,.18);color:var(--text2)}
 .share-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(244,114,182,.12));border:1px solid rgba(167,139,250,.3);border-radius:14px;color:var(--purple);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
 .share-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(244,114,182,.2));border-color:rgba(167,139,250,.5);transform:translateY(-1px)}
 .share-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1730;border:1px solid rgba(167,139,250,.35);color:#f0eeff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s ease,opacity .3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none;opacity:0}
@@ -401,6 +418,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .share-result-banner-icon{font-size:24px;flex-shrink:0}
 .share-result-banner-text{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.6}
 .share-result-banner-text strong{color:var(--purple);display:block;font-size:14px;margin-bottom:2px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body class="booting">
@@ -569,16 +587,15 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <div class="match-section-label" style="margin-top:8px">🎶 ศิลปินที่น่าจะชอบด้วย</div>
     <div id="otherCards"></div>
     <div style="margin-top:24px">
-    <button class="share-btn" onclick="shareResult()" style="width:100%;margin-bottom:10px">
+    <button class="share-btn" onclick="openShareModal()" style="width:100%;margin-bottom:10px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-      แชร์ผลลัพธ์ให้เพื่อน
+      แชร์ผลลัพธ์ให้เพื่อน 🎉
     </button>
     <div style="display:flex;gap:10px">
       <button onclick="goHome()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">🏠 กลับหน้าแรก</button>
       <button onclick="resetQuiz()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">↩ ทำ Quiz ใหม่</button>
     </div>
   </div>
-<div class="share-toast" id="shareToast"></div>
   </div>
 </div>
 </div>
@@ -1370,13 +1387,15 @@ function showResult(){
   setTimeout(function(){var b=document.getElementById('topBar');if(b)b.style.width=topPct+'%';},300);
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
-  // บันทึก share payload สำหรับปุ่ม "แชร์ผลลัพธ์"
-  _lastSharePayload = buildSharePayload(
-    persona.name,
-    selectedLang || 'intl',
-    top.name || '',
-    top.sp || ''
-  );
+  // บันทึก state สำหรับ share banner
+  _shareState.personaEmoji = persona.emoji || '🎵';
+  _shareState.personaName  = persona.name  || '';
+  _shareState.personaDesc  = persona.desc  || '';
+  _shareState.artistName   = top.name  || '';
+  _shareState.artistEmoji  = top.emoji || '🎵';
+  _shareState.artistNat    = top.nat   || '';
+  _shareState.lang         = selectedLang || 'intl';
+  _lastSharePayload = buildSharePayload(persona.name, selectedLang||'intl', top.name||'', top.sp||'');
 
   // --- Others: แสดง 5 คนถัดไป (index 1-5) ---
   var othersHtml='';
@@ -2322,152 +2341,219 @@ document.addEventListener('DOMContentLoaded',function(){
   if(pa) pa.addEventListener('click',doPlShuffle);
   // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
   initChart();
-  // ตรวจสอบ shared result URL hash
   checkShareHash();
 });
 
 // ============================================================
-// SHARE RESULT — encode/decode ผ่าน URL hash (no backend)
-// format hash: #r=<base64url(personaName|lang|artistName|spotifyUrl)>
+// SHARE FEATURE — Canvas banner + Social sharing
 // ============================================================
+var _shareState = {
+  personaEmoji:'🎵', personaName:'', personaDesc:'',
+  artistName:'', artistEmoji:'🎵', artistNat:'', lang:'intl'
+};
 
 function buildSharePayload(personaName, lang, artistName, artistSp) {
-  var raw = [
-    encodeURIComponent(personaName || ''),
-    encodeURIComponent(lang || 'intl'),
-    encodeURIComponent(artistName || ''),
-    encodeURIComponent(artistSp || '')
-  ].join('|');
-  try {
-    return btoa(unescape(encodeURIComponent(raw)))
-      .replace(/\+/g,'_').replace(/\//g,'-').replace(/=/g,'');
-  } catch(e) { return ''; }
+  var raw=[encodeURIComponent(personaName||''),encodeURIComponent(lang||'intl'),encodeURIComponent(artistName||''),encodeURIComponent(artistSp||'')].join('|');
+  try{return btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'_').replace(/\//g,'-').replace(/=/g,'');}catch(e){return '';}
 }
-
 function parseSharePayload(hash) {
-  try {
-    var b64 = hash.replace(/^#r=/, '').replace(/_/g,'+').replace(/-/g,'/');
-    while (b64.length % 4) b64 += '=';
-    var raw = decodeURIComponent(escape(atob(b64)));
-    var parts = raw.split('|').map(decodeURIComponent);
-    return { personaName: parts[0]||'', lang: parts[1]||'intl', artistName: parts[2]||'', artistSp: parts[3]||'' };
-  } catch(e) { return null; }
+  try{var b64=hash.replace(/^#r=/,'').replace(/_/g,'+').replace(/-/g,'/');while(b64.length%4)b64+='=';var raw=decodeURIComponent(escape(atob(b64)));var parts=raw.split('|').map(decodeURIComponent);return{personaName:parts[0]||'',lang:parts[1]||'intl',artistName:parts[2]||'',artistSp:parts[3]||''};}catch(e){return null;}
 }
 
-function shareResult() {
-  if (!_lastSharePayload) { showShareToast('⚠️ ยังไม่มีผลลัพธ์ให้แชร์'); return; }
-  var url = location.origin + location.pathname + '#r=' + _lastSharePayload;
-  if (navigator.share) {
-    navigator.share({ title: 'Muzik Match — ผลลัพธ์ของฉัน 🎵', text: 'ดูบุคลิกดนตรีของฉันใน Muzik Match!', url: url })
-      .catch(function() { copyShareUrl(url); });
-    return;
-  }
-  copyShareUrl(url);
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+function wrapText(ctx,text,x,y,maxW,lineH){
+  if(!text)return;
+  var words=text.split(' '),line='',lineY=y;
+  for(var i=0;i<words.length;i++){var test=line+words[i]+' ';if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line.trim(),x,lineY);line=words[i]+' ';lineY+=lineH;}else{line=test;}}
+  if(line.trim())ctx.fillText(line.trim(),x,lineY);
 }
 
-function copyShareUrl(url) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url)
-      .then(function() { showShareToast('✅ คัดลอกลิงก์แล้ว! ส่งให้เพื่อนได้เลย 🎉'); })
-      .catch(function() { fallbackCopy(url); });
-  } else { fallbackCopy(url); }
+function drawShareBanner(artistImgEl) {
+  var canvas=document.getElementById('shareCanvas');
+  if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var W=1080,H=1080;
+  canvas.width=W;canvas.height=H;
+
+  // Background
+  var bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0d0a1a');bg.addColorStop(0.5,'#1a1030');bg.addColorStop(1,'#0d0a1a');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Glow orbs
+  function glow(cx,cy,r,col){var g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,col);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();}
+  glow(180,180,420,'rgba(124,58,237,0.22)');
+  glow(900,900,380,'rgba(244,114,182,0.16)');
+  glow(540,540,300,'rgba(251,146,60,0.07)');
+
+  // Artist image circle
+  var imgSize=320,imgX=(W-imgSize)/2,imgY=150,imgR=imgSize/2;
+  ctx.save();
+  ctx.beginPath();ctx.arc(imgX+imgR,imgY+imgR,imgR,0,Math.PI*2);ctx.clip();
+  if(artistImgEl&&artistImgEl.complete&&artistImgEl.naturalWidth>0){
+    try{ctx.drawImage(artistImgEl,imgX,imgY,imgSize,imgSize);}
+    catch(e){fillArtistPh(ctx,imgX,imgY,imgSize,_shareState.artistEmoji);}
+  }else{fillArtistPh(ctx,imgX,imgY,imgSize,_shareState.artistEmoji);}
+  ctx.restore();
+
+  // Circle border
+  ctx.save();
+  ctx.beginPath();ctx.arc(imgX+imgR,imgY+imgR,imgR+5,0,Math.PI*2);
+  var bGrad=ctx.createLinearGradient(imgX,imgY,imgX+imgSize,imgY+imgSize);
+  bGrad.addColorStop(0,'rgba(167,139,250,0.9)');bGrad.addColorStop(0.5,'rgba(244,114,182,0.8)');bGrad.addColorStop(1,'rgba(251,146,60,0.7)');
+  ctx.strokeStyle=bGrad;ctx.lineWidth=6;ctx.stroke();ctx.restore();
+
+  // Artist name
+  var cy=imgY+imgSize+60;
+  ctx.save();ctx.textAlign='center';
+  ctx.font='bold 56px Inter,Arial,sans-serif';
+  ctx.fillStyle='#f0eeff';ctx.shadowColor='rgba(167,139,250,0.5)';ctx.shadowBlur=20;
+  wrapText(ctx,_shareState.artistName||'—',W/2,cy,W-140,64);
+  ctx.restore();
+
+  // Nat badge
+  var natY=cy+76;
+  if(_shareState.artistNat){
+    ctx.save();ctx.font='bold 24px Inter,Arial,sans-serif';
+    var tw=ctx.measureText(_shareState.artistNat).width,bw=tw+44,bh=42,bx=W/2-bw/2,by=natY;
+    roundRect(ctx,bx,by,bw,bh,21);
+    ctx.fillStyle='rgba(167,139,250,0.15)';ctx.fill();
+    ctx.strokeStyle='rgba(167,139,250,0.35)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#a78bfa';ctx.textAlign='center';ctx.fillText(_shareState.artistNat,W/2,by+29);
+    ctx.restore();
+  }
+
+  // Divider
+  var pY=natY+72;
+  ctx.save();
+  var dGrad=ctx.createLinearGradient(120,0,W-120,0);
+  dGrad.addColorStop(0,'transparent');dGrad.addColorStop(0.3,'rgba(167,139,250,0.4)');dGrad.addColorStop(0.7,'rgba(244,114,182,0.3)');dGrad.addColorStop(1,'transparent');
+  ctx.strokeStyle=dGrad;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(120,pY);ctx.lineTo(W-120,pY);ctx.stroke();ctx.restore();
+
+  // Persona
+  pY+=44;
+  ctx.save();ctx.textAlign='center';
+  ctx.font='26px Inter,Arial,sans-serif';ctx.fillStyle='rgba(240,238,255,0.5)';ctx.fillText('บุคลิกดนตรีของคุณ 🎵',W/2,pY);
+  pY+=52;ctx.font='60px serif';ctx.fillStyle='#f0eeff';ctx.fillText(_shareState.personaEmoji||'🎵',W/2,pY);
+  pY+=58;
+  ctx.font='bold 50px Inter,Arial,sans-serif';
+  var pGrad=ctx.createLinearGradient(200,0,W-200,0);
+  pGrad.addColorStop(0,'#a78bfa');pGrad.addColorStop(0.5,'#f472b6');pGrad.addColorStop(1,'#fb923c');
+  ctx.fillStyle=pGrad;ctx.shadowColor='rgba(167,139,250,0.4)';ctx.shadowBlur=16;
+  wrapText(ctx,_shareState.personaName||'',W/2,pY,W-160,56);
+  ctx.restore();
+
+  // CTA strip
+  var ctaY=H-160;
+  ctx.save();
+  roundRect(ctx,60,ctaY,W-120,100,20);
+  var ctaBg=ctx.createLinearGradient(60,ctaY,W-60,ctaY+100);
+  ctaBg.addColorStop(0,'rgba(124,58,237,0.28)');ctaBg.addColorStop(1,'rgba(244,114,182,0.18)');
+  ctx.fillStyle=ctaBg;ctx.fill();
+  ctx.strokeStyle='rgba(167,139,250,0.3)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.textAlign='center';
+  ctx.font='bold 30px Inter,Arial,sans-serif';ctx.fillStyle='#f0eeff';ctx.shadowColor='none';ctx.shadowBlur=0;
+  ctx.fillText('อยากรู้ว่าคุณ Match กับศิลปินคนไหน?',W/2,ctaY+38);
+  ctx.font='bold 26px Inter,Arial,sans-serif';
+  var uGrad=ctx.createLinearGradient(300,0,W-300,0);
+  uGrad.addColorStop(0,'#a78bfa');uGrad.addColorStop(1,'#f472b6');
+  ctx.fillStyle=uGrad;ctx.fillText('มาลองทำ Quiz! → muzik-match.vercel.app',W/2,ctaY+76);
+  ctx.restore();
 }
 
-function fallbackCopy(url) {
-  var ta = document.createElement('textarea');
-  ta.value = url;
-  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-  document.body.appendChild(ta);
-  ta.focus(); ta.select();
-  try { document.execCommand('copy'); showShareToast('✅ คัดลอกลิงก์แล้ว! ส่งให้เพื่อนได้เลย 🎉'); }
-  catch(e) { showShareToast('🔗 copy ไม่สำเร็จ ลอง share ด้วยตัวเองนะครับ'); }
-  document.body.removeChild(ta);
+function fillArtistPh(ctx,x,y,size,emoji){
+  var g=ctx.createRadialGradient(x+size/2,y+size/2,0,x+size/2,y+size/2,size/2);
+  g.addColorStop(0,'rgba(124,58,237,0.4)');g.addColorStop(1,'rgba(244,114,182,0.2)');
+  ctx.fillStyle=g;ctx.fillRect(x,y,size,size);
+  ctx.font=Math.floor(size*.42)+'px serif';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.fillText(emoji||'🎵',x+size/2,y+size/2+size*.14);
 }
 
-function showShareToast(msg) {
-  var el = document.getElementById('shareToast');
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+function openShareModal(){
+  var modal=document.getElementById('shareModal');
+  if(!modal)return;
+  modal.style.display='flex';
+  var topImgEl=document.getElementById('topImg');
+  var imgEl=null;
+  if(topImgEl){var imgs=topImgEl.getElementsByTagName('img');if(imgs.length&&imgs[0].complete&&imgs[0].naturalWidth>0)imgEl=imgs[0];}
+  drawShareBanner(imgEl);
+  var siteUrl='https://muzik-match.vercel.app/';
+  var shareText='ฉัน Match กับ '+(_shareState.artistName||'ศิลปิน')+' 🎵 บุคลิกดนตรี: '+(_shareState.personaName||'')+'\n\nอยากรู้ว่าคุณจะ Match กับศิลปินคนไหน มาลองทำ Quiz! ของเราเลย '+siteUrl;
+  var xBtn=document.getElementById('shareXBtn');
+  if(xBtn)xBtn.href='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText);
+  var fbBtn=document.getElementById('shareFbBtn');
+  if(fbBtn)fbBtn.href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(siteUrl);
 }
 
-function checkShareHash() {
-  var hash = location.hash || '';
-  if (hash.indexOf('#r=') !== 0) return;
-  var payload = parseSharePayload(hash);
-  if (!payload || !payload.personaName) return;
+function closeShareModal(){var m=document.getElementById('shareModal');if(m)m.style.display='none';}
 
-  // หา persona จาก name
-  var persona = null;
-  if (typeof PERSONALITIES !== 'undefined') {
-    for (var pi = 0; pi < PERSONALITIES.length; pi++) {
-      if ((PERSONALITIES[pi].name || '') === payload.personaName) { persona = PERSONALITIES[pi]; break; }
-    }
-    if (!persona) persona = PERSONALITIES[PERSONALITIES.length - 1];
+function downloadShareBanner(){
+  var canvas=document.getElementById('shareCanvas');
+  if(!canvas)return;
+  var a=document.createElement('a');
+  a.download='muzik-match-result.png';a.href=canvas.toDataURL('image/png');a.click();
+  showShareToast('✅ Download รูปแล้ว! นำไปโพสต์ได้เลย 🎉');
+}
+
+function copyShareLink(){
+  var url='https://muzik-match.vercel.app/';
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){showShareToast('✅ คัดลอกลิงก์แล้ว!');}).catch(function(){fbCopy(url);});}else{fbCopy(url);}
+}
+function fbCopy(url){var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;opacity:0;top:0;left:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showShareToast('✅ คัดลอกลิงก์แล้ว!');}catch(e){showShareToast('🔗 '+url);}document.body.removeChild(ta);}
+
+function showShareToast(msg){var el=document.getElementById('shareToast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(el._timer);el._timer=setTimeout(function(){el.classList.remove('show');},3200);}
+
+function checkShareHash(){
+  var hash=location.hash||'';
+  if(hash.indexOf('#r=')!==0)return;
+  var payload=parseSharePayload(hash);
+  if(!payload||!payload.personaName)return;
+  var persona=null;
+  if(typeof PERSONALITIES!=='undefined'){
+    for(var pi=0;pi<PERSONALITIES.length;pi++){if((PERSONALITIES[pi].name||'')===payload.personaName){persona=PERSONALITIES[pi];break;}}
+    if(!persona)persona=PERSONALITIES[PERSONALITIES.length-1];
   }
-
-  // แสดง banner "เพื่อนแชร์มา"
-  var banner = document.getElementById('shareBanner');
-  if (banner) {
-    banner.style.display = 'block';
-    banner.innerHTML = '<div class="share-result-banner">' +
-      '<div class="share-result-banner-icon">🔗</div>' +
-      '<div class="share-result-banner-text">' +
-        '<strong>เพื่อนแชร์ผลลัพธ์ให้คุณดู!</strong>' +
-        'ลองทำ Quiz ด้วยตัวเองเพื่อดูว่าคุณ match กับศิลปินคนไหน 🎵' +
-      '</div></div>';
-  }
-
-  // ใส่ persona info
-  if (persona) {
-    var el; 
-    el = document.getElementById('resEmoji');  if(el) el.textContent = persona.emoji || '🎵';
-    el = document.getElementById('resType');   if(el) el.textContent = 'บุคลิกภาพดนตรีของเพื่อน 🎵';
-    el = document.getElementById('resName');   if(el) el.textContent = persona.name || '';
-    el = document.getElementById('resDesc');   if(el) el.textContent = persona.desc || '';
-    el = document.getElementById('resQuote');  if(el) el.textContent = persona.quote || '';
-  }
-
-  // ใส่ artist #1
-  if (payload.artistName) {
-    var topCard = document.getElementById('topMatchCard');
-    if (topCard) {
-      var natLabel = payload.lang === 'thai' ? '🇹🇭 ไทย' : payload.lang === 'korean' ? '🇰🇷 เกาหลี' : '🌍 สากล';
-      var spUrl = payload.artistSp || '#';
-      topCard.innerHTML =
-        '<div class="artist-row">' +
-          '<div class="artist-img" style="font-size:32px">🎵</div>' +
-          '<div class="artist-info">' +
-            '<div class="artist-name">' + esc(payload.artistName) + '</div>' +
-            '<div class="artist-tags"><span class="atag nat">' + esc(natLabel) + '</span></div>' +
-          '</div>' +
-        '</div>' +
-        '<a class="btn-spotify" href="' + esc(spUrl) + '" target="_blank" rel="noopener">' +
-          '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>' +
-          ' เปิด Playlist ใน Spotify' +
-        '</a>';
-    }
-    var oc = document.getElementById('otherCards');
-    if (oc) oc.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:16px">ลองทำ Quiz ด้วยตัวเองเพื่อดูศิลปินที่ match คุณ →</div>';
-  }
-
-  // switch ไปแสดง result
+  var banner=document.getElementById('shareBanner');
+  if(banner){banner.style.display='block';banner.innerHTML='<div class="share-result-banner"><div class="share-result-banner-icon">🔗</div><div class="share-result-banner-text"><strong>เพื่อนแชร์ผลลัพธ์ให้คุณดู!</strong>ลองทำ Quiz ด้วยตัวเองเพื่อดูว่าคุณ match กับศิลปินคนไหน 🎵</div></div>';}
+  if(persona){var ids=['resEmoji','resType','resName','resDesc','resQuote'];var vals=[persona.emoji||'🎵','บุคลิกภาพดนตรีของเพื่อน 🎵',persona.name||'',persona.desc||'',persona.quote||''];ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=vals[i];});}
+  if(payload.artistName){var tc=document.getElementById('topMatchCard');if(tc){var nl=payload.lang==='thai'?'🇹🇭 ไทย':payload.lang==='korean'?'🇰🇷 เกาหลี':'🌍 สากล';tc.innerHTML='<div class="artist-row"><div class="artist-img" style="font-size:32px">🎵</div><div class="artist-info"><div class="artist-name">'+esc(payload.artistName)+'</div><div class="artist-tags"><span class="atag nat">'+esc(nl)+'</span></div></div></div><a class="btn-spotify" href="'+esc(payload.artistSp||'#')+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg> เปิด Playlist ใน Spotify</a>';}}
   switchTab('quiz');
-  var ls = document.getElementById('langScreen');
-  var qs = document.getElementById('quizScreen');
-  var lds = document.getElementById('loadingScreen');
-  var rs = document.getElementById('resultScreen');
-  if(ls) ls.style.display = 'none';
-  if(qs) qs.classList.remove('active');
-  if(lds) lds.classList.remove('active');
-  if(rs) rs.classList.add('active');
-
-  // ล้าง hash
-  if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+  var ls=document.getElementById('langScreen'),qs=document.getElementById('quizScreen'),lds=document.getElementById('loadingScreen'),rs=document.getElementById('resultScreen');
+  if(ls)ls.style.display='none';if(qs)qs.classList.remove('active');if(lds)lds.classList.remove('active');if(rs)rs.classList.add('active');
+  if(history.replaceState)history.replaceState(null,'',location.pathname+location.search);
 }
 
 </script>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" class="share-modal-overlay" style="display:none" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-modal">
+    <div class="share-modal-title">📤 แชร์ผลลัพธ์ของคุณ</div>
+    <div class="share-modal-sub">กด Download แล้วนำไปโพสต์ใน Facebook / Instagram / TikTok ได้เลย ✨</div>
+    <div class="share-preview-wrap">
+      <canvas id="shareCanvas" width="1080" height="1080"></canvas>
+    </div>
+    <div class="share-actions">
+      <button class="share-action-btn share-dl" onclick="downloadShareBanner()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download รูป Banner
+      </button>
+      <a id="shareXBtn" class="share-action-btn share-x" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        แชร์ไป X
+      </a>
+      <a id="shareFbBtn" class="share-action-btn share-fb" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        แชร์ไป Facebook
+      </a>
+      <button class="share-action-btn share-copy" onclick="copyShareLink()">
+        🔗 คัดลอกลิงก์เว็บ
+      </button>
+    </div>
+    <button class="share-modal-close" onclick="closeShareModal()">ปิด</button>
+  </div>
+</div>
+<div class="share-toast" id="shareToast"></div>
 </body>
 </html>
