@@ -380,6 +380,9 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   .da-img{width:72px;height:72px}
   .da-actions{flex-direction:column}
 }
+
+.chart-row-btn-yt{background:rgba(255,0,0,.1);color:#ff4444}
+.chart-row-btn-yt:hover{background:rgba(255,0,0,.2)}
 </style>
 </head>
 <body class="booting">
@@ -423,7 +426,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
       <div class="how-step"><div class="how-step-num">3️⃣</div><h3>รับ Playlist</h3><p>เจอบุคลิกดนตรีของคุณ พร้อมศิลปินที่ match และลิงก์ Spotify เปิดฟังได้เลยทันที 🎧</p></div>
     </div>
   </div>
-</div>
+
 <!-- CHART TEASER on landing -->
 <div class="chart-teaser">
   <div class="chart-teaser-header">
@@ -491,7 +494,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     </div>
   </div>
 </div>
-
+</div>
 
 <!-- QUIZ PAGE -->
 <div class="page" id="pageQuiz">
@@ -1538,6 +1541,7 @@ function renderChartPage(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
+        '<a class="chart-row-btn chart-row-btn-yt" href="https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv') + '" target="_blank" rel="noopener" title="YouTube MV">' + YT_ICON + '</a>' +
       '</div></div>';
   });
   listHtml += '</div>';
@@ -1562,12 +1566,28 @@ function fetchYoutubeId(query) {
 }
 
 function loadYT() {
-  if (!ytVideoId) return;
   if (ytLoaded) return;
+  var wrap = document.getElementById('ytWrap');
+  if (!wrap) return;
+  if (!ytVideoId) {
+    // ยังไม่ได้ video id — แสดง loading และรอ
+    var ph = document.getElementById('ytPlaceholder');
+    if (ph) { ph.innerHTML = '<div style="color:rgba(255,255,255,.5);font-size:13px;padding:20px">⏳ กำลังค้นหา MV...</div>'; ph.onclick = null; }
+    var waitFor = setInterval(function(){
+      if (ytVideoId) { clearInterval(waitFor); doLoadYT(); }
+    }, 300);
+    // timeout 8s
+    setTimeout(function(){ clearInterval(waitFor); if(!ytLoaded && ph){ ph.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:12px;padding:20px">ไม่พบ MV สำหรับเพลงนี้</div>'; } }, 8000);
+    return;
+  }
+  doLoadYT();
+}
+function doLoadYT() {
+  if (ytLoaded || !ytVideoId) return;
   ytLoaded = true;
   var wrap = document.getElementById('ytWrap');
   if (!wrap) return;
-  wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytVideoId + '?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytVideoId + '?autoplay=1&rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>';
 }
 
 // ---- Spotify URI handler (บัค #3 — เปิด app ก่อน fallback web) ----
