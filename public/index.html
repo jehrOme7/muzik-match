@@ -434,7 +434,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
       <div class="chart-teaser-eyebrow">📊 TOP HIT ติด CHARTS</div>
       <div class="chart-teaser-title">เพลง TOP HIT ที่น่าฟังตอนนี้</div>
     </div>
-    <button class="chart-teaser-btn" onclick="switchTab('chart')">
+    <button type="button" class="chart-teaser-btn" onclick="switchTab('chart')">
       ดูทั้งหมด
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
@@ -1427,6 +1427,7 @@ var chartDataFetching = false;
 // icon SVGs
 var SP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
 var APPLE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+var YT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M23.5 6.2s-.2-1.7-.9-2.4c-.9-.9-1.9-.9-2.4-1C16.8 2.5 12 2.5 12 2.5h0s-4.8 0-8.2.3c-.5.1-1.5.1-2.4 1-.7.7-.9 2.4-.9 2.4S0 8.1 0 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.7.9 2.4c.9.9 2.1.9 2.6 1 1.9.2 8.1.3 8.1.3s4.8 0 8.2-.3c.5-.1 1.5-.1 2.4-1 .7-.7.9-2.4.9-2.4s.2-1.9.2-3.8V10c.2-1.9 0-3.8 0-3.8zM9.5 14.5v-7l6.3 3.5-6.3 3.5z"/></svg>';
 
 function chartSpotifyUrl(title, artist) {
   return 'spotify:search:' + encodeURIComponent(title + ' ' + artist);
@@ -1875,8 +1876,14 @@ var chartReadyCbs = []; // callbacks รอเมื่อ chart โหลดเ
 function initChart(onReady) {
   if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
   chartState = 'ok';
-  renderChartTeaser(chartData);
-  renderChartPage(chartData);
+  try { renderChartTeaser(chartData); } catch(e) { console.error('renderChartTeaser error:', e); }
+  try { renderChartPage(chartData); } catch(e) {
+    console.error('renderChartPage error:', e);
+    var el = document.getElementById('chartPageContent');
+    if (el) {
+      el.innerHTML = '<div class="chart-error">โหลดรายการเพลงไม่สำเร็จ แต่ข้อมูลอยู่ในเว็บแล้ว กรุณารีเฟรชหน้าอีกครั้ง</div>';
+    }
+  }
   if (onReady) { try { onReady(chartData); } catch(e){} }
 }
 function retryChart() {
@@ -1894,7 +1901,7 @@ function switchTab(tab) {
   // สำคัญ: ถ้าเข้า chart/home ให้ render จาก static database ก่อนเปลี่ยนหน้า
   // เพื่อไม่ให้ผู้ใช้เห็นหน้ากำลังโหลด charts อีก
   if (tab === 'chart' || tab === 'home') {
-    initChart();
+    try { initChart(); } catch(e) { console.error('initChart error:', e); }
   }
 
   Object.keys(tabs).forEach(function(k) {
