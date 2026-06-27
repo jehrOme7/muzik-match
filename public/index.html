@@ -1645,6 +1645,8 @@ function normalizeStaticCharts() {
       artist: s.artist || 'ไม่ระบุศิลปิน',
       artwork: s.artwork || '',
       appleUrl: s.appleUrl || '',
+      youtubeId: s.youtubeId || '',
+      youtubeLabel: s.youtubeLabel || '',
       wiki: s.wiki || wikiNameFromArtist(s.artist || '')
     };
   }).filter(function(s) { return s.title && s.artist; }).slice(0, 20);
@@ -1689,18 +1691,21 @@ function artImg(url, cls, ph, wikiName) {
 function hydrateChartWikipediaImages() {
   var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-loaded])'));
   if (!nodes.length) return;
-  var cacheKey = 'mm_chart_wiki_images_v1';
+
+  var cacheKey = 'mm_chart_wiki_img_v3';
   var cache = {};
   try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}') || {}; } catch(e) { cache = {}; }
 
   function applyToName(name, src) {
     if (!src) return;
-    document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + CSS.escape(name) + '"]').forEach(function(node){
+    var selectorName = String(name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + selectorName + '"]').forEach(function(node){
       if (node.getAttribute('data-wiki-loaded') === 'done') return;
       var img = document.createElement('img');
       img.src = src;
       img.alt = '';
       img.loading = 'lazy';
+      img.referrerPolicy = 'no-referrer';
       img.style.width = '100%';
       img.style.height = '100%';
       img.style.objectFit = 'cover';
@@ -1714,29 +1719,58 @@ function hydrateChartWikipediaImages() {
     });
   }
 
+  function wikiTitle(name) {
+    var n = String(name || '').trim();
+    var alias = {
+      'Dan + Shay': 'Dan_+_Shay',
+      'ICE NINE KILLS': 'Ice_Nine_Kills',
+      'STELLA LEFTY': 'STELLA_LEFTY'
+    };
+    return alias[n] || n.replace(/ /g, '_');
+  }
+
+  function fetchWikiImage(name) {
+    var title = wikiTitle(name);
+    var restUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title);
+    var apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&pithumbsize=400&origin=*&titles=' + encodeURIComponent(title);
+
+    return fetch(restUrl)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (d && d.thumbnail && d.thumbnail.source) return d.thumbnail.source;
+        return fetch(apiUrl)
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(j){
+            if (!j || !j.query || !j.query.pages) return '';
+            var pages = j.query.pages;
+            for (var k in pages) {
+              if (pages[k] && pages[k].thumbnail && pages[k].thumbnail.source) return pages[k].thumbnail.source;
+            }
+            return '';
+          });
+      });
+  }
+
   var names = [];
   nodes.forEach(function(node){
     var name = node.getAttribute('data-wiki-name') || '';
-    node.setAttribute('data-wiki-loaded','loading');
     if (!name) return;
+    node.setAttribute('data-wiki-loaded','loading');
     if (cache[name]) applyToName(name, cache[name]);
     else if (names.indexOf(name) === -1) names.push(name);
   });
 
-  // ดึงรูปจาก Wikipedia หลังจาก list แสดงแล้วเท่านั้น ไม่ block การเปิดหน้า Charts
   names.slice(0, 20).forEach(function(name){
-    var page = name.replace(/ /g, '_');
-    fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(page))
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(d){
-        var src = d && d.thumbnail && d.thumbnail.source ? d.thumbnail.source : '';
-        if (!src) return;
+    fetchWikiImage(name)
+      .then(function(src){
+        if (!src) throw new Error('no wiki image');
         cache[name] = src;
         try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch(e) {}
         applyToName(name, src);
       })
       .catch(function(){
-        document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + CSS.escape(name) + '"]').forEach(function(node){ node.setAttribute('data-wiki-loaded','fail'); });
+        var selectorName = String(name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + selectorName + '"]').forEach(function(node){ node.setAttribute('data-wiki-loaded','fail'); });
       });
   });
 }
@@ -1760,6 +1794,7 @@ function renderChartTeaser(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
+        (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" onclick="switchTab(\'chart\');setTimeout(function(){playChartMV(null,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')},80);return false;" title="YouTube MV">' + YT_ICON + '</a>' : '') +
       '</div></div>';
   });
   html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
