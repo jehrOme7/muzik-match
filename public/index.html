@@ -431,8 +431,8 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <div class="chart-teaser">
   <div class="chart-teaser-header">
     <div class="chart-teaser-left">
-      <div class="chart-teaser-eyebrow">📊 Manual Top Chart</div>
-      <div class="chart-teaser-title">เพลงฮิตที่คัดไว้ตอนนี้ 🔥</div>
+      <div class="chart-teaser-eyebrow">📊 TOP HIT ติด CHARTS</div>
+      <div class="chart-teaser-title">เพลง TOP HIT ที่น่าฟังตอนนี้</div>
     </div>
     <button class="chart-teaser-btn" onclick="switchTab('chart')">
       ดูทั้งหมด
@@ -560,15 +560,10 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <!-- CHART PAGE -->
 <div class="page" id="pageChart">
 <div class="chart-page-wrap">
-  <div class="chart-page-eyebrow">📊 Manual Top Chart</div>
-  <h1>เพลงฮิตที่คัดไว้<br/><span class="g">ตอนนี้เล่นอะไรอยู่?</span></h1>
-  <p class="chart-page-sub">ข้อมูลชาร์ตแบบ Manual · แก้รายชื่อเพลงเองได้ในไฟล์ · กดฟังได้ทันทีใน Spotify 🎧</p>
-  <div id="chartPageContent">
-    <div class="chart-loading">
-      <div class="chart-dots"><span></span><span></span><span></span></div>
-      กำลังโหลด chart...
-    </div>
-  </div>
+  <div class="chart-page-eyebrow">📊 TOP HIT ติด CHARTS</div>
+  <h1>เพลง TOP HIT<br/><span class="g">ที่น่าฟังตอนนี้</span></h1>
+  <p class="chart-page-sub">อ้างอิง Top 20 จาก iTunes · ฝังไว้ในเว็บเพื่อโหลดไว · กดฟังได้ทันทีใน Spotify 🎧</p>
+  <div id="chartPageContent"></div>
   <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
 </div>
 </div>
@@ -1424,7 +1419,7 @@ function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
 // ============================================================
-// CHART SYSTEM — Apple Music via /api/charts
+// CHART SYSTEM — Static iTunes Top 20 database, no runtime API fetch
 // ============================================================
 var chartData = null;       // cache data
 var chartDataFetching = false;
@@ -1441,14 +1436,14 @@ function chartSpotifyWeb(title, artist) {
 }
 
 // ============================================================
-// STATIC CHART DATABASE — แก้รายชื่อเพลงตรงนี้ได้เลย
+// STATIC CHART DATABASE — อ้างอิง iTunes Top 20 แล้วฝังไว้ในเว็บ
 // ข้อมูลนี้เป็น Snapshot จาก iTunes US Top Songs แล้วฝังไว้ในเว็บ
 // ไม่ fetch iTunes / ไม่เรียก /api/charts ตอนผู้ใช้เปิดหน้า ทำให้ Charts แสดงผลทันที
 // วิธีอัปเดต: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง จากนั้นอัปโหลดไฟล์ใหม่
-// artwork และ appleUrl ใส่ค่าว่างได้ ถ้าไม่อยากให้หน้าเว็บโหลดรูป/ลิงก์จากภายนอก
+// artwork ใส่ค่าว่างได้ ระบบจะดึงรูปศิลปินจาก Wikipedia แบบ async หลังจาก list แสดงแล้ว
 // ============================================================
 var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569 · อ้างอิง iTunes US Top Songs';
-var STATIC_CHART_SOURCE_LABEL = 'iTunes US Top Songs · Static Snapshot';
+var STATIC_CHART_SOURCE_LABEL = 'iTunes US Top Songs · TOP HIT ติด CHARTS';
 
 var STATIC_CHART_SONGS = [
   {
@@ -1600,15 +1595,16 @@ function normalizeStaticCharts() {
       title: s.title || ('เพลงอันดับ ' + (i + 1)),
       artist: s.artist || 'ไม่ระบุศิลปิน',
       artwork: s.artwork || '',
-      appleUrl: s.appleUrl || ''
+      appleUrl: s.appleUrl || '',
+      wiki: s.wiki || wikiNameFromArtist(s.artist || '')
     };
   }).filter(function(s) { return s.title && s.artist; }).slice(0, 20);
 }
 
 function fetchChartData(cb) {
-  // Static database: ตอบกลับทันทีในรอบ event loop ถัดไป เพื่อไม่ให้ UI ค้าง loading
+  // Static database: ไม่ fetch iTunes/API ตอนผู้ใช้เปิดหน้า จึงตอบกลับทันทีแบบ synchronous
   if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
-  setTimeout(function() { cb(null, chartData); }, 0);
+  cb(null, chartData);
 }
 
 // คงชื่อ function เดิมไว้ เผื่อมีปุ่ม retry หรือโค้ดส่วนอื่นเรียกใช้
@@ -1621,10 +1617,79 @@ function bgRefreshChart() {
   return false;
 }
 
-function artImg(url, cls, ph) {
-  if (!url) return '<div class="' + cls + '-ph">' + ph + '</div>';
+
+if (!window.CSS || !CSS.escape) {
+  window.CSS = window.CSS || {};
+  CSS.escape = function(s){ return String(s).replace(/\"/g, '\\"'); };
+}
+
+function wikiNameFromArtist(artist) {
+  var a = String(artist || '').trim();
+  // สำหรับศิลปินร่วม ให้ใช้ศิลปินหลักก่อน เพื่อหา Wikipedia ได้ง่ายขึ้น
+  a = a.split(' & ')[0].split(' feat.')[0].split(' featuring ')[0].trim();
+  return a;
+}
+
+function artImg(url, cls, ph, wikiName) {
+  var data = wikiName ? ' data-wiki-name="' + esc(wikiName) + '"' : '';
+  if (!url) return '<div class="' + cls + '-ph chart-wiki-art"' + data + '>' + ph + '</div>';
   return '<img class="' + cls + '" src="' + esc(url) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextSibling && (this.nextSibling.style.display=\'flex\')">' +
-         '<div class="' + cls + '-ph" style="display:none">' + ph + '</div>';
+         '<div class="' + cls + '-ph chart-wiki-art" style="display:none"' + data + '>' + ph + '</div>';
+}
+
+function hydrateChartWikipediaImages() {
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-loaded])'));
+  if (!nodes.length) return;
+  var cacheKey = 'mm_chart_wiki_images_v1';
+  var cache = {};
+  try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}') || {}; } catch(e) { cache = {}; }
+
+  function applyToName(name, src) {
+    if (!src) return;
+    document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + CSS.escape(name) + '"]').forEach(function(node){
+      if (node.getAttribute('data-wiki-loaded') === 'done') return;
+      var img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = 'inherit';
+      img.onerror = function(){ node.setAttribute('data-wiki-loaded','fail'); };
+      img.onload = function(){
+        node.innerHTML = '';
+        node.appendChild(img);
+        node.setAttribute('data-wiki-loaded','done');
+      };
+    });
+  }
+
+  var names = [];
+  nodes.forEach(function(node){
+    var name = node.getAttribute('data-wiki-name') || '';
+    node.setAttribute('data-wiki-loaded','loading');
+    if (!name) return;
+    if (cache[name]) applyToName(name, cache[name]);
+    else if (names.indexOf(name) === -1) names.push(name);
+  });
+
+  // ดึงรูปจาก Wikipedia หลังจาก list แสดงแล้วเท่านั้น ไม่ block การเปิดหน้า Charts
+  names.slice(0, 20).forEach(function(name){
+    var page = name.replace(/ /g, '_');
+    fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(page))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var src = d && d.thumbnail && d.thumbnail.source ? d.thumbnail.source : '';
+        if (!src) return;
+        cache[name] = src;
+        try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch(e) {}
+        applyToName(name, src);
+      })
+      .catch(function(){
+        document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + CSS.escape(name) + '"]').forEach(function(node){ node.setAttribute('data-wiki-loaded','fail'); });
+      });
+  });
 }
 
 // ---- TEASER on landing (5 rows preview) ----
@@ -1641,7 +1706,7 @@ function renderChartTeaser(songs) {
     var spWeb = chartSpotifyWeb(s.title, s.artist);
     html += '<div class="chart-row" style="border-radius:0;border-left:none;border-right:none;border-top:none;' + (i===0?'border-top:none':'') + '">' +
       '<div class="' + cls + '">' + rank + '</div>' +
-      artImg(s.artwork, 'chart-row-art', '🎵') +
+      artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
@@ -1651,6 +1716,7 @@ function renderChartTeaser(songs) {
   html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
     '<button onclick="switchTab(\'chart\')" style="font-size:12px;font-weight:700;color:#fb923c;background:none;border:none;cursor:pointer;font-family:inherit">ดูทั้งหมด 20 เพลง →</button></div>';
   el.innerHTML = html;
+  hydrateChartWikipediaImages();
 }
 
 // ---- FULL CHART PAGE (20 songs + #1 YouTube MV) ----
@@ -1666,15 +1732,15 @@ function renderChartPage(songs) {
 
   // hero #1 — ไม่มี YT embed แต่มีปุ่ม YouTube
   var heroHtml = '<div class="chart-hero-card">' +
-    '<div class="chart-hero-badge">🥇 #1 iTunes US Chart · Static Snapshot</div>' +
+    '<div class="chart-hero-badge">🥇 #1 iTunes US Chart</div>' +
     '<div class="chart-hero-body">' +
-      artImg(s1.artwork, 'chart-hero-art', '🎵') +
+      artImg(s1.artwork, 'chart-hero-art', '🎵', s1.wiki || s1.artist) +
       '<div style="flex:1;min-width:0">' +
         '<div class="chart-hero-title">' + esc(s1.title) + '</div>' +
         '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
         '<div class="chart-hero-tags">' +
           '<span class="chart-hero-tag">🏆 อันดับ 1</span>' +
-          '<span class="chart-hero-tag">iTunes Snapshot</span>' +
+          '<span class="chart-hero-tag">TOP HIT ติด CHARTS</span>' +
         '</div>' +
       '</div>' +
     '</div>' +
@@ -1697,7 +1763,7 @@ function renderChartPage(songs) {
     var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv');
     listHtml += '<div class="chart-row">' +
       '<div class="' + cls + '">' + rank + '</div>' +
-      artImg(s.artwork, 'chart-row-art', '🎵') +
+      artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
@@ -1708,6 +1774,7 @@ function renderChartPage(songs) {
   listHtml += '</div>';
 
   el.innerHTML = heroHtml + listHtml;
+  hydrateChartWikipediaImages();
 }
 
 function fetchYoutubeId(query) {
@@ -1806,46 +1873,15 @@ function openSpotify(e, webUrl) {
 var chartState = 'idle';
 var chartReadyCbs = []; // callbacks รอเมื่อ chart โหลดเสร็จ
 function initChart(onReady) {
-  if (onReady) chartReadyCbs.push(onReady);
-  // ถ้า ok อยู่แล้ว render ทันที
-  if (chartState === 'ok' && chartData && chartData.length) {
-    renderChartTeaser(chartData);
-    renderChartPage(chartData);
-    if (onReady) onReady(chartData);
-    return;
-  }
-  // ถ้ากำลัง loading อยู่ รอ callback เมื่อเสร็จ (ไม่ต้อง fetch ซ้ำ)
-  if (chartState === 'loading') return;
-  chartState = 'loading';
-  // แสดง loading state
-  ['chartPreview','chartPageContent'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el && el.innerHTML.indexOf('chart-loading') < 0 && el.innerHTML.indexOf('chart-row') < 0) {
-      el.innerHTML = '<div class="chart-loading"><div class="chart-dots"><span></span><span></span><span></span></div>กำลังโหลด chart...</div>';
-    }
-  });
-  fetchChartData(function(err, songs) {
-    if (err || !songs || !songs.length) {
-      chartState = 'fail';
-      var errHtml = '<div class="chart-error">⚠️ โหลด chart ไม่ได้ในขณะนี้<br/><small style="font-size:11px;color:var(--text3)">อาจเกิดจาก network หรือ server ชั่วคราว</small><br/><button class="chart-retry" onclick="retryChart()">🔄 ลองใหม่</button></div>';
-      ['chartPreview','chartPageContent'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = errHtml;
-      });
-      return;
-    }
-    chartState = 'ok';
-    renderChartTeaser(songs);
-    renderChartPage(songs);
-    // เรียก callbacks ที่รออยู่
-    var cbs = chartReadyCbs.splice(0);
-    cbs.forEach(function(fn){ try { fn(songs); } catch(e){} });
-  });
+  if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
+  chartState = 'ok';
+  renderChartTeaser(chartData);
+  renderChartPage(chartData);
+  if (onReady) { try { onReady(chartData); } catch(e){} }
 }
 function retryChart() {
-  chartState = 'idle';
-  chartData = null;
-  chartDataFetching = false;
+  chartData = normalizeStaticCharts();
+  chartState = 'ok';
   initChart();
 }
 
@@ -1854,6 +1890,13 @@ function retryChart() {
 // ============================================================
 function switchTab(tab) {
   var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
+
+  // สำคัญ: ถ้าเข้า chart/home ให้ render จาก static database ก่อนเปลี่ยนหน้า
+  // เพื่อไม่ให้ผู้ใช้เห็นหน้ากำลังโหลด charts อีก
+  if (tab === 'chart' || tab === 'home') {
+    initChart();
+  }
+
   Object.keys(tabs).forEach(function(k) {
     var page = document.getElementById(tabs[k]);
     if (!page) return;
@@ -1868,17 +1911,6 @@ function switchTab(tab) {
   if (navChart) navChart.classList.toggle('active', tab === 'chart');
   if (navPlaylist) navPlaylist.classList.toggle('active', tab === 'playlist');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // เรียก initChart ทุกครั้งที่เข้าหน้า chart หรือ home
-  // initChart จะ handle state เองว่าต้อง fetch ใหม่หรือแค่ re-render
-  if (tab === 'chart' || tab === 'home') {
-    setTimeout(function() {
-      initChart(tab === 'chart' ? function(songs) {
-        // ensure chart page content renders after tab is active
-        renderChartPage(songs);
-      } : null);
-    }, 50);
-  }
-  // reset YT เมื่อออกจากหน้า chart
   if (tab !== 'chart') { ytLoaded = false; }
 }
 function goHome() { switchTab('home'); }
@@ -1941,10 +1973,8 @@ document.addEventListener('DOMContentLoaded',function(){
   var pa = document.getElementById('plAgainBtn');
   if(ps) ps.addEventListener('click',doPlShuffle);
   if(pa) pa.addEventListener('click',doPlShuffle);
-  // prefetch chart แบบเบา ๆ หลังหน้าแรกพร้อม ไม่แย่งโหลดช่วงแรก
-  var startChartPrefetch = function(){ setTimeout(initChart, 800); };
-  if ('requestIdleCallback' in window) requestIdleCallback(startChartPrefetch, { timeout: 2000 });
-  else startChartPrefetch();
+  // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
+  initChart();
 });
 </script>
 </body>
