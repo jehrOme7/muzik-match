@@ -1442,34 +1442,155 @@ function chartSpotifyWeb(title, artist) {
 
 // ============================================================
 // STATIC CHART DATABASE — แก้รายชื่อเพลงตรงนี้ได้เลย
-// ไม่โหลด iTunes / ไม่เรียก /api/charts ทำให้หน้า Charts แสดงผลทันที
-// วิธีอัปเดต: แก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง แล้วอัปโหลดไฟล์ใหม่
+// ข้อมูลนี้เป็น Snapshot จาก iTunes US Top Songs แล้วฝังไว้ในเว็บ
+// ไม่ fetch iTunes / ไม่เรียก /api/charts ตอนผู้ใช้เปิดหน้า ทำให้ Charts แสดงผลทันที
+// วิธีอัปเดต: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง จากนั้นอัปโหลดไฟล์ใหม่
 // artwork และ appleUrl ใส่ค่าว่างได้ ถ้าไม่อยากให้หน้าเว็บโหลดรูป/ลิงก์จากภายนอก
 // ============================================================
-var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569';
-var STATIC_CHART_SOURCE_LABEL = 'Muzik Match Manual Chart';
+var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569 · อ้างอิง iTunes US Top Songs';
+var STATIC_CHART_SOURCE_LABEL = 'iTunes US Top Songs · Static Snapshot';
 
 var STATIC_CHART_SONGS = [
-  {rank:1,title:'ใส่ชื่อเพลงอันดับ 1',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:2,title:'ใส่ชื่อเพลงอันดับ 2',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:3,title:'ใส่ชื่อเพลงอันดับ 3',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:4,title:'ใส่ชื่อเพลงอันดับ 4',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:5,title:'ใส่ชื่อเพลงอันดับ 5',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:6,title:'ใส่ชื่อเพลงอันดับ 6',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:7,title:'ใส่ชื่อเพลงอันดับ 7',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:8,title:'ใส่ชื่อเพลงอันดับ 8',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:9,title:'ใส่ชื่อเพลงอันดับ 9',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:10,title:'ใส่ชื่อเพลงอันดับ 10',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:11,title:'ใส่ชื่อเพลงอันดับ 11',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:12,title:'ใส่ชื่อเพลงอันดับ 12',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:13,title:'ใส่ชื่อเพลงอันดับ 13',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:14,title:'ใส่ชื่อเพลงอันดับ 14',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:15,title:'ใส่ชื่อเพลงอันดับ 15',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:16,title:'ใส่ชื่อเพลงอันดับ 16',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:17,title:'ใส่ชื่อเพลงอันดับ 17',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:18,title:'ใส่ชื่อเพลงอันดับ 18',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:19,title:'ใส่ชื่อเพลงอันดับ 19',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
-  {rank:20,title:'ใส่ชื่อเพลงอันดับ 20',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''}
+  {
+    "rank": 1,
+    "title": "Choosin' Texas",
+    "artist": "Ella Langley",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Choosin%27%20Texas%20Ella%20Langley"
+  },
+  {
+    "rank": 2,
+    "title": "Look at My Life",
+    "artist": "Gracie Abrams",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Look%20at%20My%20Life%20Gracie%20Abrams"
+  },
+  {
+    "rank": 3,
+    "title": "Marry You Again",
+    "artist": "Dan + Shay",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Marry%20You%20Again%20Dan%20%2B%20Shay"
+  },
+  {
+    "rank": 4,
+    "title": "Another Drink",
+    "artist": "Marshmello & Kelsea Ballerini",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Another%20Drink%20Marshmello%20%26%20Kelsea%20Ballerini"
+  },
+  {
+    "rank": 5,
+    "title": "The Time Of My Life",
+    "artist": "Benson Boone",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=The%20Time%20Of%20My%20Life%20Benson%20Boone"
+  },
+  {
+    "rank": 6,
+    "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+    "artist": "Taylor Swift",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=I%20Knew%20It%2C%20I%20Knew%20You%20%28From%20%22Toy%20Story%205%22%29%20Taylor%20Swift"
+  },
+  {
+    "rank": 7,
+    "title": "Let Him In Anyway",
+    "artist": "Blake Shelton",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Let%20Him%20In%20Anyway%20Blake%20Shelton"
+  },
+  {
+    "rank": 8,
+    "title": "Hands Up",
+    "artist": "Jelly Roll",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Hands%20Up%20Jelly%20Roll"
+  },
+  {
+    "rank": 9,
+    "title": "Be Her",
+    "artist": "Ella Langley",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Be%20Her%20Ella%20Langley"
+  },
+  {
+    "rank": 10,
+    "title": "Dancing On My Own",
+    "artist": "Robyn",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Dancing%20On%20My%20Own%20Robyn"
+  },
+  {
+    "rank": 11,
+    "title": "Divine Intervention",
+    "artist": "The Rolling Stones",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Divine%20Intervention%20The%20Rolling%20Stones"
+  },
+  {
+    "rank": 12,
+    "title": "Jealous Lover",
+    "artist": "The Rolling Stones",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Jealous%20Lover%20The%20Rolling%20Stones"
+  },
+  {
+    "rank": 13,
+    "title": "If I Don't Leave I'm Gonna Stay",
+    "artist": "Carly Pearce & Riley Green",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=If%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%20Carly%20Pearce%20%26%20Riley%20Green"
+  },
+  {
+    "rank": 14,
+    "title": "Made It A Memory",
+    "artist": "Luke Bryan",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Made%20It%20A%20Memory%20Luke%20Bryan"
+  },
+  {
+    "rank": 15,
+    "title": "Watch It Burn",
+    "artist": "Katy Perry",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Watch%20It%20Burn%20Katy%20Perry"
+  },
+  {
+    "rank": 16,
+    "title": "We Go Back (feat. Michael McDonald)",
+    "artist": "Keith Urban",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=We%20Go%20Back%20%28feat.%20Michael%20McDonald%29%20Keith%20Urban"
+  },
+  {
+    "rank": 17,
+    "title": "Cowgirl",
+    "artist": "Shaboozey",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Cowgirl%20Shaboozey"
+  },
+  {
+    "rank": 18,
+    "title": "RUN IT",
+    "artist": "Stray Kids",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=RUN%20IT%20Stray%20Kids"
+  },
+  {
+    "rank": 19,
+    "title": "Play Dead",
+    "artist": "ICE NINE KILLS",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Play%20Dead%20ICE%20NINE%20KILLS"
+  },
+  {
+    "rank": 20,
+    "title": "Boston",
+    "artist": "STELLA LEFTY",
+    "artwork": "",
+    "appleUrl": "https://music.apple.com/us/search?term=Boston%20STELLA%20LEFTY"
+  }
 ];
 
 function normalizeStaticCharts() {
@@ -1545,7 +1666,7 @@ function renderChartPage(songs) {
 
   // hero #1 — ไม่มี YT embed แต่มีปุ่ม YouTube
   var heroHtml = '<div class="chart-hero-card">' +
-    '<div class="chart-hero-badge">🥇 #1 Chart · Manual Update</div>' +
+    '<div class="chart-hero-badge">🥇 #1 iTunes US Chart · Static Snapshot</div>' +
     '<div class="chart-hero-body">' +
       artImg(s1.artwork, 'chart-hero-art', '🎵') +
       '<div style="flex:1;min-width:0">' +
@@ -1553,7 +1674,7 @@ function renderChartPage(songs) {
         '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
         '<div class="chart-hero-tags">' +
           '<span class="chart-hero-tag">🏆 อันดับ 1</span>' +
-          '<span class="chart-hero-tag">Manual Chart</span>' +
+          '<span class="chart-hero-tag">iTunes Snapshot</span>' +
         '</div>' +
       '</div>' +
     '</div>' +
