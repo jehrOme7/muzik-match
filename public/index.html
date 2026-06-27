@@ -1618,8 +1618,9 @@ function renderChartPage(songs) {
   if (!el || !songs.length) return;
   var s1 = songs[0];
   var ranks = ['🥇','🥈','🥉'];
+  var ytSearch1 = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s1.title + ' ' + s1.artist + ' official mv');
 
-  // hero #1
+  // hero #1 — ไม่มี YT embed แต่มีปุ่ม YouTube
   var heroHtml = '<div class="chart-hero-card">' +
     '<div class="chart-hero-badge">🥇 #1 Global · Apple Music</div>' +
     '<div class="chart-hero-body">' +
@@ -1633,27 +1634,23 @@ function renderChartPage(songs) {
         '</div>' +
       '</div>' +
     '</div>' +
-    // YouTube MV embed
-    '<div id="ytWrap" class="chart-yt-wrap">' +
-      '<div class="chart-yt-placeholder" id="ytPlaceholder" onclick="loadYT()">' +
-        '<div class="chart-yt-play-btn"><svg viewBox="0 0 24 24" fill="white" width="28" height="28"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' +
-        '<div class="chart-yt-label" id="ytLabel">▶ กดดู MV — ' + esc(s1.title) + ' · ' + esc(s1.artist) + '</div>' +
-      '</div>' +
-    '</div>' +
-    // listen buttons
     '<div class="chart-listen-btns">' +
       '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
+      '<a class="chart-listen-btn chart-listen-yt" href="' + ytSearch1 + '" target="_blank" rel="noopener">' +
+        YT_ICON + ' YouTube MV' +
+      '</a>' +
     '</div>' +
   '</div>';
 
-  // rank list 2-20
-  var listHtml = '<div class="chart-rank-label">อันดับ 2–20</div><div class="chart-list">';
-  songs.slice(1).forEach(function(s, i) {
-    var rank = ranks[i+1] || ('#' + s.rank);
-    var cls = i < 2 ? 'chart-row-num t3' : 'chart-row-num';
+  // rank list 1-20 (ทุกเพลง)
+  var listHtml = '<div class="chart-rank-label">อันดับ 1–20</div><div class="chart-list">';
+  songs.forEach(function(s, i) {
+    var rank = ranks[i] || ('#' + s.rank);
+    var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
+    var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv');
     listHtml += '<div class="chart-row">' +
       '<div class="' + cls + '">' + rank + '</div>' +
       artImg(s.artwork, 'chart-row-art', '🎵') +
@@ -1661,15 +1658,12 @@ function renderChartPage(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        '<a class="chart-row-btn chart-row-btn-yt" href="https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv') + '" target="_blank" rel="noopener" title="YouTube MV">' + YT_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-yt" href="' + ytUrl + '" target="_blank" rel="noopener" title="YouTube MV">' + YT_ICON + '</a>' +
       '</div></div>';
   });
   listHtml += '</div>';
 
   el.innerHTML = heroHtml + listHtml;
-
-  // ค้นหา YouTube MV สำหรับ #1
-  fetchYoutubeId(s1.title + ' ' + s1.artist);
 }
 
 function fetchYoutubeId(query) {
