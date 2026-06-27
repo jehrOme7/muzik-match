@@ -1458,26 +1458,111 @@ function playlistSearchQuery(pl){
   }catch(e){}
   return String(pl.name||'playlist').trim();
 }
+function spotifyWebUrlToAppUri(webUrl, fallbackQuery, type){
+  webUrl = String(webUrl || '').trim();
+  fallbackQuery = String(fallbackQuery || '').trim();
+  try{
+    var u = new URL(webUrl, window.location.href);
+    if(/(^|\.)open\.spotify\.com$/i.test(u.hostname)){
+      var parts = u.pathname.split('/').filter(Boolean);
+      var kind = parts[0] || '';
+      var id = parts[1] || '';
+      if(kind === 'playlist' && id) return 'spotify:playlist:' + id;
+      if(kind === 'track' && id) return 'spotify:track:' + id;
+      if(kind === 'album' && id) return 'spotify:album:' + id;
+      if(kind === 'artist' && id) return 'spotify:artist:' + id;
+      if(kind === 'search'){
+        var q = parts[1] ? decodeURIComponent(parts[1]) : fallbackQuery;
+        return 'spotify:search:' + encodeURIComponent(q || fallbackQuery || 'music');
+      }
+    }
+  }catch(e){}
+  return 'spotify:search:' + encodeURIComponent(fallbackQuery || (type === 'playlist' ? 'playlist' : 'music'));
+}
 function openSpotifySearch(event, el, name){
-  return openSpotifyUrl(event, el, spotifyWebSearchUrl(name));
+  return openSpotifyDeepLink(event, el, spotifyQuery(name), spotifyWebSearchUrl(name), 'artist');
 }
 function openSpotifyPlaylist(event, el){
   var direct = (el&&el.dataset&&el.dataset.spotifyUrl) ? el.dataset.spotifyUrl : '';
   var query=(el&&el.dataset&&el.dataset.spotifyQuery) ? el.dataset.spotifyQuery : 'playlist';
-  return openSpotifyUrl(event, el, direct || spotifyPlaylistWebSearchUrl(query));
+  return openSpotifyDeepLink(event, el, query, direct || spotifyPlaylistWebSearchUrl(query), 'playlist');
 }
-function openSpotifyUrl(event, el, url){
+function openSpotifyUrl(event, el, url, query, type){
   if(event) event.preventDefault();
-  url = String(url || '').trim() || 'https://open.spotify.com/';
-  if(el) el.href = url;
-  // ใช้ Spotify Universal Link ตัวเดียว ให้ระบบเลือกเปิด app เอง ถ้ามี app; ถ้าไม่มีจะเปิดเว็บ
-  window.location.href = url;
+  var webUrl = String(url || '').trim() || 'https://open.spotify.com/';
+  var appUri = spotifyWebUrlToAppUri(webUrl, query || '', type || 'music');
+  if(el){
+    el.href = webUrl;
+    el.target = '_blank';
+    el.rel = 'noopener';
+  }
+
+  var appLikelyOpened = false;
+  var spotifyTab = null;
+  var fallbackTimer = null;
+  var cleanupTimer = null;
+
+  function cleanup(){
+    window.removeEventListener('blur', markAppLikelyOpened);
+    window.removeEventListener('pagehide', markAppLikelyOpened);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    if(fallbackTimer) clearTimeout(fallbackTimer);
+    if(cleanupTimer) clearTimeout(cleanupTimer);
+  }
+  function markAppLikelyOpened(){
+    appLikelyOpened = true;
+    cleanup();
+    // ถ้า browser เปิด tab ว่างไว้หลังส่งผู้ใช้ไป app ให้พยายามปิดเพื่อลดความรก
+    try{
+      if(spotifyTab && !spotifyTab.closed){ spotifyTab.close(); }
+    }catch(e){}
+  }
+  function onVisibilityChange(){ if(document.hidden) markAppLikelyOpened(); }
+
+  window.addEventListener('blur', markAppLikelyOpened, {once:true});
+  window.addEventListener('pagehide', markAppLikelyOpened, {once:true});
+  document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
+
+  // เปิดใน tab ใหม่เท่านั้น: ห้ามเปลี่ยนหน้าเว็บ Muzik Match ปัจจุบัน
+  // 1) ลองเปิด Spotify app ด้วย URI scheme ใน tab ใหม่
+  // 2) ถ้าไม่มี app/ไม่ตอบสนอง ค่อยเปลี่ยน tab เดิมนั้นไปเป็น Spotify web
+  try{
+    spotifyTab = window.open('about:blank', '_blank');
+    if(spotifyTab){
+      try{ spotifyTab.opener = null; }catch(e){}
+      spotifyTab.location.href = appUri;
+    }else{
+      // popup ถูก block: อย่างน้อย fallback web ยังต้องเป็น new tab ไม่ใช่หน้าเดิม
+      window.open(webUrl, '_blank', 'noopener');
+      cleanup();
+      return false;
+    }
+  }catch(e){
+    window.open(webUrl, '_blank', 'noopener');
+    cleanup();
+    return false;
+  }
+
+  fallbackTimer = setTimeout(function(){
+    if(!appLikelyOpened && document.visibilityState !== 'hidden'){
+      cleanup();
+      try{
+        if(spotifyTab && !spotifyTab.closed){
+          spotifyTab.location.href = webUrl;
+        }else{
+          window.open(webUrl, '_blank', 'noopener');
+        }
+      }catch(e){ window.open(webUrl, '_blank', 'noopener'); }
+    }
+  }, 1700);
+
+  cleanupTimer = setTimeout(cleanup, 5000);
   return false;
 }
 function openSpotifyDeepLink(event, el, query, webUrl, type){
   query=String(query||'').trim() || (type==='playlist'?'playlist':'music');
   webUrl=webUrl || spotifyGenericWebSearchUrl(query, type==='playlist');
-  return openSpotifyUrl(event, el, webUrl);
+  return openSpotifyUrl(event, el, webUrl, query, type);
 }
 function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -1727,7 +1812,7 @@ function bgRefreshChart() {
 
 if (!window.CSS || !CSS.escape) {
   window.CSS = window.CSS || {};
-  CSS.escape = function(s){ return String(s).replace(/\"/g, '\\"'); };
+  CSS.escape = function(s){ return String(s).replace(/"/g, '\\"'); };
 }
 
 function wikiNameFromArtist(artist) {
@@ -1737,174 +1822,165 @@ function wikiNameFromArtist(artist) {
   return a;
 }
 
+// ใช้แนวทางเดียวกับ “แนะนำศิลปินประจำวัน”: render placeholder ก่อน แล้วค่อยใส่รูปจาก Wikipedia เข้า element เดิม
+var chartWikiImgSeq = 0;
+
 function artImg(url, cls, ph, wikiName) {
+  var id = 'chartWikiImg_' + (++chartWikiImgSeq);
   var data = wikiName ? ' data-wiki-name="' + esc(wikiName) + '"' : '';
-  if (!url) return '<div class="' + cls + '-ph chart-wiki-art"' + data + '>' + ph + '</div>';
-  return '<img class="' + cls + '" src="' + esc(url) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextSibling && (this.nextSibling.style.display=\'flex\')">' +
-         '<div class="' + cls + '-ph chart-wiki-art" style="display:none"' + data + '>' + ph + '</div>';
+  if (!url) {
+    return '<div id="' + id + '" class="' + cls + '-ph chart-wiki-art"' + data + '>' + ph + '</div>';
+  }
+  return '<img class="' + cls + '" src="' + esc(url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextSibling && (this.nextSibling.style.display=\'flex\')">' +
+         '<div id="' + id + '" class="' + cls + '-ph chart-wiki-art" style="display:none"' + data + '>' + ph + '</div>';
+}
+
+function chartWikiArtistKey(name) {
+  return String(name || '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*\([^)]*\)\s*$/g, '')
+    .trim();
+}
+
+function chartWikiCandidates(name) {
+  var raw = chartWikiArtistKey(name);
+  var clean = wikiNameFromArtist(raw);
+  var alias = {
+    'Dan + Shay': ['Dan + Shay'],
+    'ICE NINE KILLS': ['Ice Nine Kills'],
+    'Ice Nine Kills': ['Ice Nine Kills'],
+    'STELLA LEFTY': ['STELLA LEFTY', 'Stella Lefty'],
+    'Ella Langley': ['Ella Langley'],
+    'Gracie Abrams': ['Gracie Abrams'],
+    'Marshmello': ['Marshmello'],
+    'Kelsea Ballerini': ['Kelsea Ballerini'],
+    'Benson Boone': ['Benson Boone'],
+    'Taylor Swift': ['Taylor Swift'],
+    'Blake Shelton': ['Blake Shelton'],
+    'Jelly Roll': ['Jelly Roll (singer)', 'Jelly Roll'],
+    'Robyn': ['Robyn (singer)', 'Robyn'],
+    'The Rolling Stones': ['The Rolling Stones'],
+    'Carly Pearce': ['Carly Pearce'],
+    'Riley Green': ['Riley Green'],
+    'Luke Bryan': ['Luke Bryan'],
+    'Katy Perry': ['Katy Perry'],
+    'Keith Urban': ['Keith Urban'],
+    'Shaboozey': ['Shaboozey'],
+    'Stray Kids': ['Stray Kids']
+  };
+  var arr = [];
+  function add(x){ x = String(x || '').trim(); if (x && arr.indexOf(x) === -1) arr.push(x); }
+  (alias[raw] || []).forEach(add);
+  (alias[clean] || []).forEach(add);
+  add(raw);
+  add(clean);
+  // REST summary ใช้ชื่อหน้าแบบ underscore เหมือนส่วน Daily Artist ที่ทำงานปกติ
+  if (clean) add(clean.replace(/ /g, '_'));
+  if (clean) add(clean + ' (singer)');
+  if (clean) add(clean + ' (musician)');
+  return arr;
+}
+
+function safeWikiThumb(src) {
+  if (!src) return '';
+  try {
+    var u = new URL(src, window.location.href);
+    var allowedHost = /(^|\.)wikimedia\.org$/i.test(u.hostname) || u.hostname === 'upload.wikimedia.org';
+    return (u.protocol === 'https:' && allowedHost) ? u.href : '';
+  } catch(e) { return ''; }
+}
+
+function setWikiImgToEl(el, src) {
+  src = safeWikiThumb(src);
+  if (!el || !src) return false;
+  var img = document.createElement('img');
+  img.src = src;
+  img.alt = '';
+  img.loading = 'lazy';
+  img.referrerPolicy = 'no-referrer';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = 'inherit';
+  img.onload = function(){ el.setAttribute('data-wiki-loaded', 'done'); };
+  img.onerror = function(){ el.setAttribute('data-wiki-loaded', 'fail'); };
+  el.textContent = '';
+  el.appendChild(img);
+  el.style.display = 'flex';
+  return true;
+}
+
+function fetchJsonWithTimeout(url, ms) {
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, ms || 4500) : null;
+  return fetch(url, { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
+    .then(function(r){ if (timer) clearTimeout(timer); return r.ok ? r.json() : null; })
+    .catch(function(){ if (timer) clearTimeout(timer); return null; });
+}
+
+function fetchWikiSummaryThumb(title) {
+  var pageTitle = String(title || '').trim().replace(/ /g, '_');
+  if (!pageTitle) return Promise.resolve('');
+  var url = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(pageTitle);
+  return fetchJsonWithTimeout(url, 4800).then(function(d){
+    return safeWikiThumb(d && d.thumbnail && d.thumbnail.source);
+  });
+}
+
+function fetchWikiSearchThumb(name) {
+  var search = chartWikiArtistKey(name);
+  if (!search) return Promise.resolve('');
+  var url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=' + encodeURIComponent(search) + '&gsrlimit=6&prop=pageimages&pithumbsize=500';
+  return fetchJsonWithTimeout(url, 5200).then(function(j){
+    if (!j || !j.query || !j.query.pages) return '';
+    var pages = Object.keys(j.query.pages).map(function(k){ return j.query.pages[k]; });
+    pages.sort(function(a,b){ return (a.index || 999) - (b.index || 999); });
+    for (var i=0;i<pages.length;i++) {
+      var thumb = pages[i] && pages[i].thumbnail && pages[i].thumbnail.source;
+      thumb = safeWikiThumb(thumb);
+      if (thumb) return thumb;
+    }
+    return '';
+  });
+}
+
+function fetchChartWikiThumb(name) {
+  var candidates = chartWikiCandidates(name);
+  var chain = Promise.resolve('');
+  candidates.forEach(function(c){
+    chain = chain.then(function(src){ return src || fetchWikiSummaryThumb(c); });
+  });
+  return chain.then(function(src){ return src || fetchWikiSearchThumb(name); });
 }
 
 function hydrateChartWikipediaImages() {
-  var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-loaded])'));
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-requested])'));
   if (!nodes.length) return;
 
-  var cacheKey = 'mm_chart_wiki_img_v4';
+  var cacheKey = 'mm_chart_wiki_img_v7';
   var cache = {};
   try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}') || {}; } catch(e) { cache = {}; }
 
-  function applyToName(name, src) {
-    if (!src) return;
-    var selectorName = String(name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-    document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + selectorName + '"]').forEach(function(node){
-      if (node.getAttribute('data-wiki-loaded') === 'done') return;
-      var img = document.createElement('img');
-      img.src = src;
-      img.alt = '';
-      img.loading = 'lazy';
-      img.referrerPolicy = 'no-referrer';
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.style.borderRadius = 'inherit';
-      img.onerror = function(){ node.setAttribute('data-wiki-loaded','fail'); };
-      img.onload = function(){
-        node.innerHTML = '';
-        node.appendChild(img);
-        node.setAttribute('data-wiki-loaded','done');
-      };
-    });
-  }
-
-  function wikiTitle(name) {
-    var n = String(name || '').trim();
-    var alias = {
-      'Dan + Shay': 'Dan_+_Shay',
-      'ICE NINE KILLS': 'Ice_Nine_Kills',
-      'STELLA LEFTY': 'STELLA_LEFTY'
-    };
-    return alias[n] || n.replace(/ /g, '_');
-  }
-
-  function wikiCandidates(name) {
-    var n = String(name || '').trim();
-    var clean = n.split(' & ')[0].split(' feat.')[0].split(' featuring ')[0].trim();
-    var alias = {
-      'Dan + Shay': ['Dan_+_Shay', 'Dan + Shay'],
-      'ICE NINE KILLS': ['Ice_Nine_Kills', 'Ice Nine Kills'],
-      'STELLA LEFTY': ['STELLA_LEFTY', 'Stella Lefty'],
-      'Marshmello': ['Marshmello'],
-      'Kelsea Ballerini': ['Kelsea_Ballerini'],
-      'Ella Langley': ['Ella Langley'],
-      'Gracie Abrams': ['Gracie Abrams'],
-      'Benson Boone': ['Benson Boone'],
-      'Taylor Swift': ['Taylor Swift'],
-      'Blake Shelton': ['Blake Shelton'],
-      'Jelly Roll': ['Jelly Roll (singer)', 'Jelly Roll'],
-      'Robyn': ['Robyn', 'Robyn (singer)'],
-      'The Rolling Stones': ['The Rolling Stones'],
-      'Carly Pearce': ['Carly Pearce'],
-      'Riley Green': ['Riley Green'],
-      'Luke Bryan': ['Luke Bryan'],
-      'Katy Perry': ['Katy Perry'],
-      'Keith Urban': ['Keith Urban'],
-      'Shaboozey': ['Shaboozey'],
-      'Stray Kids': ['Stray Kids']
-    };
-    var arr = [];
-    function add(x){ x = String(x || '').trim(); if (x && arr.indexOf(x) === -1) arr.push(x); }
-    (alias[n] || []).forEach(add);
-    (alias[clean] || []).forEach(add);
-    add(n);
-    add(clean);
-    add(clean + ' singer');
-    add(clean + ' musician');
-    return arr;
-  }
-
-  function safeWikiThumb(src) {
-    if (!src) return '';
-    try {
-      var u = new URL(src, window.location.href);
-      var allowedHost = /(^|\.)wikimedia\.org$/i.test(u.hostname) || u.hostname === 'upload.wikimedia.org';
-      return (u.protocol === 'https:' && allowedHost) ? u.href : '';
-    } catch(e) { return ''; }
-  }
-
-  function fetchJsonWithTimeout(url, ms) {
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, ms || 4500) : null;
-    return fetch(url, { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
-      .then(function(r){ if (timer) clearTimeout(timer); return r.ok ? r.json() : null; })
-      .catch(function(){ if (timer) clearTimeout(timer); return null; });
-  }
-
-  function fetchWikiExact(title) {
-    var pageTitle = String(title || '').replace(/ /g, '_');
-    var restUrl = 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(pageTitle);
-    var apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&pithumbsize=500&origin=*&titles=' + encodeURIComponent(title);
-    return fetchJsonWithTimeout(restUrl, 4200)
-      .then(function(d){
-        var src = d && d.thumbnail && d.thumbnail.source;
-        if (safeWikiThumb(src)) return safeWikiThumb(src);
-        return fetchJsonWithTimeout(apiUrl, 4200).then(function(j){
-          if (!j || !j.query || !j.query.pages) return '';
-          var pages = j.query.pages;
-          for (var k in pages) {
-            var thumb = pages[k] && pages[k].thumbnail && pages[k].thumbnail.source;
-            if (safeWikiThumb(thumb)) return safeWikiThumb(thumb);
-          }
-          return '';
-        });
-      });
-  }
-
-  function fetchWikiSearch(name) {
-    var search = String(name || '').trim();
-    var url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=' + encodeURIComponent(search) + '&gsrlimit=5&prop=pageimages&pithumbsize=500';
-    return fetchJsonWithTimeout(url, 5000).then(function(j){
-      if (!j || !j.query || !j.query.pages) return '';
-      var pages = Object.keys(j.query.pages).map(function(k){ return j.query.pages[k]; });
-      pages.sort(function(a,b){ return (a.index || 999) - (b.index || 999); });
-      for (var i=0;i<pages.length;i++) {
-        var thumb = pages[i] && pages[i].thumbnail && pages[i].thumbnail.source;
-        if (safeWikiThumb(thumb)) return safeWikiThumb(thumb);
-      }
-      return '';
-    });
-  }
-
-  function fetchWikiImage(name) {
-    var candidates = wikiCandidates(name);
-    var chain = Promise.resolve('');
-    candidates.forEach(function(c){
-      chain = chain.then(function(src){ return src || fetchWikiExact(c); });
-    });
-    return chain.then(function(src){ return src || fetchWikiSearch(name); });
-  }
-
-
-  var names = [];
   nodes.forEach(function(node){
     var name = node.getAttribute('data-wiki-name') || '';
     if (!name) return;
-    node.setAttribute('data-wiki-loaded','loading');
-    if (cache[name]) applyToName(name, cache[name]);
-    // ยัง fetch ซ้ำเบา ๆ ได้เพื่อแก้กรณี cache เก่า/รูปเดิมเสีย
-    if (names.indexOf(name) === -1) names.push(name);
-  });
+    node.setAttribute('data-wiki-requested', '1');
+    var key = chartWikiArtistKey(name);
 
-  names.slice(0, 50).forEach(function(name){
-    fetchWikiImage(name)
-      .then(function(src){
-        if (!src) throw new Error('no wiki image');
-        cache[name] = src;
-        try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch(e) {}
-        applyToName(name, src);
-      })
-      .catch(function(){
-        var selectorName = String(name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-        document.querySelectorAll('.chart-wiki-art[data-wiki-name="' + selectorName + '"]').forEach(function(node){ node.setAttribute('data-wiki-loaded','fail'); });
-      });
+    // ถ้าเคยได้รูปแล้ว ใส่ทันที แต่ยังไม่ block การโหลดหน้า
+    if (cache[key]) {
+      setWikiImgToEl(node, cache[key]);
+      return;
+    }
+
+    fetchChartWikiThumb(key).then(function(src){
+      if (!src) { node.setAttribute('data-wiki-loaded', 'fail'); return; }
+      cache[key] = src;
+      try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch(e) {}
+      setWikiImgToEl(node, src);
+    }).catch(function(){
+      node.setAttribute('data-wiki-loaded', 'fail');
+    });
   });
 }
 
@@ -1925,7 +2001,7 @@ function renderChartTeaser(songs) {
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event, this,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
         (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" onclick="switchTab(\'chart\');setTimeout(function(){playChartMV(null,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')},80);return false;" title="YouTube MV">' + YT_ICON + '</a>' : '') +
       '</div></div>';
@@ -1998,7 +2074,7 @@ function renderChartPage(songs) {
     '</div>' +
     renderChartMVPlayer(s1) +
     '<div class="chart-listen-btns">' +
-      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event, this,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
+      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
@@ -2016,7 +2092,7 @@ function renderChartPage(songs) {
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event, this,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
         (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" onclick="return playChartMV(event,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
       '</div></div>';
@@ -2106,7 +2182,7 @@ function doLoadYT() {
   wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytVideoId + '?autoplay=1&rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>';
 }
 
-// ---- Spotify URI handler (บัค #3 — เปิด app ก่อน fallback web) ----
+// ---- Spotify handler — open app first, fallback web in a new tab only ----
 function openSpotify(e, el, webUrl) {
   return openSpotifyUrl(e, el || (e && e.currentTarget), webUrl || (el && el.href));
 }
