@@ -431,8 +431,8 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <div class="chart-teaser">
   <div class="chart-teaser-header">
     <div class="chart-teaser-left">
-      <div class="chart-teaser-eyebrow">📊 Global Top Chart</div>
-      <div class="chart-teaser-title">เพลงฮิตทั่วโลกตอนนี้ 🔥</div>
+      <div class="chart-teaser-eyebrow">📊 Manual Top Chart</div>
+      <div class="chart-teaser-title">เพลงฮิตที่คัดไว้ตอนนี้ 🔥</div>
     </div>
     <button class="chart-teaser-btn" onclick="switchTab('chart')">
       ดูทั้งหมด
@@ -560,9 +560,9 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <!-- CHART PAGE -->
 <div class="page" id="pageChart">
 <div class="chart-page-wrap">
-  <div class="chart-page-eyebrow">📊 Global Top Chart</div>
-  <h1>เพลงฮิตทั่วโลก<br/><span class="g">ตอนนี้เล่น อะไรอยู่?</span></h1>
-  <p class="chart-page-sub">อัปเดตทุกวัน · ข้อมูลจาก Apple Music · กดฟังได้ทันทีใน Spotify 🎧</p>
+  <div class="chart-page-eyebrow">📊 Manual Top Chart</div>
+  <h1>เพลงฮิตที่คัดไว้<br/><span class="g">ตอนนี้เล่นอะไรอยู่?</span></h1>
+  <p class="chart-page-sub">ข้อมูลชาร์ตแบบ Manual · แก้รายชื่อเพลงเองได้ในไฟล์ · กดฟังได้ทันทีใน Spotify 🎧</p>
   <div id="chartPageContent">
     <div class="chart-loading">
       <div class="chart-dots"><span></span><span></span><span></span></div>
@@ -1441,184 +1441,63 @@ function chartSpotifyWeb(title, artist) {
 }
 
 // ============================================================
-// fetchChartData — 3-layer strategy:
-//   Layer 1: localStorage cache (instant, 6hr TTL)
-//   Layer 2: browser → iTunes RSS directly (fast, no cold start)
-//   Layer 3: browser → /api/charts fallback (if CORS fails)
+// STATIC CHART DATABASE — แก้รายชื่อเพลงตรงนี้ได้เลย
+// ไม่โหลด iTunes / ไม่เรียก /api/charts ทำให้หน้า Charts แสดงผลทันที
+// วิธีอัปเดต: แก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง แล้วอัปโหลดไฟล์ใหม่
+// artwork และ appleUrl ใส่ค่าว่างได้ ถ้าไม่อยากให้หน้าเว็บโหลดรูป/ลิงก์จากภายนอก
 // ============================================================
-var CHART_CACHE_KEY = 'muzik_chart_v2';
-var CHART_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 ชั่วโมง
+var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569';
+var STATIC_CHART_SOURCE_LABEL = 'Muzik Match Manual Chart';
 
-function parseItunesRSS(data) {
-  var entries = (data && data.feed && data.feed.entry) || [];
-  return entries.map(function(e, i) {
-    var images = Array.isArray(e['im:image']) ? e['im:image'] : [];
-    var artRaw = (images[images.length - 1] || {}).label || '';
-    var artwork = artRaw.replace(/\/\d+x\d+bb\./, '/300x300bb.');
-    var links = Array.isArray(e.link) ? e.link : (e.link ? [e.link] : []);
-    var appleUrl = '';
-    for (var li = 0; li < links.length; li++) {
-      if (links[li] && links[li].attributes && links[li].attributes.type === 'text/html') {
-        appleUrl = links[li].attributes.href || ''; break;
-      }
-    }
-    if (!appleUrl && links[0] && links[0].attributes) appleUrl = links[0].attributes.href || '';
-    return {
-      rank: i + 1,
-      title: (e['im:name'] || {}).label || '',
-      artist: (e['im:artist'] || {}).label || '',
-      artwork: artwork,
-      appleUrl: appleUrl
-    };
-  }).filter(function(s) { return s.title && s.artist; });
-}
-
-function loadChartCache() {
-  try {
-    var raw = localStorage.getItem(CHART_CACHE_KEY);
-    if (!raw) return null;
-    var obj = JSON.parse(raw);
-    if (!obj || !obj.ts || !obj.songs || !obj.songs.length) return null;
-    if (Date.now() - obj.ts > CHART_CACHE_TTL) return null; // หมดอายุ
-    return obj.songs;
-  } catch(e) { return null; }
-}
-
-function saveChartCache(songs) {
-  try {
-    localStorage.setItem(CHART_CACHE_KEY, JSON.stringify({ ts: Date.now(), songs: songs }));
-  } catch(e) {}
-}
-
-function loadAnyChartCache() {
-  // ใช้ cache เก่าเป็น fallback ได้ แม้ TTL หมดอายุ เพื่อไม่ให้หน้า chart ค้าง loading
-  try {
-    var raw = localStorage.getItem(CHART_CACHE_KEY);
-    if (!raw) return null;
-    var obj = JSON.parse(raw);
-    if (!obj || !obj.songs || !obj.songs.length) return null;
-    return obj.songs;
-  } catch(e) { return null; }
-}
-
-var CHART_FALLBACK_SONGS = [
-  {rank:1,title:'Global Top Songs',artist:'Apple Music Charts',artwork:'',appleUrl:'https://music.apple.com/us/charts/songs'},
-  {rank:2,title:'Viral Hits',artist:'Spotify Search',artwork:'',appleUrl:'https://music.apple.com/us/charts/songs'},
-  {rank:3,title:'Trending Pop',artist:'Muzik Match',artwork:'',appleUrl:'https://music.apple.com/us/charts/songs'},
-  {rank:4,title:'Fresh Music Friday',artist:'Muzik Match',artwork:'',appleUrl:'https://music.apple.com/us/charts/songs'},
-  {rank:5,title:'Today’s Hits',artist:'Muzik Match',artwork:'',appleUrl:'https://music.apple.com/us/charts/songs'}
+var STATIC_CHART_SONGS = [
+  {rank:1,title:'ใส่ชื่อเพลงอันดับ 1',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:2,title:'ใส่ชื่อเพลงอันดับ 2',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:3,title:'ใส่ชื่อเพลงอันดับ 3',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:4,title:'ใส่ชื่อเพลงอันดับ 4',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:5,title:'ใส่ชื่อเพลงอันดับ 5',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:6,title:'ใส่ชื่อเพลงอันดับ 6',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:7,title:'ใส่ชื่อเพลงอันดับ 7',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:8,title:'ใส่ชื่อเพลงอันดับ 8',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:9,title:'ใส่ชื่อเพลงอันดับ 9',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:10,title:'ใส่ชื่อเพลงอันดับ 10',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:11,title:'ใส่ชื่อเพลงอันดับ 11',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:12,title:'ใส่ชื่อเพลงอันดับ 12',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:13,title:'ใส่ชื่อเพลงอันดับ 13',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:14,title:'ใส่ชื่อเพลงอันดับ 14',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:15,title:'ใส่ชื่อเพลงอันดับ 15',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:16,title:'ใส่ชื่อเพลงอันดับ 16',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:17,title:'ใส่ชื่อเพลงอันดับ 17',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:18,title:'ใส่ชื่อเพลงอันดับ 18',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:19,title:'ใส่ชื่อเพลงอันดับ 19',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''},
+  {rank:20,title:'ใส่ชื่อเพลงอันดับ 20',artist:'ใส่ชื่อศิลปิน',artwork:'',appleUrl:''}
 ];
 
-function fetchWithTimeout(url, options, ms) {
-  options = options || {};
-  var controller = null;
-  var timer = null;
-  if (window.AbortController) {
-    controller = new AbortController();
-    options.signal = controller.signal;
-  }
-  return new Promise(function(resolve, reject) {
-    timer = setTimeout(function() {
-      if (controller) controller.abort();
-      reject(new Error('timeout'));
-    }, ms);
-    fetch(url, options).then(function(r) {
-      clearTimeout(timer);
-      resolve(r);
-    }).catch(function(e) {
-      clearTimeout(timer);
-      reject(e);
-    });
-  });
-}
-
-function fetchItunesCharts() {
-  return fetchWithTimeout('https://itunes.apple.com/us/rss/topsongs/limit=20/json', {
-    headers: { 'Accept': 'application/json' },
-    mode: 'cors'
-  }, 3500)
-  .then(function(r) {
-    if (!r.ok) throw new Error('iTunes ' + r.status);
-    return r.json();
-  })
-  .then(function(data) {
-    var songs = parseItunesRSS(data);
-    if (!songs.length) throw new Error('itunes empty');
-    return songs;
-  });
-}
-
-function fetchApiCharts() {
-  return fetchWithTimeout('/api/charts?limit=20', { headers: { 'Accept': 'application/json' } }, 3500)
-  .then(function(r) {
-    if (!r.ok) throw new Error('API ' + r.status);
-    return r.json();
-  })
-  .then(function(d) {
-    var songs = (d && d.songs && d.songs.length) ? d.songs : null;
-    if (!songs) throw new Error('api empty');
-    return songs;
-  });
+function normalizeStaticCharts() {
+  return STATIC_CHART_SONGS.map(function(s, i) {
+    return {
+      rank: s.rank || (i + 1),
+      title: s.title || ('เพลงอันดับ ' + (i + 1)),
+      artist: s.artist || 'ไม่ระบุศิลปิน',
+      artwork: s.artwork || '',
+      appleUrl: s.appleUrl || ''
+    };
+  }).filter(function(s) { return s.title && s.artist; }).slice(0, 20);
 }
 
 function fetchChartData(cb) {
-  // Layer 1: memory/cache ต้องตอบทันที เพื่อไม่ให้ UI ค้าง
-  if (chartData && chartData.length) { cb(null, chartData); return; }
-
-  var cached = loadChartCache();
-  if (cached) {
-    chartData = cached;
-    cb(null, chartData);
-    // refresh เงียบ ๆ ด้านหลัง ไม่ block ผู้ใช้
-    setTimeout(bgRefreshChart, 1200);
-    return;
-  }
-
-  // ถ้าไม่มี cache ให้ยิง API และ iTunes พร้อมกัน เอาอันที่ตอบสำเร็จก่อน
-  chartDataFetching = true;
-  var done = false;
-  var failed = 0;
-  function finish(err, songs, save) {
-    if (done) return;
-    if (songs && songs.length) {
-      done = true;
-      chartDataFetching = false;
-      chartData = songs;
-      if (save) saveChartCache(songs);
-      cb(null, songs);
-      return;
-    }
-    failed++;
-    if (failed >= 2) {
-      done = true;
-      chartDataFetching = false;
-      var stale = loadAnyChartCache();
-      if (stale && stale.length) { chartData = stale; cb(null, stale); return; }
-      // fallback สุดท้าย: ไม่ปล่อยให้หน้า chart ค้าง loading
-      chartData = CHART_FALLBACK_SONGS;
-      cb(null, CHART_FALLBACK_SONGS);
-    }
-  }
-
-  fetchApiCharts().then(function(songs){ finish(null, songs, true); }).catch(function(e){ finish(e); });
-  fetchItunesCharts().then(function(songs){ finish(null, songs, true); }).catch(function(e){ finish(e); });
+  // Static database: ตอบกลับทันทีในรอบ event loop ถัดไป เพื่อไม่ให้ UI ค้าง loading
+  if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
+  setTimeout(function() { cb(null, chartData); }, 0);
 }
 
 // คงชื่อ function เดิมไว้ เผื่อมีปุ่ม retry หรือโค้ดส่วนอื่นเรียกใช้
 function tryApiCharts(cb) {
-  fetchApiCharts().then(function(songs){ cb(null, songs); }).catch(function(e){ cb(e, null); });
+  fetchChartData(cb);
 }
 
 function bgRefreshChart() {
-  // background refresh ไม่ block UI
-  if (chartDataFetching) return;
-  chartDataFetching = true;
-  fetchItunesCharts()
-    .then(function(songs) {
-      if (songs.length) { chartData = songs; saveChartCache(songs); }
-      chartDataFetching = false;
-    })
-    .catch(function() { chartDataFetching = false; });
+  // ไม่มี background refresh แล้ว เพราะใช้ข้อมูล manual/static
+  return false;
 }
 
 function artImg(url, cls, ph) {
@@ -1666,7 +1545,7 @@ function renderChartPage(songs) {
 
   // hero #1 — ไม่มี YT embed แต่มีปุ่ม YouTube
   var heroHtml = '<div class="chart-hero-card">' +
-    '<div class="chart-hero-badge">🥇 #1 Global · Apple Music</div>' +
+    '<div class="chart-hero-badge">🥇 #1 Chart · Manual Update</div>' +
     '<div class="chart-hero-body">' +
       artImg(s1.artwork, 'chart-hero-art', '🎵') +
       '<div style="flex:1;min-width:0">' +
@@ -1674,7 +1553,7 @@ function renderChartPage(songs) {
         '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
         '<div class="chart-hero-tags">' +
           '<span class="chart-hero-tag">🏆 อันดับ 1</span>' +
-          '<span class="chart-hero-tag">Apple Music</span>' +
+          '<span class="chart-hero-tag">Manual Chart</span>' +
         '</div>' +
       '</div>' +
     '</div>' +
