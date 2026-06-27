@@ -2254,11 +2254,13 @@ function retryChart() {
 // ============================================================
 // switchTab — อัปเดตให้รองรับ chart tab + highlight nav
 // ============================================================
-function switchTab(tab) {
-  var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
+var _currentTab = 'home';
+var _pushingState = false; // กัน loop ระหว่าง switchTab และ popstate
 
-  // สำคัญ: ถ้าเข้า chart/home ให้ render จาก static database ก่อนเปลี่ยนหน้า
-  // เพื่อไม่ให้ผู้ใช้เห็นหน้ากำลังโหลด charts อีก
+function switchTab(tab, fromPopState) {
+  var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
+  if (!tabs[tab]) tab = 'home';
+
   if (tab === 'chart' || tab === 'home') {
     try { initChart(); } catch(e) { console.error('initChart error:', e); }
   }
@@ -2271,13 +2273,21 @@ function switchTab(tab) {
     page.classList.remove('reveal-page');
     if (isActive) { void page.offsetWidth; page.classList.add('reveal-page'); }
   });
-  // nav tab highlight
+
   var navChart = document.getElementById('navChart');
   var navPlaylist = document.getElementById('navPlaylist');
   if (navChart) navChart.classList.toggle('active', tab === 'chart');
   if (navPlaylist) navPlaylist.classList.toggle('active', tab === 'playlist');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (tab !== 'chart') { ytLoaded = false; }
+
+  // push history เฉพาะตอนที่ user กดเอง (ไม่ใช่ตอน popstate)
+  if (!fromPopState && tab !== _currentTab) {
+    _pushingState = true;
+    history.pushState({ tab: tab }, '', location.pathname + (tab !== 'home' ? '?p=' + tab : ''));
+    _pushingState = false;
+  }
+  _currentTab = tab;
 }
 function goHome() { switchTab('home'); }
 
@@ -2339,9 +2349,47 @@ document.addEventListener('DOMContentLoaded',function(){
   var pa = document.getElementById('plAgainBtn');
   if(ps) ps.addEventListener('click',doPlShuffle);
   if(pa) pa.addEventListener('click',doPlShuffle);
-  // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
   initChart();
   checkShareHash();
+
+  // ---- History API: ทำให้ browser back/forward ทำงานใน SPA ----
+  // ตั้ง initial state และ restore tab จาก URL ถ้ามี
+  var initTab = 'home';
+  try {
+    var sp = location.search ? new URLSearchParams(location.search) : null;
+    var urlTab = sp ? sp.get('p') : null;
+    if (urlTab && ['quiz','playlist','chart'].indexOf(urlTab) >= 0) initTab = urlTab;
+  } catch(e) {}
+  history.replaceState({ tab: initTab }, '', location.pathname + (initTab !== 'home' ? '?p=' + initTab : ''));
+  _currentTab = initTab;
+  if (initTab !== 'home') switchTab(initTab, true);
+
+  // popstate: จัดการปุ่ม back/forward ของ browser
+  window.addEventListener('popstate', function(e) {
+    if (_pushingState) return;
+    var tab = (e.state && e.state.tab) ? e.state.tab : 'home';
+
+    // ถ้ากำลังอยู่ใน quiz ให้ back ทีละ step ก่อน
+    if (_currentTab === 'quiz') {
+      var rs = document.getElementById('resultScreen');
+      var qs = document.getElementById('quizScreen');
+      if (rs && rs.classList.contains('active')) {
+        // result → กลับไป quiz question
+        history.pushState({ tab: 'quiz' }, '', '?p=quiz');
+        rs.classList.remove('active');
+        if (qs) { qs.classList.add('active'); }
+        return;
+      }
+      if (qs && qs.classList.contains('active') && currentQ > 0) {
+        // quiz mid — back ทีละคำถาม
+        history.pushState({ tab: 'quiz' }, '', '?p=quiz');
+        if (typeof prevQuestion === 'function') prevQuestion();
+        return;
+      }
+    }
+    // ทุกกรณีอื่น: switch ไปยัง tab ที่ history กำหนด
+    switchTab(tab, true);
+  });
 });
 
 // ============================================================
