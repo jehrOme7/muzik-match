@@ -2385,7 +2385,7 @@ function drawShareBanner(artistImgEl) {
   function glow(cx,cy,r,col){var g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,col);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();}
   glow(180,180,400,'rgba(124,58,237,0.22)');
   glow(900,900,360,'rgba(244,114,182,0.16)');
-  glow(540,500,'rgba(251,146,60,0.06)');
+  glow(540,500,300,'rgba(251,146,60,0.06)');
 
   // ---- HEADER — "Muzik-Match! คุณเหมาะกับศิลปินนี้" ----
   var headerY = 80;
