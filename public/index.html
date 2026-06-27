@@ -1441,18 +1441,32 @@ function chartSpotifyWeb(title, artist) {
 }
 
 function fetchChartData(cb) {
-  if (chartData) { cb(null, chartData); return; }
-  if (chartDataFetching) { setTimeout(function(){ fetchChartData(cb); }, 300); return; }
+  if (chartData && chartData.length) { cb(null, chartData); return; }
+  if (chartDataFetching) { setTimeout(function(){ fetchChartData(cb); }, 400); return; }
   chartDataFetching = true;
+  // timeout 12s กัน fetch ค้าง
+  var done = false;
+  var timer = setTimeout(function(){
+    if (!done) { done = true; chartDataFetching = false; cb(new Error('timeout'), null); }
+  }, 12000);
   fetch('/api/charts?limit=20')
-    .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function(d){
-      chartData = d.songs || [];
+      if (done) return;
+      done = true; clearTimeout(timer);
+      chartData = (d.songs && d.songs.length) ? d.songs : null;
       chartDataFetching = false;
+      if (!chartData) { cb(new Error('empty'), null); return; }
       cb(null, chartData);
     })
     .catch(function(e){
+      if (done) return;
+      done = true; clearTimeout(timer);
       chartDataFetching = false;
+      chartData = null;
       cb(e, null);
     });
 }
@@ -1603,22 +1617,45 @@ function openSpotify(e, webUrl) {
 }
 
 // ---- Load chart data once on init ----
-var chartInited = false;
+// chart state: 'idle' | 'loading' | 'ok' | 'fail'
+var chartState = 'idle';
 function initChart() {
-  if (chartInited) return;
-  chartInited = true;
+  // ถ้า ok อยู่แล้ว ไม่ต้อง fetch ใหม่ แต่ render ถ้า DOM พร้อม
+  if (chartState === 'ok' && chartData && chartData.length) {
+    renderChartTeaser(chartData);
+    renderChartPage(chartData);
+    return;
+  }
+  // ถ้ากำลัง loading อยู่ ไม่ต้อง fetch ซ้ำ
+  if (chartState === 'loading') return;
+  chartState = 'loading';
+  // แสดง loading state
+  ['chartPreview','chartPageContent'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.innerHTML.indexOf('chart-loading') < 0 && el.innerHTML.indexOf('chart-row') < 0) {
+      el.innerHTML = '<div class="chart-loading"><div class="chart-dots"><span></span><span></span><span></span></div>กำลังโหลด chart...</div>';
+    }
+  });
   fetchChartData(function(err, songs) {
     if (err || !songs || !songs.length) {
-      var els = ['chartPreview','chartPageContent'];
-      els.forEach(function(id){
+      chartState = 'fail';
+      var errHtml = '<div class="chart-error">⚠️ โหลด chart ไม่ได้ในขณะนี้<br/><small style="font-size:11px;color:var(--text3)">อาจเกิดจาก network หรือ server ชั่วคราว</small><br/><button class="chart-retry" onclick="retryChart()">🔄 ลองใหม่</button></div>';
+      ['chartPreview','chartPageContent'].forEach(function(id){
         var el = document.getElementById(id);
-        if (el) el.innerHTML = '<div class="chart-error">⚠️ โหลด chart ไม่ได้ในขณะนี้<br/><button class="chart-retry" onclick="chartInited=false;chartData=null;initChart()">🔄 ลองใหม่</button></div>';
+        if (el) el.innerHTML = errHtml;
       });
       return;
     }
+    chartState = 'ok';
     renderChartTeaser(songs);
     renderChartPage(songs);
   });
+}
+function retryChart() {
+  chartState = 'idle';
+  chartData = null;
+  chartDataFetching = false;
+  initChart();
 }
 
 // ============================================================
@@ -1640,8 +1677,11 @@ function switchTab(tab) {
   if (navChart) navChart.classList.toggle('active', tab === 'chart');
   if (navPlaylist) navPlaylist.classList.toggle('active', tab === 'playlist');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // โหลด chart ครั้งแรกที่เข้า
-  if (tab === 'chart' || tab === 'home') initChart();
+  // เรียก initChart ทุกครั้งที่เข้าหน้า chart หรือ home
+  // initChart จะ handle state เองว่าต้อง fetch ใหม่หรือแค่ re-render
+  if (tab === 'chart' || tab === 'home') {
+    setTimeout(initChart, 50); // delay เล็กน้อยให้ DOM render ก่อน
+  }
   // reset YT เมื่อออกจากหน้า chart
   if (tab !== 'chart') { ytLoaded = false; }
 }
@@ -1679,15 +1719,16 @@ function daShuffle() {
   if(artist.tags&&artist.tags[0]) th+='<span class="da-tag">'+esc(artist.tags[0])+'</span>';
   document.getElementById('daTags').innerHTML = th;
 
-  // Spotify — BUG #3 FIX: ใช้ URI เพื่อเปิด app ก่อน
-  var spUri = artist.sp || ('spotify:search:this is '+encodeURIComponent(artist.name||''));
-  var spWeb = artist.sp
-    ? artist.sp.replace('spotify:search:','https://open.spotify.com/search/').replace('/playlists','') + '/playlists'
-    : ('https://open.spotify.com/search/this%20is%20'+encodeURIComponent(artist.name||'')+'/playlists');
-  document.getElementById('daSpName').textContent = 'This Is '+(artist.name||'');
+  // Spotify: ใช้ openSpotifyDeepLink ที่มีอยู่แล้ว (รองรับ app open + fallback web)
+  var daSpQuery = 'this is ' + String(artist.name || '').trim();
+  document.getElementById('daSpName').textContent = 'This Is ' + (artist.name || '');
   var spLink = document.getElementById('daSpLink');
-  spLink.href = spUri;
-  spLink.onclick = function(e){ e.preventDefault(); window.location.href=spUri; setTimeout(function(){window.open(spWeb,'_blank');},1500); };
+  // ตั้ง href เป็น web URL เผื่อ browser เปิด default
+  spLink.href = spotifyPlaylistWebSearchUrl(daSpQuery);
+  spLink.onclick = function(e) {
+    return openSpotifyDeepLink(e, spLink, daSpQuery,
+      spotifyPlaylistWebSearchUrl(daSpQuery), 'playlist');
+  };
 
   var imgEl = document.getElementById('daImg');
   imgEl.innerHTML = artist.emoji||'🎵'; imgEl.style.fontSize='36px';
@@ -1704,8 +1745,8 @@ document.addEventListener('DOMContentLoaded',function(){
   var pa = document.getElementById('plAgainBtn');
   if(ps) ps.addEventListener('click',doPlShuffle);
   if(pa) pa.addEventListener('click',doPlShuffle);
-  // โหลด chart ทันทีที่เปิดหน้าแรก
-  initChart();
+  // โหลด chart หลัง DOM พร้อม — delay เล็กน้อยกัน race condition
+  setTimeout(initChart, 100);
 });
 </script>
 </body>
