@@ -253,51 +253,36 @@ function openSpotifyPlaylistDirect(event, el){
   var appUri = spotifyPlaylistAppUriFromWebUrl(webUrl);
   if(el){ el.target = '_blank'; el.rel = 'noopener'; }
 
-  var appLikelyOpened = false;
-  var spotifyTab = null;
+  var appOpenedOrPromptActive = false;
   var fallbackTimer = null;
   var cleanupTimer = null;
+
   function cleanup(){
-    window.removeEventListener('blur', markAppLikelyOpened);
-    window.removeEventListener('pagehide', markAppLikelyOpened);
+    window.removeEventListener('pagehide', markAppOpened);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     if(fallbackTimer) clearTimeout(fallbackTimer);
     if(cleanupTimer) clearTimeout(cleanupTimer);
   }
-  function markAppLikelyOpened(){
-    appLikelyOpened = true;
-    cleanup();
-    try{ if(spotifyTab && !spotifyTab.closed){ spotifyTab.close(); } }catch(e){}
-  }
-  function onVisibilityChange(){ if(document.hidden) markAppLikelyOpened(); }
-  window.addEventListener('blur', markAppLikelyOpened, {once:true});
-  window.addEventListener('pagehide', markAppLikelyOpened, {once:true});
+  function markAppOpened(){ appOpenedOrPromptActive = true; }
+  function onVisibilityChange(){ if(document.hidden) markAppOpened(); }
+
+  window.addEventListener('pagehide', markAppOpened, {once:true});
   document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
-  try{
-    spotifyTab = window.open('about:blank', '_blank');
-    if(spotifyTab){
-      try{ spotifyTab.opener = null; }catch(e){}
-      spotifyTab.location.href = appUri;
-    }else{
-      window.open(webUrl, '_blank', 'noopener');
-      cleanup();
-      return false;
-    }
-  }catch(e){
-    window.open(webUrl, '_blank', 'noopener');
-    cleanup();
-    return false;
-  }
+
+  // SPOTIFY LOGIC — ห้ามเปลี่ยนโดยไม่ขออนุญาต:
+  // กด Spotify > browser ถาม Allow/Open Spotify > มีแอปเปิดแอป > ไม่มีแอป fallback web ใน new tab
+  try{ window.location.href = appUri; }catch(e){}
+
   fallbackTimer = setTimeout(function(){
-    if(!appLikelyOpened && document.visibilityState !== 'hidden'){
-      cleanup();
-      try{
-        if(spotifyTab && !spotifyTab.closed){ spotifyTab.location.href = webUrl; }
-        else { window.open(webUrl, '_blank', 'noopener'); }
-      }catch(e){ window.open(webUrl, '_blank', 'noopener'); }
+    var pageStillHere = document.visibilityState !== 'hidden';
+    var pageHasFocus = !document.hasFocus || document.hasFocus();
+    if(!appOpenedOrPromptActive && pageStillHere && pageHasFocus){
+      window.open(webUrl, '_blank', 'noopener');
     }
-  }, 1700);
-  cleanupTimer = setTimeout(cleanup, 5000);
+    cleanup();
+  }, 2400);
+
+  cleanupTimer = setTimeout(cleanup, 6000);
   return false;
 }
 

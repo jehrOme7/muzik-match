@@ -1497,66 +1497,43 @@ function openSpotifyUrl(event, el, url, query, type){
     el.rel = 'noopener';
   }
 
-  var appLikelyOpened = false;
+  var appOpenedOrPromptActive = false;
   var fallbackTimer = null;
   var cleanupTimer = null;
-  var appFrame = null;
 
   function cleanup(){
-    window.removeEventListener('blur', markAppLikelyOpened);
-    window.removeEventListener('pagehide', markAppLikelyOpened);
+    window.removeEventListener('pagehide', markAppOpened);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     if(fallbackTimer) clearTimeout(fallbackTimer);
     if(cleanupTimer) clearTimeout(cleanupTimer);
-    if(appFrame && appFrame.parentNode){
-      setTimeout(function(){
-        try{ if(appFrame && appFrame.parentNode) appFrame.parentNode.removeChild(appFrame); }catch(e){}
-      }, 800);
-    }
   }
-  function markAppLikelyOpened(){
-    appLikelyOpened = true;
-    cleanup();
+  function markAppOpened(){
+    appOpenedOrPromptActive = true;
   }
   function onVisibilityChange(){
-    if(document.hidden) markAppLikelyOpened();
+    if(document.hidden) markAppOpened();
   }
 
-  window.addEventListener('blur', markAppLikelyOpened, {once:true});
-  window.addEventListener('pagehide', markAppLikelyOpened, {once:true});
+  window.addEventListener('pagehide', markAppOpened, {once:true});
   document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
 
-  // App-first โดยไม่เปลี่ยนหน้าเว็บหลัก:
-  // ลองยิง spotify: URI จาก iframe ที่ซ่อนอยู่ก่อน เพื่อให้ browser เปิด Spotify app
-  // ถ้า app ไม่เปิด/หน้าไม่ blur จึง fallback เป็น Spotify web ใน new tab เท่านั้น
+  // SPOTIFY LOGIC — ห้ามเปลี่ยนโดยไม่ขออนุญาต:
+  // 1) กด Spotify แล้วเรียก spotify: URI จาก user gesture โดยตรง เพื่อให้ browser เด้งถาม Allow/Open Spotify
+  // 2) ถ้าผู้ใช้กด Allow และมีแอป Spotify ให้เปิดแอป
+  // 3) ถ้าไม่มีแอป/เปิดไม่ได้ ค่อย fallback ไป Spotify web ใน new tab เท่านั้น
+  // 4) ห้ามพาหน้าเว็บ Muzik Match ปัจจุบันไป Spotify web
   try{
-    appFrame = document.createElement('iframe');
-    appFrame.style.display = 'none';
-    appFrame.style.width = '0';
-    appFrame.style.height = '0';
-    appFrame.style.border = '0';
-    appFrame.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(appFrame);
-    appFrame.src = appUri;
-  }catch(e){
-    try{
-      var appLink = document.createElement('a');
-      appLink.href = appUri;
-      appLink.target = '_blank';
-      appLink.rel = 'noopener';
-      appLink.style.display = 'none';
-      document.body.appendChild(appLink);
-      appLink.click();
-      setTimeout(function(){ try{ document.body.removeChild(appLink); }catch(e){} }, 500);
-    }catch(e2){}
-  }
+    window.location.href = appUri;
+  }catch(e){}
 
   fallbackTimer = setTimeout(function(){
-    if(!appLikelyOpened && document.visibilityState !== 'hidden'){
-      cleanup();
+    var pageStillHere = document.visibilityState !== 'hidden';
+    var pageHasFocus = !document.hasFocus || document.hasFocus();
+    if(!appOpenedOrPromptActive && pageStillHere && pageHasFocus){
       window.open(webUrl, '_blank', 'noopener');
     }
-  }, 2200);
+    cleanup();
+  }, 2400);
 
   cleanupTimer = setTimeout(cleanup, 6000);
   return false;
