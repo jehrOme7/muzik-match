@@ -269,35 +269,79 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   .pl-result-actions{flex-direction:column}
 }
 
+/* ===== GLOBAL CHART SECTION ===== */
+.chart-section{max-width:720px;margin:0 auto;padding:0 24px 56px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.chart-header-left{}
+.chart-eyebrow{font-size:12px;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.chart-title{font-size:clamp(20px,3vw,26px);font-weight:800;color:var(--text);letter-spacing:-.02em}
+.chart-see-all{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fb923c;text-decoration:none;padding:7px 14px;border:1px solid rgba(251,146,60,.25);border-radius:10px;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.chart-see-all:hover{background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.4)}
+
+/* chart card grid */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chart-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:all .18s;cursor:default}
+.chart-item:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px)}
+.chart-rank{font-size:13px;font-weight:900;color:var(--text3);min-width:20px;text-align:right;flex-shrink:0}
+.chart-rank.top3{color:#fb923c}
+.chart-art{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
+.chart-art-ph{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,rgba(251,146,60,.2),rgba(124,58,237,.15));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.chart-info{flex:1;min-width:0}
+.chart-song{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-artist{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.chart-links{display:flex;gap:5px;flex-shrink:0}
+.chart-link-btn{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:all .15s;text-decoration:none;flex-shrink:0}
+.chart-link-apple{background:rgba(255,255,255,.06);color:var(--text2)}
+.chart-link-apple:hover{background:rgba(255,255,255,.12)}
+.chart-link-sp{background:rgba(29,185,84,.1);color:var(--green)}
+.chart-link-sp:hover{background:rgba(29,185,84,.2)}
+
+/* loading / error state */
+.chart-loading{text-align:center;padding:32px 0;color:var(--text3);font-size:13px}
+.chart-loading-dots{display:flex;justify-content:center;gap:5px;margin-bottom:12px}
+.chart-loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:chartDot .9s ease-in-out infinite}
+.chart-loading-dots span:nth-child(2){animation-delay:.15s}
+.chart-loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes chartDot{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+.chart-error{text-align:center;padding:24px;color:var(--text3);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:14px}
+.chart-retry-btn{margin-top:10px;padding:8px 18px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);color:#fb923c;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.chart-retry-btn:hover{background:rgba(251,146,60,.18)}
+
+/* top-1 hero card */
+.chart-hero{background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(124,58,237,.07));border:1.5px solid rgba(251,146,60,.22);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center;margin-bottom:10px;grid-column:1/-1}
+.chart-hero-art{width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
+.chart-hero-art-ph{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,rgba(251,146,60,.25),rgba(124,58,237,.2));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px}
+.chart-hero-rank{font-size:10px;font-weight:700;color:#fb923c;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.2);border-radius:5px;padding:2px 7px;display:inline-block;margin-bottom:5px}
+.chart-hero-song{font-size:16px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:3px;line-height:1.3}
+.chart-hero-artist{font-size:12px;color:var(--text3);margin-bottom:10px}
+.chart-hero-btns{display:flex;gap:7px}
+.chart-hero-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:all .15s;border:none}
+.chart-hero-btn-apple{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid var(--border2)}
+.chart-hero-btn-apple:hover{background:rgba(255,255,255,.12)}
+.chart-hero-btn-sp{background:rgba(29,185,84,.12);color:var(--green);border:1px solid rgba(29,185,84,.2)}
+.chart-hero-btn-sp:hover{background:rgba(29,185,84,.2)}
+
 /* ===== DAILY ARTIST SECTION ===== */
 .daily-section{max-width:720px;margin:0 auto;padding:0 24px 72px}
 .daily-label{text-align:center;font-size:12px;font-weight:700;color:#f472b6;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 .daily-title{text-align:center;font-size:clamp(20px,3vw,28px);font-weight:800;color:var(--text);margin-bottom:32px;letter-spacing:-.02em}
-
-/* card wrapper */
-.da-card{background:var(--card);border:1.5px solid var(--border2);border-radius:24px;padding:28px;transition:border-color .2s;position:relative;overflow:hidden}
+.da-card{background:var(--card);border:1.5px solid var(--border2);border-radius:24px;padding:28px;position:relative;overflow:hidden}
 .da-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(244,114,182,.05),rgba(124,58,237,.04));pointer-events:none}
-
-/* idle state */
 .da-idle{text-align:center;padding:16px 0 4px}
 .da-idle-emoji{font-size:64px;margin-bottom:14px;display:block;animation:bouncy 3s ease-in-out infinite}
 .da-idle-text{font-size:15px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.8;margin-bottom:6px}
 .da-idle-hint{font-size:12px;color:var(--text3);margin-bottom:22px}
-
-/* result state */
 .da-result{display:none;animation:fadeUp .4s ease}
 .da-top{display:flex;gap:18px;align-items:flex-start;margin-bottom:16px}
-.da-img{width:90px;height:90px;border-radius:20px;background:linear-gradient(135deg,rgba(244,114,182,.25),rgba(124,58,237,.2));border:2px solid rgba(244,114,182,.2);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;overflow:hidden;transition:transform .3s}
+.da-img{width:90px;height:90px;border-radius:20px;background:linear-gradient(135deg,rgba(244,114,182,.25),rgba(124,58,237,.2));border:2px solid rgba(244,114,182,.2);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;overflow:hidden}
 .da-img img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .da-info{flex:1;min-width:0}
 .da-pool-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:6px;background:rgba(244,114,182,.12);color:#f472b6;border:1px solid rgba(244,114,182,.2)}
 .da-name{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-.03em;margin-bottom:6px;line-height:1.2}
-.da-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0}
+.da-tags{display:flex;flex-wrap:wrap;gap:4px}
 .da-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--text2)}
 .da-tag.nat{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.2);color:var(--purple)}
 .da-bio{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.85;margin-bottom:18px}
-
-/* spotify card inside daily */
 .da-sp-card{background:rgba(29,185,84,.06);border:1.5px solid rgba(29,185,84,.22);border-radius:14px;padding:14px 16px;margin-bottom:12px}
 .da-sp-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .da-sp-icon{width:46px;height:46px;background:rgba(29,185,84,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
@@ -305,23 +349,19 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .da-sp-sub{font-size:11px;color:var(--text3);margin-top:2px}
 .da-sp-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-decoration:none}
 .da-sp-btn:hover{background:var(--green2);transform:translateY(-1px)}
-
-/* action buttons */
 .da-actions{display:flex;gap:8px;margin-top:4px}
 .da-reshuffle{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);border-radius:12px;color:#f472b6;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
 .da-reshuffle:hover{background:rgba(244,114,182,.14);border-color:rgba(244,114,182,.35)}
 .da-home{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .da-home:hover{border-color:rgba(255,255,255,.14);color:var(--text2)}
-
-/* shuffle btn (idle) */
 .da-shuffle-btn{width:100%;padding:15px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 20px rgba(219,39,119,.3);display:flex;align-items:center;justify-content:center;gap:9px}
 .da-shuffle-btn:hover{transform:translateY(-2px);box-shadow:0 7px 28px rgba(219,39,119,.4)}
-
-/* flip animation */
 .da-flip{animation:daFlip .35s ease}
-@keyframes daFlip{0%{transform:rotateY(0deg) scale(1)}50%{transform:rotateY(90deg) scale(.95);opacity:.4}100%{transform:rotateY(0deg) scale(1);opacity:1}}
+@keyframes daFlip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(.95);opacity:.4}100%{transform:rotateY(0) scale(1);opacity:1}}
 
 @media(max-width:600px){
+  .chart-grid{grid-template-columns:1fr}
+  .chart-hero{grid-column:auto}
   .da-top{flex-direction:column;gap:12px}
   .da-img{width:72px;height:72px}
   .da-actions{flex-direction:column}
@@ -364,6 +404,26 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
       <div class="how-step"><div class="how-step-num">2️⃣</div><h3>ตอบคำถาม</h3><p>5 คำถามง่ายๆ เกี่ยวกับความรู้สึกและบรรยากาศที่ชอบ ไม่มีผิดไม่มีถูก — แค่ตอบตามใจ 💭</p></div>
       <div class="how-step"><div class="how-step-num">3️⃣</div><h3>รับ Playlist</h3><p>เจอบุคลิกดนตรีของคุณ พร้อมศิลปินที่ match และลิงก์ Spotify เปิดฟังได้เลยทันที 🎧</p></div>
     </div>
+  </div>
+</div>
+<!-- GLOBAL CHART SECTION -->
+<div class="chart-section">
+  <div class="chart-header">
+    <div class="chart-header-left">
+      <div class="chart-eyebrow">📊 Global Top Chart</div>
+      <div class="chart-title">เพลงฮิตทั่วโลกตอนนี้ 🔥</div>
+    </div>
+    <a class="chart-see-all" href="https://www.shazam.com/charts/top-200/world" target="_blank" rel="noopener">
+      ดูทั้งหมด
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+  <div id="chartContent">
+    <div class="chart-loading">
+      <div class="chart-loading-dots"><span></span><span></span><span></span></div>
+      กำลังโหลด chart...
+    </div>
+  </div>
 </div>
 
 <!-- DAILY ARTIST SECTION -->
@@ -371,7 +431,6 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   <div class="daily-label">🎲 Discover</div>
   <div class="daily-title">แนะนำศิลปินประจำวัน ✨</div>
   <div class="da-card" id="daCard">
-    <!-- idle state -->
     <div class="da-idle" id="daIdle">
       <span class="da-idle-emoji">🎵</span>
       <div class="da-idle-text">อยากค้นพบศิลปินใหม่ที่คุณอาจยังไม่รู้จัก?<br/>กดสุ่มได้เลย — มีทั้งไทย สากล และเกาหลี 🌏</div>
@@ -381,7 +440,6 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
         🎲 สุ่มศิลปินประจำวัน!
       </button>
     </div>
-    <!-- result state -->
     <div class="da-result" id="daResult">
       <div class="da-top">
         <div class="da-img" id="daImg">🎵</div>
@@ -400,8 +458,8 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
             <div class="da-sp-sub">Spotify Playlist · เปิดใน App ได้เลย 🎧</div>
           </div>
         </div>
-        <a class="da-sp-btn" id="daSpLink" href="#" target="_blank" rel="noopener" onclick="trySpotify(currentDaArtist&&currentDaArtist.name)">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>
+        <a class="da-sp-btn" id="daSpLink" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>
           เปิด Playlist ใน Spotify
         </a>
       </div>
@@ -413,10 +471,9 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
         <button class="da-home" onclick="goHome()">🏠 กลับหน้าหลัก</button>
       </div>
     </div>
-  
+  </div>
 </div>
-</div>
-</div>
+
 
 <!-- QUIZ PAGE -->
 <div class="page" id="pageQuiz">
@@ -1347,11 +1404,102 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ============================================================
+// GLOBAL CHART — Apple Music Top Songs via /api/charts
+// ============================================================
+var chartLoaded = false;
+
+function loadChart() {
+  if (chartLoaded) return;
+  chartLoaded = true;
+  var container = document.getElementById('chartContent');
+  if (!container) return;
+
+  fetch('/api/charts?limit=10')
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      var songs = data.songs || [];
+      if (!songs.length) throw new Error('empty');
+      renderChart(songs, container);
+    })
+    .catch(function(err) {
+      container.innerHTML =
+        '<div class="chart-error">⚠️ ไม่สามารถโหลด chart ได้ในขณะนี้' +
+        '<br/><button class="chart-retry-btn" onclick="chartLoaded=false;loadChart()">🔄 ลองใหม่</button></div>';
+    });
+}
+
+function renderChart(songs, container) {
+  // icon SVGs
+  var appleIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+  var spIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
+
+  var html = '<div class="chart-grid">';
+
+  songs.forEach(function(s, i) {
+    var rankClass = i < 3 ? 'chart-rank top3' : 'chart-rank';
+    var rankNum = ['🥇','🥈','🥉'][i] || ('#' + s.rank);
+    var artHtml = s.artwork
+      ? '<img class="chart-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">' +
+        '<div class="chart-art-ph" style="display:none">🎵</div>'
+      : '<div class="chart-art-ph">🎵</div>';
+    var appleBtn = s.appleUrl
+      ? '<a class="chart-link-btn chart-link-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + appleIcon + '</a>'
+      : '';
+    var spBtn = '<a class="chart-link-btn chart-link-sp" href="' + esc(s.spotifyUrl) + '" target="_blank" rel="noopener" title="Spotify">' + spIcon + '</a>';
+
+    if (i === 0) {
+      // hero card สำหรับ #1
+      var heroArt = s.artwork
+        ? '<img class="chart-hero-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">' +
+          '<div class="chart-hero-art-ph" style="display:none">🎵</div>'
+        : '<div class="chart-hero-art-ph">🎵</div>';
+      html += '<div class="chart-hero">' + heroArt +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="chart-hero-rank">🥇 #1 Global</div>' +
+          '<div class="chart-hero-song">' + esc(s.title) + '</div>' +
+          '<div class="chart-hero-artist">' + esc(s.artist) + '</div>' +
+          '<div class="chart-hero-btns">' +
+            (s.appleUrl ? '<a class="chart-hero-btn chart-hero-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener">' + appleIcon + ' Apple Music</a>' : '') +
+            '<a class="chart-hero-btn chart-hero-btn-sp" href="' + esc(s.spotifyUrl) + '" target="_blank" rel="noopener">' + spIcon + ' Spotify</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    } else {
+      html += '<div class="chart-item">' +
+        '<div class="' + rankClass + '">' + rankNum + '</div>' +
+        artHtml +
+        '<div class="chart-info">' +
+          '<div class="chart-song">' + esc(s.title) + '</div>' +
+          '<div class="chart-artist">' + esc(s.artist) + '</div>' +
+        '</div>' +
+        '<div class="chart-links">' + appleBtn + spBtn + '</div>' +
+      '</div>';
+    }
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+  container.style.animation = 'fadeUp .4s ease';
+}
+
+// โหลด chart เมื่อเข้าหน้าแรก
+document.addEventListener('DOMContentLoaded', function() {
+  loadChart();
+});
+
+// ============================================================
 // DAILY ARTIST — สุ่มจาก pool รวม 300 ศิลปิน
 // ============================================================
-var daAll = (ARTISTS_THAI || []).concat(ARTISTS_INTL || []).concat(ARTISTS_KOREAN || []);
+var daAll = [];
 var daQueue = [];
 var currentDaArtist = null;
+
+function daInit() {
+  daAll = [].concat(ARTISTS_THAI || []).concat(ARTISTS_INTL || []).concat(ARTISTS_KOREAN || []);
+}
 
 function daBuildQueue() {
   var arr = daAll.map(function(_, i) { return i; });
@@ -1363,71 +1511,54 @@ function daBuildQueue() {
 }
 
 function daNext() {
+  if (!daAll.length) daInit();
   if (!daQueue.length) daQueue = daBuildQueue();
   return daQueue.pop();
 }
 
 function daGetPoolLabel(a) {
-  // ตรวจจาก nat string
   var nat = (a.nat || '').toLowerCase();
   if (nat.includes('ไทย')) return '🇹🇭 ไทย';
-  if (nat.includes('เกาหลี') || nat.includes('korea')) return '🇰🇷 เกาหลี';
+  if (nat.includes('เกาหลี')) return '🇰🇷 เกาหลี';
   return '🌍 สากล';
 }
 
 function daShuffle() {
+  if (!daAll.length) daInit();
   var idx = daNext();
   var artist = daAll[idx];
   if (!artist) return;
   currentDaArtist = artist;
 
-  // flip animation
   var card = document.getElementById('daCard');
-  card.classList.remove('da-flip');
-  void card.offsetWidth;
-  card.classList.add('da-flip');
+  if (card) { card.classList.remove('da-flip'); void card.offsetWidth; card.classList.add('da-flip'); }
 
-  // ซ่อน idle, แสดง result
   document.getElementById('daIdle').style.display = 'none';
-  var res = document.getElementById('daResult');
-  res.style.display = 'block';
+  document.getElementById('daResult').style.display = 'block';
 
-  // ใส่ข้อมูล
   document.getElementById('daPool').textContent = daGetPoolLabel(artist);
   document.getElementById('daName').textContent = (artist.emoji || '🎵') + ' ' + esc(artist.name);
   document.getElementById('daBio').textContent = artist.bio || '';
 
-  // tags: nat + genre + tags[0]
   var tagsHtml = '<span class="da-tag nat">' + esc(artist.nat || '') + '</span>';
   tagsHtml += '<span class="da-tag">' + esc(artist.genre || '') + '</span>';
-  if (artist.tags && artist.tags[0]) {
-    tagsHtml += '<span class="da-tag">' + esc(artist.tags[0]) + '</span>';
-  }
+  if (artist.tags && artist.tags[0]) tagsHtml += '<span class="da-tag">' + esc(artist.tags[0]) + '</span>';
   document.getElementById('daTags').innerHTML = tagsHtml;
 
-  // Spotify link
-  var spName = artist.name || '';
-  var spUrl = artist.sp || ('https://open.spotify.com/search/this%20is%20' + encodeURIComponent(spName) + '/playlists');
-  document.getElementById('daSpName').textContent = 'This Is ' + spName;
+  var spUrl = artist.sp || ('https://open.spotify.com/search/this%20is%20' + encodeURIComponent(artist.name || '') + '/playlists');
+  document.getElementById('daSpName').textContent = 'This Is ' + (artist.name || '');
   document.getElementById('daSpLink').href = spUrl;
 
-  // รูป — reset ก่อน แล้วค่อยโหลด Wikipedia
   var imgEl = document.getElementById('daImg');
   imgEl.innerHTML = artist.emoji || '🎵';
   imgEl.style.fontSize = '36px';
 
-  // โหลดรูปจาก Wikipedia แบบ async
-  var wikiTitle = (spName).replace(/ /g, '_');
-  daLoadWiki(wikiTitle, imgEl, artist.emoji || '🎵');
-}
-
-function daLoadWiki(title, el, fallbackEmoji) {
-  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title))
+  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent((artist.name || '').replace(/ /g, '_')))
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
       if (d && d.thumbnail && d.thumbnail.source) {
-        el.innerHTML = '<img src="' + d.thumbnail.source + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';
-        el.style.fontSize = '';
+        imgEl.innerHTML = '<img src="' + d.thumbnail.source + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';
+        imgEl.style.fontSize = '';
       }
     })
     .catch(function() {});
