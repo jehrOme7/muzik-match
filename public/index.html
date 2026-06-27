@@ -391,6 +391,16 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   .da-actions{flex-direction:column}
 }
 
+
+/* ===== SHARE FEATURE ===== */
+.share-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(244,114,182,.12));border:1px solid rgba(167,139,250,.3);border-radius:14px;color:var(--purple);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.share-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(244,114,182,.2));border-color:rgba(167,139,250,.5);transform:translateY(-1px)}
+.share-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1730;border:1px solid rgba(167,139,250,.35);color:#f0eeff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s ease,opacity .3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none;opacity:0}
+.share-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.share-result-banner{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(244,114,182,.07));border:1px solid rgba(167,139,250,.25);border-radius:16px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;animation:fadeUp .4s ease}
+.share-result-banner-icon{font-size:24px;flex-shrink:0}
+.share-result-banner-text{font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;line-height:1.6}
+.share-result-banner-text strong{color:var(--purple);display:block;font-size:14px;margin-bottom:2px}
 </style>
 </head>
 <body class="booting">
@@ -552,15 +562,23 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <div class="loading-progress"><span></span></div>
   </div>
   <div id="resultScreen" class="result-screen">
+    <div id="shareBanner" style="display:none"></div>
     <div class="persona-card"><span class="persona-emoji-wrap" id="resEmoji">🎵</span><div class="persona-type" id="resType"></div><div class="persona-name" id="resName"></div><div class="persona-desc" id="resDesc"></div><div class="persona-quote" id="resQuote"></div></div>
     <div class="match-section-label">🎯 ศิลปินที่ match คุณมากที่สุด</div>
     <div class="top-card" id="topMatchCard"></div>
     <div class="match-section-label" style="margin-top:8px">🎶 ศิลปินที่น่าจะชอบด้วย</div>
     <div id="otherCards"></div>
-    <div style="display:flex;gap:10px;margin-top:24px">
-    <button onclick="goHome()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">🏠 กลับหน้าหลัก</button>
-    <button onclick="resetQuiz()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">↩ ทำ Quiz ใหม่</button>
+    <div style="margin-top:24px">
+    <button class="share-btn" onclick="shareResult()" style="width:100%;margin-bottom:10px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      แชร์ผลลัพธ์ให้เพื่อน
+    </button>
+    <div style="display:flex;gap:10px">
+      <button onclick="goHome()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">🏠 กลับหน้าแรก</button>
+      <button onclick="resetQuiz()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">↩ ทำ Quiz ใหม่</button>
+    </div>
   </div>
+<div class="share-toast" id="shareToast"></div>
   </div>
 </div>
 </div>
@@ -1352,6 +1370,14 @@ function showResult(){
   setTimeout(function(){var b=document.getElementById('topBar');if(b)b.style.width=topPct+'%';},300);
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
+  // บันทึก share payload สำหรับปุ่ม "แชร์ผลลัพธ์"
+  _lastSharePayload = buildSharePayload(
+    persona.name,
+    selectedLang || 'intl',
+    top.name || '',
+    top.sp || ''
+  );
+
   // --- Others: แสดง 5 คนถัดไป (index 1-5) ---
   var othersHtml='';
   scored.slice(1,6).forEach(function(item,i){
@@ -1596,7 +1622,7 @@ var STATIC_CHART_SONGS = [
     "rank": 1,
     "title": "Choosin' Texas",
     "artist": "Ella Langley",
-    "artwork": "https://img.youtube.com/vi/nUsrYVxrDwI/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Choosin%27%20Texas%20Ella%20Langley",
     "youtubeId": "nUsrYVxrDwI",
     "youtubeLabel": "Official Video"
@@ -1605,7 +1631,7 @@ var STATIC_CHART_SONGS = [
     "rank": 2,
     "title": "Look at My Life",
     "artist": "Gracie Abrams",
-    "artwork": "https://img.youtube.com/vi/2YSnCqHXMGY/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Look%20at%20My%20Life%20Gracie%20Abrams",
     "youtubeId": "2YSnCqHXMGY",
     "youtubeLabel": "Official Music Video"
@@ -1614,7 +1640,7 @@ var STATIC_CHART_SONGS = [
     "rank": 3,
     "title": "Marry You Again",
     "artist": "Dan + Shay",
-    "artwork": "https://img.youtube.com/vi/g62EHIjxDks/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Marry%20You%20Again%20Dan%20%2B%20Shay",
     "youtubeId": "g62EHIjxDks",
     "youtubeLabel": "Official Audio"
@@ -1623,7 +1649,7 @@ var STATIC_CHART_SONGS = [
     "rank": 4,
     "title": "Another Drink",
     "artist": "Marshmello & Kelsea Ballerini",
-    "artwork": "https://img.youtube.com/vi/UW1UKhrQphI/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Another%20Drink%20Marshmello%20%26%20Kelsea%20Ballerini",
     "youtubeId": "UW1UKhrQphI",
     "youtubeLabel": "Official Visualizer"
@@ -1632,7 +1658,7 @@ var STATIC_CHART_SONGS = [
     "rank": 5,
     "title": "The Time Of My Life",
     "artist": "Benson Boone",
-    "artwork": "https://img.youtube.com/vi/ptlsli-QXXc/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=The%20Time%20Of%20My%20Life%20Benson%20Boone",
     "youtubeId": "ptlsli-QXXc",
     "youtubeLabel": "Official Music Video"
@@ -1641,7 +1667,7 @@ var STATIC_CHART_SONGS = [
     "rank": 6,
     "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
     "artist": "Taylor Swift",
-    "artwork": "https://img.youtube.com/vi/hDU4GB1PTxc/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=I%20Knew%20It%2C%20I%20Knew%20You%20%28From%20%22Toy%20Story%205%22%29%20Taylor%20Swift",
     "youtubeId": "hDU4GB1PTxc",
     "youtubeLabel": "Official Music Video"
@@ -1650,7 +1676,7 @@ var STATIC_CHART_SONGS = [
     "rank": 7,
     "title": "Let Him In Anyway",
     "artist": "Blake Shelton",
-    "artwork": "https://img.youtube.com/vi/K0aRuR_bA4k/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Let%20Him%20In%20Anyway%20Blake%20Shelton",
     "youtubeId": "K0aRuR_bA4k",
     "youtubeLabel": "Official Music Video"
@@ -1659,7 +1685,7 @@ var STATIC_CHART_SONGS = [
     "rank": 8,
     "title": "Hands Up",
     "artist": "Jelly Roll",
-    "artwork": "https://img.youtube.com/vi/6DPkDnUL1so/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Hands%20Up%20Jelly%20Roll",
     "youtubeId": "6DPkDnUL1so",
     "youtubeLabel": "Official Audio"
@@ -1668,7 +1694,7 @@ var STATIC_CHART_SONGS = [
     "rank": 9,
     "title": "Be Her",
     "artist": "Ella Langley",
-    "artwork": "https://img.youtube.com/vi/Dg47eNL_Usw/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Be%20Her%20Ella%20Langley",
     "youtubeId": "Dg47eNL_Usw",
     "youtubeLabel": "Official Video"
@@ -1677,7 +1703,7 @@ var STATIC_CHART_SONGS = [
     "rank": 10,
     "title": "Dancing On My Own",
     "artist": "Robyn",
-    "artwork": "https://img.youtube.com/vi/CcNo07Xp8aQ/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Dancing%20On%20My%20Own%20Robyn",
     "youtubeId": "CcNo07Xp8aQ",
     "youtubeLabel": "Official Music Video"
@@ -1686,7 +1712,7 @@ var STATIC_CHART_SONGS = [
     "rank": 11,
     "title": "Divine Intervention",
     "artist": "The Rolling Stones",
-    "artwork": "https://img.youtube.com/vi/3mUf_DGhygA/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Divine%20Intervention%20The%20Rolling%20Stones",
     "youtubeId": "3mUf_DGhygA",
     "youtubeLabel": "Official Audio"
@@ -1695,7 +1721,7 @@ var STATIC_CHART_SONGS = [
     "rank": 12,
     "title": "Jealous Lover",
     "artist": "The Rolling Stones",
-    "artwork": "https://img.youtube.com/vi/tV-PWFpSR4c/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Jealous%20Lover%20The%20Rolling%20Stones",
     "youtubeId": "tV-PWFpSR4c",
     "youtubeLabel": "Official Lyric Video"
@@ -1704,7 +1730,7 @@ var STATIC_CHART_SONGS = [
     "rank": 13,
     "title": "If I Don't Leave I'm Gonna Stay",
     "artist": "Carly Pearce & Riley Green",
-    "artwork": "https://img.youtube.com/vi/puwLnJ7bb9o/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=If%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%20Carly%20Pearce%20%26%20Riley%20Green",
     "youtubeId": "puwLnJ7bb9o",
     "youtubeLabel": "Official Music Video"
@@ -1713,7 +1739,7 @@ var STATIC_CHART_SONGS = [
     "rank": 14,
     "title": "Made It A Memory",
     "artist": "Luke Bryan",
-    "artwork": "https://img.youtube.com/vi/pG2jHH9_1co/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Made%20It%20A%20Memory%20Luke%20Bryan",
     "youtubeId": "pG2jHH9_1co",
     "youtubeLabel": "Official Audio Video"
@@ -1722,7 +1748,7 @@ var STATIC_CHART_SONGS = [
     "rank": 15,
     "title": "Watch It Burn",
     "artist": "Katy Perry",
-    "artwork": "https://img.youtube.com/vi/YzUs8ohSB3w/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Watch%20It%20Burn%20Katy%20Perry",
     "youtubeId": "YzUs8ohSB3w",
     "youtubeLabel": "Official Music Video"
@@ -1731,7 +1757,7 @@ var STATIC_CHART_SONGS = [
     "rank": 16,
     "title": "We Go Back (feat. Michael McDonald)",
     "artist": "Keith Urban",
-    "artwork": "https://img.youtube.com/vi/ssC-ReImg9Y/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=We%20Go%20Back%20%28feat.%20Michael%20McDonald%29%20Keith%20Urban",
     "youtubeId": "ssC-ReImg9Y",
     "youtubeLabel": "Official Lyric Video"
@@ -1740,7 +1766,7 @@ var STATIC_CHART_SONGS = [
     "rank": 17,
     "title": "Cowgirl",
     "artist": "Shaboozey",
-    "artwork": "https://img.youtube.com/vi/u0g8elvennQ/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Cowgirl%20Shaboozey",
     "youtubeId": "u0g8elvennQ",
     "youtubeLabel": "Official Video"
@@ -1749,7 +1775,7 @@ var STATIC_CHART_SONGS = [
     "rank": 18,
     "title": "RUN IT",
     "artist": "Stray Kids",
-    "artwork": "https://img.youtube.com/vi/Q7IFjVUUb_E/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=RUN%20IT%20Stray%20Kids",
     "youtubeId": "Q7IFjVUUb_E",
     "youtubeLabel": "M/V"
@@ -1758,7 +1784,7 @@ var STATIC_CHART_SONGS = [
     "rank": 19,
     "title": "Play Dead",
     "artist": "ICE NINE KILLS",
-    "artwork": "https://img.youtube.com/vi/7WpxyUbltqw/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Play%20Dead%20ICE%20NINE%20KILLS",
     "youtubeId": "7WpxyUbltqw",
     "youtubeLabel": "Official Music Video"
@@ -1767,7 +1793,7 @@ var STATIC_CHART_SONGS = [
     "rank": 20,
     "title": "Boston",
     "artist": "STELLA LEFTY",
-    "artwork": "https://img.youtube.com/vi/v2ttAph6PhM/mqdefault.jpg",
+    "artwork": "",
     "appleUrl": "https://music.apple.com/us/search?term=Boston%20STELLA%20LEFTY",
     "youtubeId": "v2ttAph6PhM",
     "youtubeLabel": "Lyric Video"
@@ -1819,12 +1845,16 @@ function wikiNameFromArtist(artist) {
 }
 
 // ใช้แนวทางเดียวกับ “แนะนำศิลปินประจำวัน”: render placeholder ก่อน แล้วค่อยใส่รูปจาก Wikipedia เข้า element เดิม
+var chartWikiImgSeq = 0;
 
-
-function artImg(url, cls, ph) {
-  if (!url) return '<div class="' + cls + '-ph">' + ph + '</div>';
+function artImg(url, cls, ph, wikiName) {
+  var id = 'chartWikiImg_' + (++chartWikiImgSeq);
+  var data = wikiName ? ' data-wiki-name="' + esc(wikiName) + '"' : '';
+  if (!url) {
+    return '<div id="' + id + '" class="' + cls + '-ph chart-wiki-art"' + data + '>' + ph + '</div>';
+  }
   return '<img class="' + cls + '" src="' + esc(url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextSibling && (this.nextSibling.style.display=\'flex\')">' +
-         '<div class="' + cls + '-ph" style="display:none">' + ph + '</div>';
+         '<div id="' + id + '" class="' + cls + '-ph chart-wiki-art" style="display:none"' + data + '>' + ph + '</div>';
 }
 
 function chartWikiArtistKey(name) {
@@ -1945,6 +1975,36 @@ function fetchChartWikiThumb(name) {
   return chain.then(function(src){ return src || fetchWikiSearchThumb(name); });
 }
 
+function hydrateChartWikipediaImages() {
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.chart-wiki-art[data-wiki-name]:not([data-wiki-requested])'));
+  if (!nodes.length) return;
+
+  var cacheKey = 'mm_chart_wiki_img_v7';
+  var cache = {};
+  try { cache = JSON.parse(localStorage.getItem(cacheKey) || '{}') || {}; } catch(e) { cache = {}; }
+
+  nodes.forEach(function(node){
+    var name = node.getAttribute('data-wiki-name') || '';
+    if (!name) return;
+    node.setAttribute('data-wiki-requested', '1');
+    var key = chartWikiArtistKey(name);
+
+    // ถ้าเคยได้รูปแล้ว ใส่ทันที แต่ยังไม่ block การโหลดหน้า
+    if (cache[key]) {
+      setWikiImgToEl(node, cache[key]);
+      return;
+    }
+
+    fetchChartWikiThumb(key).then(function(src){
+      if (!src) { node.setAttribute('data-wiki-loaded', 'fail'); return; }
+      cache[key] = src;
+      try { localStorage.setItem(cacheKey, JSON.stringify(cache)); } catch(e) {}
+      setWikiImgToEl(node, src);
+    }).catch(function(){
+      node.setAttribute('data-wiki-loaded', 'fail');
+    });
+  });
+}
 
 // ---- TEASER on landing (5 rows preview) ----
 function renderChartTeaser(songs) {
@@ -1960,7 +2020,7 @@ function renderChartTeaser(songs) {
     var spWeb = chartSpotifyWeb(s.title, s.artist);
     html += '<div class="chart-row" style="border-radius:0;border-left:none;border-right:none;border-top:none;' + (i===0?'border-top:none':'') + '">' +
       '<div class="' + cls + '">' + rank + '</div>' +
-      artImg(s.artwork, 'chart-row-art', '🎵') +
+      artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
@@ -1971,6 +2031,7 @@ function renderChartTeaser(songs) {
   html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
     '<button onclick="switchTab(\'chart\')" style="font-size:12px;font-weight:700;color:#fb923c;background:none;border:none;cursor:pointer;font-family:inherit">ดูทั้งหมด 20 เพลง →</button></div>';
   el.innerHTML = html;
+  hydrateChartWikipediaImages();
 }
 
 
@@ -2022,7 +2083,7 @@ function renderChartPage(songs) {
   var heroHtml = '<div class="chart-hero-card">' +
     '<div class="chart-hero-badge">🥇 #1 iTunes US Chart</div>' +
     '<div class="chart-hero-body">' +
-      artImg(s1.artwork, 'chart-hero-art', '🎵') +
+      artImg(s1.artwork, 'chart-hero-art', '🎵', s1.wiki || s1.artist) +
       '<div style="flex:1;min-width:0">' +
         '<div class="chart-hero-title">' + esc(s1.title) + '</div>' +
         '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
@@ -2050,7 +2111,7 @@ function renderChartPage(songs) {
     var ytUrl = chartYoutubeUrl(s);
     listHtml += '<div class="chart-row">' +
       '<div class="' + cls + '">' + rank + '</div>' +
-      artImg(s.artwork, 'chart-row-art', '🎵') +
+      artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
@@ -2061,6 +2122,7 @@ function renderChartPage(songs) {
   listHtml += '</div>';
 
   el.innerHTML = heroHtml + listHtml;
+  hydrateChartWikipediaImages();
 }
 
 function fetchYoutubeId(query) {
@@ -2260,7 +2322,152 @@ document.addEventListener('DOMContentLoaded',function(){
   if(pa) pa.addEventListener('click',doPlShuffle);
   // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
   initChart();
+  // ตรวจสอบ shared result URL hash
+  checkShareHash();
 });
+
+// ============================================================
+// SHARE RESULT — encode/decode ผ่าน URL hash (no backend)
+// format hash: #r=<base64url(personaName|lang|artistName|spotifyUrl)>
+// ============================================================
+
+function buildSharePayload(personaName, lang, artistName, artistSp) {
+  var raw = [
+    encodeURIComponent(personaName || ''),
+    encodeURIComponent(lang || 'intl'),
+    encodeURIComponent(artistName || ''),
+    encodeURIComponent(artistSp || '')
+  ].join('|');
+  try {
+    return btoa(unescape(encodeURIComponent(raw)))
+      .replace(/\+/g,'_').replace(/\//g,'-').replace(/=/g,'');
+  } catch(e) { return ''; }
+}
+
+function parseSharePayload(hash) {
+  try {
+    var b64 = hash.replace(/^#r=/, '').replace(/_/g,'+').replace(/-/g,'/');
+    while (b64.length % 4) b64 += '=';
+    var raw = decodeURIComponent(escape(atob(b64)));
+    var parts = raw.split('|').map(decodeURIComponent);
+    return { personaName: parts[0]||'', lang: parts[1]||'intl', artistName: parts[2]||'', artistSp: parts[3]||'' };
+  } catch(e) { return null; }
+}
+
+function shareResult() {
+  if (!_lastSharePayload) { showShareToast('⚠️ ยังไม่มีผลลัพธ์ให้แชร์'); return; }
+  var url = location.origin + location.pathname + '#r=' + _lastSharePayload;
+  if (navigator.share) {
+    navigator.share({ title: 'Muzik Match — ผลลัพธ์ของฉัน 🎵', text: 'ดูบุคลิกดนตรีของฉันใน Muzik Match!', url: url })
+      .catch(function() { copyShareUrl(url); });
+    return;
+  }
+  copyShareUrl(url);
+}
+
+function copyShareUrl(url) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(function() { showShareToast('✅ คัดลอกลิงก์แล้ว! ส่งให้เพื่อนได้เลย 🎉'); })
+      .catch(function() { fallbackCopy(url); });
+  } else { fallbackCopy(url); }
+}
+
+function fallbackCopy(url) {
+  var ta = document.createElement('textarea');
+  ta.value = url;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); showShareToast('✅ คัดลอกลิงก์แล้ว! ส่งให้เพื่อนได้เลย 🎉'); }
+  catch(e) { showShareToast('🔗 copy ไม่สำเร็จ ลอง share ด้วยตัวเองนะครับ'); }
+  document.body.removeChild(ta);
+}
+
+function showShareToast(msg) {
+  var el = document.getElementById('shareToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+}
+
+function checkShareHash() {
+  var hash = location.hash || '';
+  if (hash.indexOf('#r=') !== 0) return;
+  var payload = parseSharePayload(hash);
+  if (!payload || !payload.personaName) return;
+
+  // หา persona จาก name
+  var persona = null;
+  if (typeof PERSONALITIES !== 'undefined') {
+    for (var pi = 0; pi < PERSONALITIES.length; pi++) {
+      if ((PERSONALITIES[pi].name || '') === payload.personaName) { persona = PERSONALITIES[pi]; break; }
+    }
+    if (!persona) persona = PERSONALITIES[PERSONALITIES.length - 1];
+  }
+
+  // แสดง banner "เพื่อนแชร์มา"
+  var banner = document.getElementById('shareBanner');
+  if (banner) {
+    banner.style.display = 'block';
+    banner.innerHTML = '<div class="share-result-banner">' +
+      '<div class="share-result-banner-icon">🔗</div>' +
+      '<div class="share-result-banner-text">' +
+        '<strong>เพื่อนแชร์ผลลัพธ์ให้คุณดู!</strong>' +
+        'ลองทำ Quiz ด้วยตัวเองเพื่อดูว่าคุณ match กับศิลปินคนไหน 🎵' +
+      '</div></div>';
+  }
+
+  // ใส่ persona info
+  if (persona) {
+    var el; 
+    el = document.getElementById('resEmoji');  if(el) el.textContent = persona.emoji || '🎵';
+    el = document.getElementById('resType');   if(el) el.textContent = 'บุคลิกภาพดนตรีของเพื่อน 🎵';
+    el = document.getElementById('resName');   if(el) el.textContent = persona.name || '';
+    el = document.getElementById('resDesc');   if(el) el.textContent = persona.desc || '';
+    el = document.getElementById('resQuote');  if(el) el.textContent = persona.quote || '';
+  }
+
+  // ใส่ artist #1
+  if (payload.artistName) {
+    var topCard = document.getElementById('topMatchCard');
+    if (topCard) {
+      var natLabel = payload.lang === 'thai' ? '🇹🇭 ไทย' : payload.lang === 'korean' ? '🇰🇷 เกาหลี' : '🌍 สากล';
+      var spUrl = payload.artistSp || '#';
+      topCard.innerHTML =
+        '<div class="artist-row">' +
+          '<div class="artist-img" style="font-size:32px">🎵</div>' +
+          '<div class="artist-info">' +
+            '<div class="artist-name">' + esc(payload.artistName) + '</div>' +
+            '<div class="artist-tags"><span class="atag nat">' + esc(natLabel) + '</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<a class="btn-spotify" href="' + esc(spUrl) + '" target="_blank" rel="noopener">' +
+          '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>' +
+          ' เปิด Playlist ใน Spotify' +
+        '</a>';
+    }
+    var oc = document.getElementById('otherCards');
+    if (oc) oc.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:16px">ลองทำ Quiz ด้วยตัวเองเพื่อดูศิลปินที่ match คุณ →</div>';
+  }
+
+  // switch ไปแสดง result
+  switchTab('quiz');
+  var ls = document.getElementById('langScreen');
+  var qs = document.getElementById('quizScreen');
+  var lds = document.getElementById('loadingScreen');
+  var rs = document.getElementById('resultScreen');
+  if(ls) ls.style.display = 'none';
+  if(qs) qs.classList.remove('active');
+  if(lds) lds.classList.remove('active');
+  if(rs) rs.classList.add('active');
+
+  // ล้าง hash
+  if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+}
+
 </script>
 </body>
 </html>
