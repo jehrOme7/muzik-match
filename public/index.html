@@ -1440,35 +1440,141 @@ function chartSpotifyWeb(title, artist) {
   return 'https://open.spotify.com/search/' + encodeURIComponent(title + ' ' + artist) + '/tracks';
 }
 
+// ============================================================
+// fetchChartData — 3-layer strategy:
+//   Layer 1: localStorage cache (instant, 6hr TTL)
+//   Layer 2: browser → iTunes RSS directly (fast, no cold start)
+//   Layer 3: browser → /api/charts fallback (if CORS fails)
+// ============================================================
+var CHART_CACHE_KEY = 'muzik_chart_v2';
+var CHART_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 ชั่วโมง
+
+function parseItunesRSS(data) {
+  var entries = (data && data.feed && data.feed.entry) || [];
+  return entries.map(function(e, i) {
+    var images = Array.isArray(e['im:image']) ? e['im:image'] : [];
+    var artRaw = (images[images.length - 1] || {}).label || '';
+    var artwork = artRaw.replace(/\/\d+x\d+bb\./, '/300x300bb.');
+    var links = Array.isArray(e.link) ? e.link : (e.link ? [e.link] : []);
+    var appleUrl = '';
+    for (var li = 0; li < links.length; li++) {
+      if (links[li] && links[li].attributes && links[li].attributes.type === 'text/html') {
+        appleUrl = links[li].attributes.href || ''; break;
+      }
+    }
+    if (!appleUrl && links[0] && links[0].attributes) appleUrl = links[0].attributes.href || '';
+    return {
+      rank: i + 1,
+      title: (e['im:name'] || {}).label || '',
+      artist: (e['im:artist'] || {}).label || '',
+      artwork: artwork,
+      appleUrl: appleUrl
+    };
+  }).filter(function(s) { return s.title && s.artist; });
+}
+
+function loadChartCache() {
+  try {
+    var raw = localStorage.getItem(CHART_CACHE_KEY);
+    if (!raw) return null;
+    var obj = JSON.parse(raw);
+    if (!obj || !obj.ts || !obj.songs || !obj.songs.length) return null;
+    if (Date.now() - obj.ts > CHART_CACHE_TTL) return null; // หมดอายุ
+    return obj.songs;
+  } catch(e) { return null; }
+}
+
+function saveChartCache(songs) {
+  try {
+    localStorage.setItem(CHART_CACHE_KEY, JSON.stringify({ ts: Date.now(), songs: songs }));
+  } catch(e) {}
+}
+
 function fetchChartData(cb) {
+  // Layer 1: localStorage cache
   if (chartData && chartData.length) { cb(null, chartData); return; }
-  if (chartDataFetching) { setTimeout(function(){ fetchChartData(cb); }, 400); return; }
+  if (chartDataFetching) { setTimeout(function(){ fetchChartData(cb); }, 300); return; }
+
+  var cached = loadChartCache();
+  if (cached) {
+    chartData = cached;
+    cb(null, chartData);
+    // Background refresh ถ้า cache อายุ > 3hr
+    var obj; try { obj = JSON.parse(localStorage.getItem(CHART_CACHE_KEY) || '{}'); } catch(e) { obj = {}; }
+    if (obj.ts && Date.now() - obj.ts > 3 * 60 * 60 * 1000) {
+      setTimeout(function() { chartDataFetching = false; bgRefreshChart(); }, 2000);
+    }
+    return;
+  }
+
   chartDataFetching = true;
-  // timeout 12s กัน fetch ค้าง
   var done = false;
-  var timer = setTimeout(function(){
-    if (!done) { done = true; chartDataFetching = false; cb(new Error('timeout'), null); }
-  }, 12000);
+  var timer = setTimeout(function() {
+    if (!done) { done = true; chartDataFetching = false; tryApiCharts(cb); }
+  }, 8000);
+
+  // Layer 2: browser → iTunes RSS โดยตรง (ไม่ผ่าน Vercel)
+  fetch('https://itunes.apple.com/us/rss/topsongs/limit=20/json', {
+    headers: { 'Accept': 'application/json' },
+    mode: 'cors'
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('iTunes ' + r.status);
+    return r.json();
+  })
+  .then(function(data) {
+    if (done) return;
+    done = true; clearTimeout(timer);
+    var songs = parseItunesRSS(data);
+    if (!songs.length) throw new Error('empty');
+    chartData = songs;
+    chartDataFetching = false;
+    saveChartCache(songs);
+    cb(null, songs);
+  })
+  .catch(function() {
+    if (done) return;
+    done = true; clearTimeout(timer);
+    chartDataFetching = false;
+    // Layer 3: fallback → /api/charts
+    tryApiCharts(cb);
+  });
+}
+
+function tryApiCharts(cb) {
+  var done2 = false;
+  var timer2 = setTimeout(function() {
+    if (!done2) { done2 = true; cb(new Error('timeout'), null); }
+  }, 10000);
   fetch('/api/charts?limit=20')
-    .then(function(r){
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(d) {
+      if (done2) return;
+      done2 = true; clearTimeout(timer2);
+      var songs = (d.songs && d.songs.length) ? d.songs : null;
+      if (!songs) { cb(new Error('empty'), null); return; }
+      chartData = songs;
+      saveChartCache(songs);
+      cb(null, songs);
     })
-    .then(function(d){
-      if (done) return;
-      done = true; clearTimeout(timer);
-      chartData = (d.songs && d.songs.length) ? d.songs : null;
-      chartDataFetching = false;
-      if (!chartData) { cb(new Error('empty'), null); return; }
-      cb(null, chartData);
-    })
-    .catch(function(e){
-      if (done) return;
-      done = true; clearTimeout(timer);
-      chartDataFetching = false;
-      chartData = null;
+    .catch(function(e) {
+      if (done2) return;
+      done2 = true; clearTimeout(timer2);
       cb(e, null);
     });
+}
+
+function bgRefreshChart() {
+  // background refresh ไม่ block UI
+  chartDataFetching = true;
+  fetch('https://itunes.apple.com/us/rss/topsongs/limit=20/json', { mode: 'cors' })
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function(data) {
+      var songs = parseItunesRSS(data);
+      if (songs.length) { chartData = songs; saveChartCache(songs); }
+      chartDataFetching = false;
+    })
+    .catch(function() { chartDataFetching = false; });
 }
 
 function artImg(url, cls, ph) {
