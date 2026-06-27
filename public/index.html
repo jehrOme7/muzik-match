@@ -1503,6 +1503,7 @@ function openSpotifyUrl(event, el, url, query, type){
 
   function cleanup(){
     window.removeEventListener('pagehide', markAppOpened);
+    window.removeEventListener('blur', markAppOpened);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     if(fallbackTimer) clearTimeout(fallbackTimer);
     if(cleanupTimer) clearTimeout(cleanupTimer);
@@ -1515,6 +1516,10 @@ function openSpotifyUrl(event, el, url, query, type){
   }
 
   window.addEventListener('pagehide', markAppOpened, {once:true});
+  // Desktop Chrome/Edge often keeps the page visible after opening Spotify app,
+  // but the window loses focus while the native app/protocol prompt opens.
+  // Treat blur as a strong signal that the app prompt/app opened, so we do not open web Spotify too.
+  window.addEventListener('blur', markAppOpened, {once:true});
   document.addEventListener('visibilitychange', onVisibilityChange, {once:true});
 
   // SPOTIFY LOGIC — ห้ามเปลี่ยนโดยไม่ขออนุญาต:
@@ -1529,11 +1534,12 @@ function openSpotifyUrl(event, el, url, query, type){
   fallbackTimer = setTimeout(function(){
     var pageStillHere = document.visibilityState !== 'hidden';
     var pageHasFocus = !document.hasFocus || document.hasFocus();
+    // ถ้า browser/app prompt ทำให้หน้าเว็บ blur/hidden แล้ว แปลว่า app flow เริ่มทำงานแล้ว ไม่ต้องเปิด web ซ้ำ
     if(!appOpenedOrPromptActive && pageStillHere && pageHasFocus){
       window.open(webUrl, '_blank', 'noopener');
     }
     cleanup();
-  }, 2400);
+  }, 3200);
 
   cleanupTimer = setTimeout(cleanup, 6000);
   return false;
@@ -1557,10 +1563,21 @@ var SP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="1
 var APPLE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
 var YT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M23.5 6.2s-.2-1.7-.9-2.4c-.9-.9-1.9-.9-2.4-1C16.8 2.5 12 2.5 12 2.5h0s-4.8 0-8.2.3c-.5.1-1.5.1-2.4 1-.7.7-.9 2.4-.9 2.4S0 8.1 0 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.7.9 2.4c.9.9 2.1.9 2.6 1 1.9.2 8.1.3 8.1.3s4.8 0 8.2-.3c.5-.1 1.5-.1 2.4-1 .7-.7.9-2.4.9-2.4s.2-1.9.2-3.8V10c.2-1.9 0-3.8 0-3.8zM9.5 14.5v-7l6.3 3.5-6.3 3.5z"/></svg>';
 
+
+// ---- Chart song direct Spotify track URLs ----
+// ใช้เฉพาะเพลงที่ยืนยันลิงก์ track ตรงแล้ว เพื่อให้เปิดหน้าเพลงจริง ไม่ใช่หน้า search
+var CHART_SPOTIFY_TRACK_URLS = {
+  "Choosin' Texas|Ella Langley": "https://open.spotify.com/track/65DbTqJKhbwqYbZ1Okr0rc"
+};
+function chartSongKey(title, artist){
+  return String(title||'').trim() + '|' + String(artist||'').trim();
+}
 function chartSpotifyUrl(title, artist) {
   return chartSpotifyWeb(title, artist);
 }
 function chartSpotifyWeb(title, artist) {
+  var direct = CHART_SPOTIFY_TRACK_URLS[chartSongKey(title, artist)];
+  if (direct) return direct;
   return 'https://open.spotify.com/search/' + encodeURIComponent(title + ' ' + artist) + '/tracks';
 }
 
