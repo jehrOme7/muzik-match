@@ -269,59 +269,73 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   .pl-result-actions{flex-direction:column}
 }
 
-/* ===== GLOBAL CHART SECTION ===== */
-.chart-section{max-width:720px;margin:0 auto;padding:0 24px 56px}
-.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.chart-header-left{}
-.chart-eyebrow{font-size:12px;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.chart-title{font-size:clamp(20px,3vw,26px);font-weight:800;color:var(--text);letter-spacing:-.02em}
-.chart-see-all{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fb923c;text-decoration:none;padding:7px 14px;border:1px solid rgba(251,146,60,.25);border-radius:10px;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.chart-see-all:hover{background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.4)}
-
-/* chart card grid */
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.chart-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:all .18s;cursor:default}
-.chart-item:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px)}
-.chart-rank{font-size:13px;font-weight:900;color:var(--text3);min-width:20px;text-align:right;flex-shrink:0}
-.chart-rank.top3{color:#fb923c}
-.chart-art{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
-.chart-art-ph{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,rgba(251,146,60,.2),rgba(124,58,237,.15));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
-.chart-info{flex:1;min-width:0}
-.chart-song{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-artist{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.chart-links{display:flex;gap:5px;flex-shrink:0}
-.chart-link-btn{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:all .15s;text-decoration:none;flex-shrink:0}
-.chart-link-apple{background:rgba(255,255,255,.06);color:var(--text2)}
-.chart-link-apple:hover{background:rgba(255,255,255,.12)}
-.chart-link-sp{background:rgba(29,185,84,.1);color:var(--green)}
-.chart-link-sp:hover{background:rgba(29,185,84,.2)}
-
-/* loading / error state */
-.chart-loading{text-align:center;padding:32px 0;color:var(--text3);font-size:13px}
-.chart-loading-dots{display:flex;justify-content:center;gap:5px;margin-bottom:12px}
-.chart-loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:chartDot .9s ease-in-out infinite}
-.chart-loading-dots span:nth-child(2){animation-delay:.15s}
-.chart-loading-dots span:nth-child(3){animation-delay:.3s}
-@keyframes chartDot{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-.chart-error{text-align:center;padding:24px;color:var(--text3);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:14px}
-.chart-retry-btn{margin-top:10px;padding:8px 18px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);color:#fb923c;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.chart-retry-btn:hover{background:rgba(251,146,60,.18)}
-
-/* top-1 hero card */
-.chart-hero{background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(124,58,237,.07));border:1.5px solid rgba(251,146,60,.22);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center;margin-bottom:10px;grid-column:1/-1}
-.chart-hero-art{width:64px;height:64px;border-radius:12px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
-.chart-hero-art-ph{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,rgba(251,146,60,.25),rgba(124,58,237,.2));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px}
-.chart-hero-rank{font-size:10px;font-weight:700;color:#fb923c;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.2);border-radius:5px;padding:2px 7px;display:inline-block;margin-bottom:5px}
-.chart-hero-song{font-size:16px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:3px;line-height:1.3}
-.chart-hero-artist{font-size:12px;color:var(--text3);margin-bottom:10px}
-.chart-hero-btns{display:flex;gap:7px}
-.chart-hero-btn{display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:all .15s;border:none}
-.chart-hero-btn-apple{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid var(--border2)}
-.chart-hero-btn-apple:hover{background:rgba(255,255,255,.12)}
-.chart-hero-btn-sp{background:rgba(29,185,84,.12);color:var(--green);border:1px solid rgba(29,185,84,.2)}
-.chart-hero-btn-sp:hover{background:rgba(29,185,84,.2)}
-
-/* ===== DAILY ARTIST SECTION ===== */
+/* ===== CHART PAGE ===== */
+.chart-page-wrap{max-width:720px;margin:0 auto;padding:60px 24px 80px}
+.chart-page-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fb923c;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);border-radius:20px;padding:6px 16px;margin-bottom:24px}
+.chart-page-wrap h1{font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.15;letter-spacing:-.04em;margin-bottom:8px}
+.chart-page-wrap h1 .g{background:linear-gradient(90deg,#fb923c,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chart-page-sub{font-size:14px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif;margin-bottom:36px;line-height:1.8}
+/* hero #1 card */
+.chart-hero-card{background:linear-gradient(135deg,rgba(251,146,60,.1),rgba(244,114,182,.06));border:1.5px solid rgba(251,146,60,.25);border-radius:22px;padding:22px;margin-bottom:24px;animation:fadeUp .4s ease}
+.chart-hero-badge{font-size:11px;font-weight:700;color:#fb923c;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.22);border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:14px}
+.chart-hero-body{display:flex;gap:18px;align-items:flex-start;margin-bottom:16px}
+.chart-hero-art{width:88px;height:88px;border-radius:16px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.06)}
+.chart-hero-art-ph{width:88px;height:88px;border-radius:16px;background:linear-gradient(135deg,rgba(251,146,60,.25),rgba(244,114,182,.2));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:32px}
+.chart-hero-title{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-.03em;margin-bottom:4px;line-height:1.25}
+.chart-hero-artist{font-size:14px;color:var(--text2);margin-bottom:10px}
+.chart-hero-tags{display:flex;gap:5px;flex-wrap:wrap}
+.chart-hero-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--text3)}
+/* YouTube embed */
+.chart-yt-wrap{border-radius:14px;overflow:hidden;margin-bottom:16px;background:#000;position:relative;padding-top:56.25%}
+.chart-yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.chart-yt-placeholder{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.6);cursor:pointer}
+.chart-yt-play-btn{width:60px;height:60px;border-radius:50%;background:rgba(251,146,60,.9);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.chart-yt-placeholder:hover .chart-yt-play-btn{transform:scale(1.1)}
+.chart-yt-label{font-size:13px;color:rgba(255,255,255,.7);font-family:'Noto Sans Thai',sans-serif}
+/* listen buttons */
+.chart-listen-btns{display:flex;gap:8px;margin-bottom:20px}
+.chart-listen-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:all .2s;border:none}
+.chart-listen-sp{background:var(--green);color:white}
+.chart-listen-sp:hover{background:var(--green2);transform:translateY(-1px)}
+.chart-listen-apple{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid var(--border2)}
+.chart-listen-apple:hover{background:rgba(255,255,255,.11)}
+/* rank list */
+.chart-rank-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.chart-rank-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.chart-list{display:flex;flex-direction:column;gap:6px}
+.chart-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:all .18s;cursor:default}
+.chart-row:hover{border-color:var(--border2);background:var(--card2)}
+.chart-row-num{font-size:13px;font-weight:900;color:var(--text3);min-width:22px;text-align:right;flex-shrink:0}
+.chart-row-num.t3{color:#fb923c}
+.chart-row-art{width:42px;height:42px;border-radius:7px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.05)}
+.chart-row-art-ph{width:42px;height:42px;border-radius:7px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.chart-row-info{flex:1;min-width:0}
+.chart-row-title{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-row-artist{font-size:11px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-row-btns{display:flex;gap:4px;flex-shrink:0}
+.chart-row-btn{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s;border:none;cursor:pointer}
+.chart-row-btn-sp{background:rgba(29,185,84,.1);color:var(--green)}
+.chart-row-btn-sp:hover{background:rgba(29,185,84,.2)}
+.chart-row-btn-apple{background:rgba(255,255,255,.06);color:var(--text2)}
+.chart-row-btn-apple:hover{background:rgba(255,255,255,.1)}
+/* loading/error */
+.chart-loading{text-align:center;padding:40px 0;color:var(--text3);font-size:14px}
+.chart-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.chart-dots span{width:7px;height:7px;border-radius:50%;background:#fb923c;animation:cdot .9s ease-in-out infinite}
+.chart-dots span:nth-child(2){animation-delay:.15s}.chart-dots span:nth-child(3){animation-delay:.3s}
+@keyframes cdot{0%,80%,100%{transform:scale(.4);opacity:.3}40%{transform:scale(1);opacity:1}}
+.chart-error{text-align:center;padding:30px;color:var(--text3);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:16px}
+.chart-retry{margin-top:12px;padding:9px 20px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.22);color:#fb923c;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+/* landing chart teaser */
+.chart-teaser{max-width:720px;margin:0 auto;padding:0 24px 56px}
+.chart-teaser-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.chart-teaser-left .chart-teaser-eyebrow{font-size:12px;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.chart-teaser-left .chart-teaser-title{font-size:clamp(18px,2.5vw,24px);font-weight:800;color:var(--text);letter-spacing:-.02em}
+.chart-teaser-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fb923c;padding:7px 14px;border:1px solid rgba(251,146,60,.25);border-radius:10px;background:none;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.chart-teaser-btn:hover{background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.4)}
+.chart-preview{background:var(--card);border:1.5px solid var(--border2);border-radius:18px;overflow:hidden}
+.chart-preview-loading{text-align:center;padding:28px;color:var(--text3);font-size:13px}
+/* ===== DAILY ARTIST SECTION (landing) ===== */
 .daily-section{max-width:720px;margin:0 auto;padding:0 24px 72px}
 .daily-label{text-align:center;font-size:12px;font-weight:700;color:#f472b6;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 .daily-title{text-align:center;font-size:clamp(20px,3vw,28px);font-weight:800;color:var(--text);margin-bottom:32px;letter-spacing:-.02em}
@@ -358,10 +372,10 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .da-shuffle-btn:hover{transform:translateY(-2px);box-shadow:0 7px 28px rgba(219,39,119,.4)}
 .da-flip{animation:daFlip .35s ease}
 @keyframes daFlip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(.95);opacity:.4}100%{transform:rotateY(0) scale(1);opacity:1}}
-
 @media(max-width:600px){
-  .chart-grid{grid-template-columns:1fr}
-  .chart-hero{grid-column:auto}
+  .chart-hero-body{flex-direction:column;gap:12px}
+  .chart-hero-art,.chart-hero-art-ph{width:72px;height:72px}
+  .chart-listen-btns{flex-direction:column}
   .da-top{flex-direction:column;gap:12px}
   .da-img{width:72px;height:72px}
   .da-actions{flex-direction:column}
@@ -373,6 +387,10 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 
 <nav>
   <a class="nav-brand" href="/" onclick="goHome();return false;"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><span class="nav-name">Muzik<span>Match</span></span></a>
+  <div class="nav-right">
+    <button class="nav-tab" id="navChart" onclick="switchTab('chart')">📊 Charts</button>
+    <button class="nav-tab" id="navPlaylist" onclick="switchTab('playlist')">🎲 Shuffle</button>
+  </div>
 </nav>
 
 <!-- HOME PAGE -->
@@ -406,21 +424,21 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     </div>
   </div>
 </div>
-<!-- GLOBAL CHART SECTION -->
-<div class="chart-section">
-  <div class="chart-header">
-    <div class="chart-header-left">
-      <div class="chart-eyebrow">📊 Global Top Chart</div>
-      <div class="chart-title">เพลงฮิตทั่วโลกตอนนี้ 🔥</div>
+<!-- CHART TEASER on landing -->
+<div class="chart-teaser">
+  <div class="chart-teaser-header">
+    <div class="chart-teaser-left">
+      <div class="chart-teaser-eyebrow">📊 Global Top Chart</div>
+      <div class="chart-teaser-title">เพลงฮิตทั่วโลกตอนนี้ 🔥</div>
     </div>
-    <a class="chart-see-all" href="https://www.shazam.com/charts/top-200/world" target="_blank" rel="noopener">
+    <button class="chart-teaser-btn" onclick="switchTab('chart')">
       ดูทั้งหมด
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>
+    </button>
   </div>
-  <div id="chartContent">
-    <div class="chart-loading">
-      <div class="chart-loading-dots"><span></span><span></span><span></span></div>
+  <div class="chart-preview" id="chartPreview">
+    <div class="chart-preview-loading">
+      <div class="chart-dots"><span></span><span></span><span></span></div>
       กำลังโหลด chart...
     </div>
   </div>
@@ -455,7 +473,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
           <div class="da-sp-icon">🎵</div>
           <div>
             <div class="da-sp-name" id="daSpName">This Is —</div>
-            <div class="da-sp-sub">Spotify Playlist · เปิดใน App ได้เลย 🎧</div>
+            <div class="da-sp-sub">Spotify Playlist · กดเปิด Spotify App ได้เลย 🎧</div>
           </div>
         </div>
         <a class="da-sp-btn" id="daSpLink" href="#" target="_blank" rel="noopener">
@@ -535,6 +553,23 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   </div>
 </div>
 </div>
+
+<!-- CHART PAGE -->
+<div class="page" id="pageChart">
+<div class="chart-page-wrap">
+  <div class="chart-page-eyebrow">📊 Global Top Chart</div>
+  <h1>เพลงฮิตทั่วโลก<br/><span class="g">ตอนนี้เล่น อะไรอยู่?</span></h1>
+  <p class="chart-page-sub">อัปเดตทุกวัน · ข้อมูลจาก Apple Music · กดฟังได้ทันทีใน Spotify 🎧</p>
+  <div id="chartPageContent">
+    <div class="chart-loading">
+      <div class="chart-dots"><span></span><span></span><span></span></div>
+      กำลังโหลด chart...
+    </div>
+  </div>
+  <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
+</div>
+</div>
+
 
 <!-- PLAYLIST PAGE -->
 <div class="page" id="pagePlaylist">
@@ -1384,186 +1419,274 @@ function openSpotifyDeepLink(event, el, query, webUrl, type){
 }
 function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function switchTab(tab){
-  var tabs={home:'pageHome',quiz:'pageQuiz',playlist:'pagePlaylist'};
-  Object.keys(tabs).forEach(function(k){
-    var page=document.getElementById(tabs[k]);
-    var isActive=k===tab;
-    page.classList.toggle('active',isActive);
-    page.classList.remove('reveal-page');
-    if(isActive){void page.offsetWidth;page.classList.add('reveal-page');}
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
+
+// ============================================================
+// CHART SYSTEM — Apple Music via /api/charts
+// ============================================================
+var chartData = null;       // cache data
+var chartDataFetching = false;
+
+// icon SVGs
+var SP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
+var APPLE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+
+function chartSpotifyUrl(title, artist) {
+  return 'spotify:search:' + encodeURIComponent(title + ' ' + artist);
 }
-function goHome(){switchTab('home');}
-document.addEventListener('DOMContentLoaded',function(){
-  document.body.classList.remove('booting');
-  document.body.classList.add('ready');
-  document.getElementById('plShuffleBtn').addEventListener('click',doPlShuffle);
-  document.getElementById('plAgainBtn').addEventListener('click',doPlShuffle);
-});
+function chartSpotifyWeb(title, artist) {
+  return 'https://open.spotify.com/search/' + encodeURIComponent(title + ' ' + artist) + '/tracks';
+}
 
-// ============================================================
-// GLOBAL CHART — Apple Music Top Songs via /api/charts
-// ============================================================
-var chartLoaded = false;
-
-function loadChart() {
-  if (chartLoaded) return;
-  chartLoaded = true;
-  var container = document.getElementById('chartContent');
-  if (!container) return;
-
-  fetch('/api/charts?limit=10')
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+function fetchChartData(cb) {
+  if (chartData) { cb(null, chartData); return; }
+  if (chartDataFetching) { setTimeout(function(){ fetchChartData(cb); }, 300); return; }
+  chartDataFetching = true;
+  fetch('/api/charts?limit=20')
+    .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(d){
+      chartData = d.songs || [];
+      chartDataFetching = false;
+      cb(null, chartData);
     })
-    .then(function(data) {
-      var songs = data.songs || [];
-      if (!songs.length) throw new Error('empty');
-      renderChart(songs, container);
-    })
-    .catch(function(err) {
-      container.innerHTML =
-        '<div class="chart-error">⚠️ ไม่สามารถโหลด chart ได้ในขณะนี้' +
-        '<br/><button class="chart-retry-btn" onclick="chartLoaded=false;loadChart()">🔄 ลองใหม่</button></div>';
+    .catch(function(e){
+      chartDataFetching = false;
+      cb(e, null);
     });
 }
 
-function renderChart(songs, container) {
-  // icon SVGs
-  var appleIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
-  var spIcon = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
-
-  var html = '<div class="chart-grid">';
-
-  songs.forEach(function(s, i) {
-    var rankClass = i < 3 ? 'chart-rank top3' : 'chart-rank';
-    var rankNum = ['🥇','🥈','🥉'][i] || ('#' + s.rank);
-    var artHtml = s.artwork
-      ? '<img class="chart-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">' +
-        '<div class="chart-art-ph" style="display:none">🎵</div>'
-      : '<div class="chart-art-ph">🎵</div>';
-    var appleBtn = s.appleUrl
-      ? '<a class="chart-link-btn chart-link-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + appleIcon + '</a>'
-      : '';
-    var spBtn = '<a class="chart-link-btn chart-link-sp" href="' + esc(s.spotifyUrl) + '" target="_blank" rel="noopener" title="Spotify">' + spIcon + '</a>';
-
-    if (i === 0) {
-      // hero card สำหรับ #1
-      var heroArt = s.artwork
-        ? '<img class="chart-hero-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">' +
-          '<div class="chart-hero-art-ph" style="display:none">🎵</div>'
-        : '<div class="chart-hero-art-ph">🎵</div>';
-      html += '<div class="chart-hero">' + heroArt +
-        '<div style="flex:1;min-width:0">' +
-          '<div class="chart-hero-rank">🥇 #1 Global</div>' +
-          '<div class="chart-hero-song">' + esc(s.title) + '</div>' +
-          '<div class="chart-hero-artist">' + esc(s.artist) + '</div>' +
-          '<div class="chart-hero-btns">' +
-            (s.appleUrl ? '<a class="chart-hero-btn chart-hero-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener">' + appleIcon + ' Apple Music</a>' : '') +
-            '<a class="chart-hero-btn chart-hero-btn-sp" href="' + esc(s.spotifyUrl) + '" target="_blank" rel="noopener">' + spIcon + ' Spotify</a>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    } else {
-      html += '<div class="chart-item">' +
-        '<div class="' + rankClass + '">' + rankNum + '</div>' +
-        artHtml +
-        '<div class="chart-info">' +
-          '<div class="chart-song">' + esc(s.title) + '</div>' +
-          '<div class="chart-artist">' + esc(s.artist) + '</div>' +
-        '</div>' +
-        '<div class="chart-links">' + appleBtn + spBtn + '</div>' +
-      '</div>';
-    }
-  });
-
-  html += '</div>';
-  container.innerHTML = html;
-  container.style.animation = 'fadeUp .4s ease';
+function artImg(url, cls, ph) {
+  if (!url) return '<div class="' + cls + '-ph">' + ph + '</div>';
+  return '<img class="' + cls + '" src="' + esc(url) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextSibling && (this.nextSibling.style.display=\'flex\')">' +
+         '<div class="' + cls + '-ph" style="display:none">' + ph + '</div>';
 }
 
-// โหลด chart เมื่อเข้าหน้าแรก
-document.addEventListener('DOMContentLoaded', function() {
-  loadChart();
-});
+// ---- TEASER on landing (5 rows preview) ----
+function renderChartTeaser(songs) {
+  var el = document.getElementById('chartPreview');
+  if (!el) return;
+  var ranks = ['🥇','🥈','🥉'];
+  var html = '';
+  songs.slice(0, 5).forEach(function(s, i) {
+    var rank = ranks[i] || ('#' + s.rank);
+    var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
+    // Spotify: ใช้ URI เปิด app ก่อน fallback web
+    var spUrl = chartSpotifyUrl(s.title, s.artist);
+    var spWeb = chartSpotifyWeb(s.title, s.artist);
+    html += '<div class="chart-row" style="border-radius:0;border-left:none;border-right:none;border-top:none;' + (i===0?'border-top:none':'') + '">' +
+      '<div class="' + cls + '">' + rank + '</div>' +
+      artImg(s.artwork, 'chart-row-art', '🎵') +
+      '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
+      '<div class="chart-row-btns">' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" onclick="openSpotify(event,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
+      '</div></div>';
+  });
+  html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
+    '<button onclick="switchTab(\'chart\')" style="font-size:12px;font-weight:700;color:#fb923c;background:none;border:none;cursor:pointer;font-family:inherit">ดูทั้งหมด 20 เพลง →</button></div>';
+  el.innerHTML = html;
+}
+
+// ---- FULL CHART PAGE (20 songs + #1 YouTube MV) ----
+var ytVideoId = null;
+var ytLoaded = false;
+
+function renderChartPage(songs) {
+  var el = document.getElementById('chartPageContent');
+  if (!el || !songs.length) return;
+  var s1 = songs[0];
+  var ranks = ['🥇','🥈','🥉'];
+
+  // hero #1
+  var heroHtml = '<div class="chart-hero-card">' +
+    '<div class="chart-hero-badge">🥇 #1 Global · Apple Music</div>' +
+    '<div class="chart-hero-body">' +
+      artImg(s1.artwork, 'chart-hero-art', '🎵') +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="chart-hero-title">' + esc(s1.title) + '</div>' +
+        '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
+        '<div class="chart-hero-tags">' +
+          '<span class="chart-hero-tag">🏆 อันดับ 1</span>' +
+          '<span class="chart-hero-tag">Apple Music</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    // YouTube MV embed
+    '<div id="ytWrap" class="chart-yt-wrap">' +
+      '<div class="chart-yt-placeholder" id="ytPlaceholder" onclick="loadYT()">' +
+        '<div class="chart-yt-play-btn"><svg viewBox="0 0 24 24" fill="white" width="28" height="28"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' +
+        '<div class="chart-yt-label">▶ กดดู MV — ' + esc(s1.title) + ' · ' + esc(s1.artist) + '</div>' +
+      '</div>' +
+    '</div>' +
+    // listen buttons
+    '<div class="chart-listen-btns">' +
+      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
+        SP_ICON + ' เปิดใน Spotify' +
+      '</a>' +
+      (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
+    '</div>' +
+  '</div>';
+
+  // rank list 2-20
+  var listHtml = '<div class="chart-rank-label">อันดับ 2–20</div><div class="chart-list">';
+  songs.slice(1).forEach(function(s, i) {
+    var rank = ranks[i+1] || ('#' + s.rank);
+    var cls = i < 2 ? 'chart-row-num t3' : 'chart-row-num';
+    listHtml += '<div class="chart-row">' +
+      '<div class="' + cls + '">' + rank + '</div>' +
+      artImg(s.artwork, 'chart-row-art', '🎵') +
+      '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
+      '<div class="chart-row-btns">' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" onclick="openSpotify(event,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
+      '</div></div>';
+  });
+  listHtml += '</div>';
+
+  el.innerHTML = heroHtml + listHtml;
+
+  // ค้นหา YouTube MV สำหรับ #1
+  fetchYoutubeId(s1.title + ' ' + s1.artist);
+}
+
+function fetchYoutubeId(query) {
+  fetch('/api/youtube?q=' + encodeURIComponent(query + ' official mv'))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.videoId) {
+        ytVideoId = d.videoId;
+        var lbl = document.getElementById('ytPlaceholder');
+        if (lbl) lbl.style.cursor = 'pointer';
+      }
+    })
+    .catch(function(){});
+}
+
+function loadYT() {
+  if (!ytVideoId) return;
+  if (ytLoaded) return;
+  ytLoaded = true;
+  var wrap = document.getElementById('ytWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytVideoId + '?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+}
+
+// ---- Spotify URI handler (บัค #3 — เปิด app ก่อน fallback web) ----
+function openSpotify(e, webUrl) {
+  e.preventDefault();
+  // ลอง URI scheme เพื่อเปิด app
+  var uri = e.currentTarget.href;
+  window.location.href = uri;
+  // fallback ไป web หลัง 1.5s ถ้า app ไม่ตอบ
+  setTimeout(function(){
+    window.open(webUrl, '_blank');
+  }, 1500);
+}
+
+// ---- Load chart data once on init ----
+var chartInited = false;
+function initChart() {
+  if (chartInited) return;
+  chartInited = true;
+  fetchChartData(function(err, songs) {
+    if (err || !songs || !songs.length) {
+      var els = ['chartPreview','chartPageContent'];
+      els.forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = '<div class="chart-error">⚠️ โหลด chart ไม่ได้ในขณะนี้<br/><button class="chart-retry" onclick="chartInited=false;chartData=null;initChart()">🔄 ลองใหม่</button></div>';
+      });
+      return;
+    }
+    renderChartTeaser(songs);
+    renderChartPage(songs);
+  });
+}
 
 // ============================================================
-// DAILY ARTIST — สุ่มจาก pool รวม 300 ศิลปิน
+// switchTab — อัปเดตให้รองรับ chart tab + highlight nav
+// ============================================================
+function switchTab(tab) {
+  var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
+  Object.keys(tabs).forEach(function(k) {
+    var page = document.getElementById(tabs[k]);
+    if (!page) return;
+    var isActive = k === tab;
+    page.classList.toggle('active', isActive);
+    page.classList.remove('reveal-page');
+    if (isActive) { void page.offsetWidth; page.classList.add('reveal-page'); }
+  });
+  // nav tab highlight
+  var navChart = document.getElementById('navChart');
+  var navPlaylist = document.getElementById('navPlaylist');
+  if (navChart) navChart.classList.toggle('active', tab === 'chart');
+  if (navPlaylist) navPlaylist.classList.toggle('active', tab === 'playlist');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // โหลด chart ครั้งแรกที่เข้า
+  if (tab === 'chart' || tab === 'home') initChart();
+  // reset YT เมื่อออกจากหน้า chart
+  if (tab !== 'chart') { ytLoaded = false; }
+}
+function goHome() { switchTab('home'); }
+
+// ============================================================
+// DAILY ARTIST
 // ============================================================
 var daAll = [];
 var daQueue = [];
-var currentDaArtist = null;
-
 function daInit() {
-  daAll = [].concat(ARTISTS_THAI || []).concat(ARTISTS_INTL || []).concat(ARTISTS_KOREAN || []);
+  if (daAll.length) return;
+  daAll = [].concat(ARTISTS_THAI||[]).concat(ARTISTS_INTL||[]).concat(ARTISTS_KOREAN||[]);
 }
-
-function daBuildQueue() {
-  var arr = daAll.map(function(_, i) { return i; });
-  for (var i = arr.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
-  }
-  return arr;
-}
-
-function daNext() {
-  if (!daAll.length) daInit();
-  if (!daQueue.length) daQueue = daBuildQueue();
-  return daQueue.pop();
-}
-
-function daGetPoolLabel(a) {
-  var nat = (a.nat || '').toLowerCase();
-  if (nat.includes('ไทย')) return '🇹🇭 ไทย';
-  if (nat.includes('เกาหลี')) return '🇰🇷 เกาหลี';
-  return '🌍 สากล';
-}
-
 function daShuffle() {
-  if (!daAll.length) daInit();
-  var idx = daNext();
-  var artist = daAll[idx];
+  daInit();
+  if (!daQueue.length) {
+    var arr = daAll.map(function(_,i){return i;});
+    for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}
+    daQueue = arr;
+  }
+  var artist = daAll[daQueue.pop()];
   if (!artist) return;
-  currentDaArtist = artist;
-
   var card = document.getElementById('daCard');
   if (card) { card.classList.remove('da-flip'); void card.offsetWidth; card.classList.add('da-flip'); }
-
   document.getElementById('daIdle').style.display = 'none';
   document.getElementById('daResult').style.display = 'block';
+  document.getElementById('daPool').textContent = (function(a){
+    var n=(a.nat||'').toLowerCase();
+    return n.includes('ไทย')?'🇹🇭 ไทย':n.includes('เกาหลี')?'🇰🇷 เกาหลี':'🌍 สากล';
+  })(artist);
+  document.getElementById('daName').textContent = (artist.emoji||'🎵')+' '+esc(artist.name);
+  document.getElementById('daBio').textContent = artist.bio||'';
+  var th = '<span class="da-tag nat">'+esc(artist.nat||'')+'</span><span class="da-tag">'+esc(artist.genre||'')+'</span>';
+  if(artist.tags&&artist.tags[0]) th+='<span class="da-tag">'+esc(artist.tags[0])+'</span>';
+  document.getElementById('daTags').innerHTML = th;
 
-  document.getElementById('daPool').textContent = daGetPoolLabel(artist);
-  document.getElementById('daName').textContent = (artist.emoji || '🎵') + ' ' + esc(artist.name);
-  document.getElementById('daBio').textContent = artist.bio || '';
-
-  var tagsHtml = '<span class="da-tag nat">' + esc(artist.nat || '') + '</span>';
-  tagsHtml += '<span class="da-tag">' + esc(artist.genre || '') + '</span>';
-  if (artist.tags && artist.tags[0]) tagsHtml += '<span class="da-tag">' + esc(artist.tags[0]) + '</span>';
-  document.getElementById('daTags').innerHTML = tagsHtml;
-
-  var spUrl = artist.sp || ('https://open.spotify.com/search/this%20is%20' + encodeURIComponent(artist.name || '') + '/playlists');
-  document.getElementById('daSpName').textContent = 'This Is ' + (artist.name || '');
-  document.getElementById('daSpLink').href = spUrl;
+  // Spotify — BUG #3 FIX: ใช้ URI เพื่อเปิด app ก่อน
+  var spUri = artist.sp || ('spotify:search:this is '+encodeURIComponent(artist.name||''));
+  var spWeb = artist.sp
+    ? artist.sp.replace('spotify:search:','https://open.spotify.com/search/').replace('/playlists','') + '/playlists'
+    : ('https://open.spotify.com/search/this%20is%20'+encodeURIComponent(artist.name||'')+'/playlists');
+  document.getElementById('daSpName').textContent = 'This Is '+(artist.name||'');
+  var spLink = document.getElementById('daSpLink');
+  spLink.href = spUri;
+  spLink.onclick = function(e){ e.preventDefault(); window.location.href=spUri; setTimeout(function(){window.open(spWeb,'_blank');},1500); };
 
   var imgEl = document.getElementById('daImg');
-  imgEl.innerHTML = artist.emoji || '🎵';
-  imgEl.style.fontSize = '36px';
-
-  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent((artist.name || '').replace(/ /g, '_')))
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(d) {
-      if (d && d.thumbnail && d.thumbnail.source) {
-        imgEl.innerHTML = '<img src="' + d.thumbnail.source + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';
-        imgEl.style.fontSize = '';
-      }
-    })
-    .catch(function() {});
+  imgEl.innerHTML = artist.emoji||'🎵'; imgEl.style.fontSize='36px';
+  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent((artist.name||'').replace(/ /g,'_')))
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){if(d&&d.thumbnail&&d.thumbnail.source){imgEl.innerHTML='<img src="'+d.thumbnail.source+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';imgEl.style.fontSize='';}})
+    .catch(function(){});
 }
 
+document.addEventListener('DOMContentLoaded',function(){
+  document.body.classList.remove('booting');
+  document.body.classList.add('ready');
+  var ps = document.getElementById('plShuffleBtn');
+  var pa = document.getElementById('plAgainBtn');
+  if(ps) ps.addEventListener('click',doPlShuffle);
+  if(pa) pa.addEventListener('click',doPlShuffle);
+  // โหลด chart ทันทีที่เปิดหน้าแรก
+  initChart();
+});
 </script>
 </body>
 </html>
