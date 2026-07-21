@@ -392,37 +392,30 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 }
 
 
-/* ===== DUAL CHART TEASER (Global + Thai side by side) ===== */
-.chart-teaser{max-width:780px;margin:0 auto;padding:0 20px 56px}
-.chart-teaser-heading{margin-bottom:20px}
-.chart-teaser-eyebrow{font-size:12px;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
-.chart-teaser-title{font-size:clamp(20px,3vw,26px);font-weight:800;color:var(--text);letter-spacing:-.02em}
-.chart-dual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.chart-col{background:var(--card);border:1.5px solid var(--border2);border-radius:18px;overflow:hidden}
-.chart-col-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid var(--border)}
-.chart-col-label{font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px}
-.chart-col-see-all{font-size:11px;font-weight:700;color:#fb923c;background:none;border:1px solid rgba(251,146,60,.25);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap}
-.chart-col-see-all:hover{background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.4)}
-.chart-col-list{padding:6px 0}
-.chart-mini-row{display:flex;align-items:center;gap:9px;padding:7px 14px;transition:background .15s}
-.chart-mini-row:hover{background:rgba(255,255,255,.03)}
-.chart-mini-num{font-size:12px;font-weight:900;min-width:18px;text-align:right;flex-shrink:0;color:var(--text3)}
-.chart-mini-num.t3{color:#fb923c}
-.chart-mini-art{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.05)}
-.chart-mini-art-ph{width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
-.chart-mini-info{flex:1;min-width:0}
-.chart-mini-title{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-mini-artist{font-size:10px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-mini-sp{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:rgba(29,185,84,.1);color:var(--green);text-decoration:none;flex-shrink:0;transition:background .15s}
-.chart-mini-sp:hover{background:rgba(29,185,84,.2)}
-
-/* ===== THAI CHART PAGE ===== */
-.thai-chart-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.22);color:#fb923c;border-radius:20px;padding:5px 14px;margin-bottom:20px}
-
-@media(max-width:580px){
-  .chart-dual{grid-template-columns:1fr}
-  .chart-col-see-all{font-size:10px;padding:3px 8px}
-}
+/* ===== SONG RECOMMENDATION ===== */
+.song-rec-section{margin-top:28px;border-top:1px solid rgba(255,255,255,.07);padding-top:24px}
+.song-rec-label{font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.song-rec-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:16px}
+.song-rec-loading{display:flex;align-items:center;gap:10px;padding:14px 0;color:var(--text3);font-size:13px;font-family:'Noto Sans Thai',sans-serif}
+.song-rec-list{display:flex;flex-direction:column;gap:6px}
+.song-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;transition:all .18s;cursor:pointer;text-decoration:none}
+.song-card:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px)}
+.song-num{font-size:12px;font-weight:800;color:var(--text3);min-width:18px;text-align:right;flex-shrink:0}
+.song-info{flex:1;min-width:0}
+.song-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-artist{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-why{font-size:11px;color:rgba(240,238,255,.45);margin-top:3px;font-family:'Noto Sans Thai',sans-serif;line-height:1.5;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.song-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.song-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:5px;background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.16);color:#fb923c}
+.song-btns{display:flex;gap:5px;flex-shrink:0}
+.song-btn{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s;border:none;cursor:pointer;flex-shrink:0}
+.song-btn-sp{background:rgba(29,185,84,.1);color:var(--green)}
+.song-btn-sp:hover{background:rgba(29,185,84,.2)}
+.song-btn-yt{background:rgba(255,0,0,.08);color:#ff4444}
+.song-btn-yt:hover{background:rgba(255,0,0,.16)}
+.song-rec-error{text-align:center;padding:16px;color:var(--text3);font-size:13px;font-family:'Noto Sans Thai',sans-serif;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.song-rec-retry{margin-top:8px;padding:8px 16px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);color:#fb923c;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.song-rec-retry:hover{background:rgba(251,146,60,.18)}
 </style>
 </head>
 <body class="booting">
@@ -469,34 +462,20 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 
 <!-- CHART TEASER on landing -->
 <div class="chart-teaser">
-  <div class="chart-teaser-heading">
-    <div class="chart-teaser-eyebrow">📊 TOP HIT ติด CHARTS</div>
-    <div class="chart-teaser-title">เพลง TOP HIT ที่น่าฟังตอนนี้</div>
-  </div>
-  <div class="chart-dual">
-    <!-- Global Top 20 -->
-    <div class="chart-col">
-      <div class="chart-col-head">
-        <div class="chart-col-label">🌍 Global Top 20</div>
-        <button class="chart-col-see-all" onclick="switchTab('chart')">ดูทั้งหมด →</button>
-      </div>
-      <div class="chart-col-list" id="teaserGlobal">
-        <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">
-          <div class="chart-dots"><span></span><span></span><span></span></div>
-        </div>
-      </div>
+  <div class="chart-teaser-header">
+    <div class="chart-teaser-left">
+      <div class="chart-teaser-eyebrow">📊 TOP HIT ติด CHARTS</div>
+      <div class="chart-teaser-title">เพลง TOP HIT ที่น่าฟังตอนนี้</div>
     </div>
-    <!-- Thai Top 20 -->
-    <div class="chart-col">
-      <div class="chart-col-head">
-        <div class="chart-col-label">🇹🇭 Thai Top 20</div>
-        <button class="chart-col-see-all" onclick="switchTab('thaichart')">ดูทั้งหมด →</button>
-      </div>
-      <div class="chart-col-list" id="teaserThai">
-        <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">
-          <div class="chart-dots"><span></span><span></span><span></span></div>
-        </div>
-      </div>
+    <button type="button" class="chart-teaser-btn" onclick="switchTab('chart')">
+      ดูทั้งหมด
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+  <div class="chart-preview" id="chartPreview">
+    <div class="chart-preview-loading">
+      <div class="chart-dots"><span></span><span></span><span></span></div>
+      กำลังโหลด chart...
     </div>
   </div>
 </div>
@@ -603,7 +582,19 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <div class="top-card" id="topMatchCard"></div>
     <div class="match-section-label" style="margin-top:8px">🎶 ศิลปินที่น่าจะชอบด้วย</div>
     <div id="otherCards"></div>
-    <div style="display:flex;gap:10px;margin-top:24px">
+    <!-- Song Recommendation Section -->
+  <div class="song-rec-section" id="songRecSection">
+    <div class="song-rec-label">🎵 แนะนำเพลง</div>
+    <div class="song-rec-title" id="songRecTitle">เพลงที่คุณน่าจะชอบ</div>
+    <div id="songRecContent">
+      <div class="song-rec-loading">
+        <div class="chart-dots"><span></span><span></span><span></span></div>
+        AI กำลังเลือกเพลงที่ match คุณ...
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:24px">
     <button onclick="goHome()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">🏠 กลับหน้าหลัก</button>
     <button onclick="resetQuiz()" style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;color:rgba(240,238,255,0.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(167,139,250,0.3)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(240,238,255,0.5)'">↩ ทำ Quiz ใหม่</button>
   </div>
@@ -618,23 +609,6 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   <h1>เพลง TOP HIT<br/><span class="g">ที่น่าฟังตอนนี้</span></h1>
   <p class="chart-page-sub">อ้างอิง Top 20 จาก iTunes · กดฟังได้ทันทีใน Spotify YouTube Apple Music 🎧</p>
   <div id="chartPageContent"></div>
-  <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
-</div>
-</div>
-
-
-<!-- THAI CHART PAGE -->
-<div class="page" id="pageThaiChart">
-<div class="chart-page-wrap">
-  <div class="thai-chart-badge">🇹🇭 Billboard Thailand</div>
-  <h1>เพลงฮิต<br/><span class="g">ไทย ที่น่าฟัง</span></h1>
-  <p class="chart-page-sub">อ้างอิง Billboard Thailand · อัปเดตทุกสัปดาห์ · กดฟังใน Spotify ได้เลย 🎧</p>
-  <div id="thaiChartPageContent">
-    <div class="chart-loading">
-      <div class="chart-dots"><span></span><span></span><span></span></div>
-      กำลังโหลด...
-    </div>
-  </div>
   <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
 </div>
 </div>
@@ -1415,6 +1389,16 @@ function showResult(){
   setTimeout(function(){var b=document.getElementById('topBar');if(b)b.style.width=topPct+'%';},300);
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
+  // โหลดเพลงแนะนำ — ทำงาน async ไม่ block result
+  _songRecFetching = false;
+  var _recContent = document.getElementById('songRecContent');
+  if (_recContent) {
+    _recContent.innerHTML = '<div class="song-rec-loading"><div class="chart-dots"><span></span><span></span><span></span></div>AI กำลังเลือกเพลงที่ match คุณ...</div>';
+  }
+  setTimeout(function() {
+    loadSongRecommendations(top.name || '', persona.name || '', selectedLang || 'intl');
+  }, 400); // หน่วง 400ms ให้ result screen render ก่อน
+
   // --- Others: แสดง 5 คนถัดไป (index 1-5) ---
   var othersHtml='';
   scored.slice(1,6).forEach(function(item,i){
@@ -1651,70 +1635,6 @@ function chartSpotifyWeb(title, artist) {
 // วิธีอัปเดต: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง จากนั้นอัปโหลดไฟล์ใหม่
 // artwork ใส่ค่าว่างได้ ระบบจะดึงรูปศิลปินจาก Wikipedia แบบ async หลังจาก list แสดงแล้ว
 // ============================================================
-var STATIC_THAI_CHART_SONGS = [
-  {rank:1, title:"กลัวว่าฉันจะไม่เสียใจ (Fear)", artist:"PURPEECH",
-   artwork:"https://billboardth.com/cover/SGED0B58EBA0C845D49D72FF62B8C0D808.jpg",
-   youtubeId:"", spotifyQuery:"กลัวว่าฉันจะไม่เสียใจ PURPEECH"},
-  {rank:2, title:"ความรัก", artist:"Bodyslam",
-   artwork:"https://billboardth.com/cover/SG95E3B1E5FB0F4DC0B7C57AADD4EF0437.jpg",
-   youtubeId:"", spotifyQuery:"ความรัก Bodyslam"},
-  {rank:3, title:"Living Death", artist:"PUN",
-   artwork:"https://billboardth.com/cover/SGB76358FF4D144AB8AEE1DC0B15602B9F.jpg",
-   youtubeId:"", spotifyQuery:"Living Death PUN"},
-  {rank:4, title:"รักให้เธอได้รู้", artist:"PUN",
-   artwork:"https://billboardth.com/cover/SG1850A0F42E674CE78D0D679B1DBC9B5B.jpg",
-   youtubeId:"", spotifyQuery:"รักให้เธอได้รู้ PUN"},
-  {rank:5, title:"ได้แค่เดินมาส่ง", artist:"GAVIN:D",
-   artwork:"https://billboardth.com/cover/SG9992273DF2814C7192732C17DDC6465D.jpg",
-   youtubeId:"", spotifyQuery:"ได้แค่เดินมาส่ง GAVIN:D"},
-  {rank:6, title:"Rain Zone", artist:"Maiyarap",
-   artwork:"https://billboardth.com/cover/SGB6C06427CD3A4B37AA21CC6F7E692E99.jpg",
-   youtubeId:"", spotifyQuery:"Rain Zone Maiyarap"},
-  {rank:7, title:"อยากจะกอดเธอนาน ๆ", artist:"BLVCKHEART",
-   artwork:"https://billboardth.com/cover/SG2075BAFE2CFD4ABCA46B07EB7C058BDA.jpg",
-   youtubeId:"", spotifyQuery:"อยากจะกอดเธอนาน BLVCKHEART"},
-  {rank:8, title:"รักใครไม่ไหว", artist:"Three Man Down",
-   artwork:"https://billboardth.com/cover/SG3712BDB717904ED09A3364947318F3E4.jpg",
-   youtubeId:"", spotifyQuery:"รักใครไม่ไหว Three Man Down"},
-  {rank:9, title:"จากกันโดยสมบูรณ์", artist:"guncharlie",
-   artwork:"https://billboardth.com/cover/SG3AA0CF85EC704BA1825CD2100CDD57D8.jpg",
-   youtubeId:"", spotifyQuery:"จากกันโดยสมบูรณ์ guncharlie"},
-  {rank:10, title:"ไม่มีวันไหนที่ไม่คิดถึง", artist:"PURPEECH",
-   artwork:"https://billboardth.com/cover/SGE8FAE85CC8854F4A8D571197F8F4C18D.jpg",
-   youtubeId:"", spotifyQuery:"ไม่มีวันไหนที่ไม่คิดถึง PURPEECH"},
-  {rank:11, title:"กลัวความเสียใจ", artist:"Saran",
-   artwork:"https://billboardth.com/cover/SGC889F2DF0F384988822A01FA40016810.jpg",
-   youtubeId:"", spotifyQuery:"กลัวความเสียใจ Saran"},
-  {rank:12, title:"รักมือสอง", artist:"Bedroom Audio",
-   artwork:"https://billboardth.com/cover/SG501FBD4F209B4AE38489FDCF13085937.jpg",
-   youtubeId:"", spotifyQuery:"รักมือสอง Bedroom Audio"},
-  {rank:13, title:"ฝากให้เขารัก", artist:"Yes'sir Days",
-   artwork:"https://billboardth.com/cover/SG3E85FF26F5A04BDDA09D5F6549AA2317.jpg",
-   youtubeId:"", spotifyQuery:"ฝากให้เขารัก Yes'sir Days"},
-  {rank:14, title:"ที่คั่นหนังสือ (Sometimes)", artist:"BOWKYLION, Nont Tanont",
-   artwork:"https://billboardth.com/cover/SG7AC02EB62D2D4D1E99054BAE9B03BF1D.jpg",
-   youtubeId:"", spotifyQuery:"ที่คั่นหนังสือ BOWKYLION Nont Tanont"},
-  {rank:15, title:"ย้าย่ายะ", artist:"อูโน่ หลาวทอง",
-   artwork:"https://billboardth.com/cover/SGA231B4E646B148238EA8D13A7ECBFFF7.jpg",
-   youtubeId:"", spotifyQuery:"ย้าย่ายะ อูโน่ หลาวทอง"},
-  {rank:16, title:"เมื่อถูกค้นพบ", artist:"FREEHAND",
-   artwork:"https://billboardth.com/cover/SG9F8147BCEAD34D518A00CB0C16941C20.jpg",
-   youtubeId:"", spotifyQuery:"เมื่อถูกค้นพบ FREEHAND"},
-  {rank:17, title:"คำยินดี", artist:"KLEAR",
-   artwork:"https://billboardth.com/cover/SG027B2F3A12344333AD6F9140D7B033DB.jpg",
-   youtubeId:"", spotifyQuery:"คำยินดี KLEAR"},
-  {rank:18, title:"ขอแค่นี้ (Forever n ever)", artist:"PUN",
-   artwork:"https://billboardth.com/cover/SG7D5CE350ACAD4B379B400E5B67C6DD56.jpg",
-   youtubeId:"", spotifyQuery:"ขอแค่นี้ PUN"},
-  {rank:19, title:"ถามเพื่ออะไร", artist:"KLEAR",
-   artwork:"https://billboardth.com/cover/SGBFDFE33D28C9480ABC7562CDD4F6AE94.jpg",
-   youtubeId:"", spotifyQuery:"ถามเพื่ออะไร KLEAR"},
-  {rank:20, title:"ONE OF MY LIFE", artist:"BlackHeart Ft.K6Y",
-   artwork:"https://billboardth.com/cover/SG8ACB3C20BB6345A2B98FB9016E79EE47.jpg",
-   youtubeId:"", spotifyQuery:"ONE OF MY LIFE BlackHeart K6Y"}
-];
-var STATIC_THAI_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 22 มิ.ย. 2569 · อ้างอิง Billboard Thailand';
-
 var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569 · อ้างอิง iTunes US Top Songs';
 var STATIC_CHART_SOURCE_LABEL = 'iTunes US Top Songs · TOP HIT ติด CHARTS';
 
@@ -2109,7 +2029,7 @@ function hydrateChartWikipediaImages() {
 
 // ---- TEASER on landing (5 rows preview) ----
 function renderChartTeaser(songs) {
-  var el = document.getElementById('teaserGlobal') || document.getElementById('chartPreview');
+  var el = document.getElementById('chartPreview');
   if (!el) return;
   var ranks = ['🥇','🥈','🥉'];
   var html = '';
@@ -2325,11 +2245,6 @@ function initChart(onReady) {
       el.innerHTML = '<div class="chart-error">โหลดรายการเพลงไม่สำเร็จ แต่ข้อมูลอยู่ในเว็บแล้ว กรุณารีเฟรชหน้าอีกครั้ง</div>';
     }
   }
-  // Thai chart — render จาก static data ทันที
-  if (typeof STATIC_THAI_CHART_SONGS !== 'undefined' && STATIC_THAI_CHART_SONGS.length) {
-    try { renderThaiTeaser(STATIC_THAI_CHART_SONGS); } catch(e) {}
-    try { renderThaiChartPage(STATIC_THAI_CHART_SONGS); } catch(e) {}
-  }
   if (onReady) { try { onReady(chartData); } catch(e){} }
 }
 function retryChart() {
@@ -2342,11 +2257,11 @@ function retryChart() {
 // switchTab — อัปเดตให้รองรับ chart tab + highlight nav
 // ============================================================
 function switchTab(tab) {
-  var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart', thaichart:'pageThaiChart'};
+  var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
 
   // สำคัญ: ถ้าเข้า chart/home ให้ render จาก static database ก่อนเปลี่ยนหน้า
   // เพื่อไม่ให้ผู้ใช้เห็นหน้ากำลังโหลด charts อีก
-  if (tab === 'chart' || tab === 'home' || tab === 'thaichart') {
+  if (tab === 'chart' || tab === 'home') {
     try { initChart(); } catch(e) { console.error('initChart error:', e); }
   }
 
@@ -2361,10 +2276,8 @@ function switchTab(tab) {
   // nav tab highlight
   var navChart = document.getElementById('navChart');
   var navPlaylist = document.getElementById('navPlaylist');
-  var navThaiChart = document.getElementById('navThaiChart');
   if (navChart) navChart.classList.toggle('active', tab === 'chart');
   if (navPlaylist) navPlaylist.classList.toggle('active', tab === 'playlist');
-  if (navThaiChart) navThaiChart.classList.toggle('active', tab === 'thaichart');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (tab !== 'chart') { ytLoaded = false; }
 }
@@ -2433,82 +2346,97 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ============================================================
-// THAI CHART — Billboard Thailand Top 20
+// SONG RECOMMENDATION — ดึงจาก /api/search mode:'song'
+// เรียกทันทีหลัง showResult() แสดง top artist
 // ============================================================
-function renderThaiTeaser(songs) {
-  var el = document.getElementById('teaserThai');
-  if (!el || !songs || !songs.length) return;
-  var ranks = ['🥇','🥈','🥉'];
-  var SP = '<svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
-  var html = '';
-  songs.slice(0, 5).forEach(function(s, i) {
-    var spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(s.spotifyQuery || s.title + ' ' + s.artist) + '/tracks';
-    var artHtml = s.artwork
-      ? '<img class="chart-mini-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">'
-      : '<div class="chart-mini-art-ph">🎵</div>';
-    html += '<div class="chart-mini-row">' +
-      '<div class="chart-mini-num' + (i < 3 ? ' t3' : '') + '">' + (ranks[i] || '#' + s.rank) + '</div>' +
-      artHtml +
-      '<div class="chart-mini-info">' +
-        '<div class="chart-mini-title">' + esc(s.title) + '</div>' +
-        '<div class="chart-mini-artist">' + esc(s.artist) + '</div>' +
-      '</div>' +
-      '<a class="chart-mini-sp" href="' + esc(spUrl) + '" target="_blank" rel="noopener" title="Spotify">' + SP + '</a>' +
-    '</div>';
+var _songRecArtist = '';  // artist ที่ใช้เป็น seed
+var _songRecFetching = false;
+
+function loadSongRecommendations(artistName, personaName, lang) {
+  if (_songRecFetching) return;
+  _songRecFetching = true;
+  _songRecArtist = artistName || '';
+
+  var titleEl = document.getElementById('songRecTitle');
+  var contentEl = document.getElementById('songRecContent');
+  if (!contentEl) return;
+
+  // ปรับหัวข้อตามศิลปิน
+  if (titleEl && artistName) {
+    titleEl.textContent = 'ถ้าชอบ ' + artistName + ' ลองฟัง...';
+  }
+
+  // query = "ศิลปิน + persona" เพื่อให้ AI เข้าใจ context
+  var query = artistName + (personaName ? ' ' + personaName : '');
+
+  fetch('/api/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: query, mode: 'song' })
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(data) {
+    _songRecFetching = false;
+    if (!data || !data.songs || !data.songs.length) {
+      showSongRecError(contentEl, 'ไม่พบเพลงแนะนำ ลองทำ Quiz ใหม่นะครับ');
+      return;
+    }
+    renderSongRec(contentEl, data.songs, lang);
+  })
+  .catch(function(err) {
+    _songRecFetching = false;
+    showSongRecError(contentEl, 'AI ยุ่งอยู่ครับ กดลองใหม่ได้เลย');
   });
-  el.innerHTML = html;
 }
 
-function renderThaiChartPage(songs) {
-  var el = document.getElementById('thaiChartPageContent');
-  if (!el || !songs || !songs.length) return;
-  var ranks = ['🥇','🥈','🥉'];
-  var SP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
-  var YT_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.5 5 12 5 12 5s-4.5 0-7 .1c-.4.1-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.8C6.6 19 12 19 12 19s4.5 0 7-.1c.4-.1 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8zM9.7 14.5V9l5.4 2.8-5.4 2.7z"/></svg>';
+function renderSongRec(el, songs, lang) {
+  var SP = '<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
+  var YT = '<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.5 5 12 5 12 5s-4.5 0-7 .1c-.4.1-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.8C6.6 19 12 19 12 19s4.5 0 7-.1c.4-.1 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8zM9.7 14.5V9l5.4 2.8-5.4 2.7z"/></svg>';
 
-  // Hero #1
-  var s1 = songs[0];
-  var spUrl1 = 'https://open.spotify.com/search/' + encodeURIComponent(s1.spotifyQuery || s1.title + ' ' + s1.artist) + '/tracks';
-  var ytUrl1 = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s1.title + ' ' + s1.artist + ' official mv');
-  var heroHtml = '<div class="chart-hero-card">' +
-    '<div class="chart-hero-badge">🥇 #1 Thailand · Billboard TH</div>' +
-    '<div class="chart-hero-body">' +
-      (s1.artwork ? '<img class="chart-hero-art" src="' + esc(s1.artwork) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextSibling&&(this.nextSibling.style.display=\'flex\')">' +
-        '<div class="chart-hero-art-ph" style="display:none">🎵</div>'
-        : '<div class="chart-hero-art-ph">🎵</div>') +
-      '<div style="flex:1;min-width:0">' +
-        '<div class="chart-hero-title">' + esc(s1.title) + '</div>' +
-        '<div class="chart-hero-artist">' + esc(s1.artist) + '</div>' +
-        '<div class="chart-hero-tags"><span class="chart-hero-tag">🏆 อันดับ 1</span><span class="chart-hero-tag">🇹🇭 Thai</span></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="chart-listen-btns">' +
-      '<a class="chart-listen-btn chart-listen-sp" href="' + esc(spUrl1) + '" target="_blank" rel="noopener">' + SP_ICON + ' เปิดใน Spotify</a>' +
-      '<a class="chart-listen-btn chart-listen-yt" href="' + esc(ytUrl1) + '" target="_blank" rel="noopener">' + YT_ICON + ' YouTube MV</a>' +
-    '</div>' +
-  '</div>';
-
-  // Rank list 1-20
-  var listHtml = '<div class="chart-rank-label">อันดับ 1–20</div><div class="chart-list">';
+  var html = '<div class="song-rec-list">';
   songs.forEach(function(s, i) {
-    var rank = ranks[i] || ('#' + s.rank);
-    var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
-    var spUrl = 'https://open.spotify.com/search/' + encodeURIComponent(s.spotifyQuery || s.title + ' ' + s.artist) + '/tracks';
-    var ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv');
-    var artHtml = s.artwork
-      ? '<img class="chart-row-art" src="' + esc(s.artwork) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextSibling&&(this.nextSibling.style.display=\'flex\')">' +
-        '<div class="chart-row-art-ph" style="display:none">🎵</div>'
-      : '<div class="chart-row-art-ph">🎵</div>';
-    listHtml += '<div class="chart-row">' +
-      '<div class="' + cls + '">' + rank + '</div>' + artHtml +
-      '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
-      '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + esc(spUrl) + '" target="_blank" rel="noopener" title="Spotify">' + SP_ICON + '</a>' +
-        '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" target="_blank" rel="noopener" title="YouTube">' + YT_ICON + '</a>' +
-      '</div></div>';
+    var spUrl  = 'https://open.spotify.com/search/' + encodeURIComponent((s.name||'') + ' ' + (s.artist||'')) + '/tracks';
+    var ytUrl  = 'https://www.youtube.com/results?search_query=' + encodeURIComponent((s.name||'') + ' ' + (s.artist||'') + ' official mv');
+    var tagsHtml = '';
+    if (s.tags && s.tags.length) {
+      tagsHtml = '<div class="song-tags">' + s.tags.slice(0,3).map(function(t){ return '<span class="song-tag">' + esc(t) + '</span>'; }).join('') + '</div>';
+    }
+    html += '<div class="song-card">' +
+      '<div class="song-num">' + (i+1) + '</div>' +
+      '<div class="song-info">' +
+        '<div class="song-name">' + esc(s.name||'') + '</div>' +
+        '<div class="song-artist">' + esc(s.artist||'') + '</div>' +
+        (s.why ? '<div class="song-why">' + esc(s.why) + '</div>' : '') +
+        tagsHtml +
+      '</div>' +
+      '<div class="song-btns">' +
+        '<a class="song-btn song-btn-sp" href="' + esc(spUrl) + '" target="_blank" rel="noopener" title="ฟังใน Spotify">' + SP + '</a>' +
+        '<a class="song-btn song-btn-yt" href="' + esc(ytUrl) + '" target="_blank" rel="noopener" title="ดู MV บน YouTube">' + YT + '</a>' +
+      '</div>' +
+    '</div>';
   });
-  listHtml += '</div>';
-  el.innerHTML = heroHtml + listHtml;
+  html += '</div>';
+
+  // ใส่ปุ่ม "โหลดเพลงใหม่" ท้ายสุด
+  html += '<button class="song-rec-retry" style="width:100%;margin-top:10px" onclick="reloadSongRec()">🔄 แนะนำเพลงชุดใหม่</button>';
+  el.innerHTML = html;
+  el.style.animation = 'fadeUp .35s ease';
+}
+
+function showSongRecError(el, msg) {
+  el.innerHTML = '<div class="song-rec-error">' + esc(msg) +
+    '<br/><button class="song-rec-retry" onclick="reloadSongRec()">🔄 ลองใหม่</button></div>';
+}
+
+function reloadSongRec() {
+  var contentEl = document.getElementById('songRecContent');
+  if (!contentEl) return;
+  contentEl.innerHTML = '<div class="song-rec-loading"><div class="chart-dots"><span></span><span></span><span></span></div>AI กำลังเลือกเพลงที่ match คุณ...</div>';
+  _songRecFetching = false;
+  loadSongRecommendations(_songRecArtist, _shareState.personaName, _shareState.lang);
 }
 
 </script>
