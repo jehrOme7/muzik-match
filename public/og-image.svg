@@ -1,0 +1,42 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0a1a"/>
+      <stop offset="100%" style="stop-color:#1a1030"/>
+    </linearGradient>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a78bfa"/>
+      <stop offset="50%" style="stop-color:#f472b6"/>
+      <stop offset="100%" style="stop-color:#fb923c"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Glow orb -->
+  <circle cx="200" cy="200" r="280" fill="rgba(124,58,237,0.12)"/>
+  <circle cx="1000" cy="430" r="220" fill="rgba(244,114,182,0.09)"/>
+  <!-- Logo icon -->
+  <rect x="80" y="80" width="70" height="70" rx="18" fill="url(#g1)"/>
+  <text x="115" y="131" font-size="38" text-anchor="middle" fill="white">🎵</text>
+  <!-- Brand -->
+  <text x="168" y="118" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="900" fill="#f0eeff" letter-spacing="-1">Muzik</text>
+  <text x="168" y="146" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="-1">
+    <tspan fill="url(#g1)">Match</tspan>
+  </text>
+  <!-- Headline -->
+  <text x="80" y="300" font-family="Inter,Arial,sans-serif" font-size="72" font-weight="900" fill="#f0eeff" letter-spacing="-3">หาเพลง</text>
+  <text x="80" y="390" font-family="Inter,Arial,sans-serif" font-size="72" font-weight="900" letter-spacing="-3">
+    <tspan fill="url(#g1)">ที่ใช่</tspan><tspan fill="#f0eeff"> สำหรับคุณ</tspan>
+  </text>
+  <!-- Subtext -->
+  <text x="80" y="460" font-family="Inter,Arial,sans-serif" font-size="28" fill="rgba(240,238,255,0.55)">ตอบ 5 คำถาม · ศิลปินกว่า 300 คน · ไทย สากล เกาหลี 🎧</text>
+  <!-- Badges -->
+  <rect x="80" y="500" width="140" height="42" rx="12" fill="rgba(167,139,250,0.15)" stroke="rgba(167,139,250,0.3)" stroke-width="1"/>
+  <text x="150" y="526" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#a78bfa" text-anchor="middle">🇹🇭 ไทย</text>
+  <rect x="234" y="500" width="140" height="42" rx="12" fill="rgba(251,146,60,0.12)" stroke="rgba(251,146,60,0.25)" stroke-width="1"/>
+  <text x="304" y="526" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#fb923c" text-anchor="middle">🌍 สากล</text>
+  <rect x="388" y="500" width="140" height="42" rx="12" fill="rgba(244,114,182,0.12)" stroke="rgba(244,114,182,0.25)" stroke-width="1"/>
+  <text x="458" y="526" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#f472b6" text-anchor="middle">🇰🇷 เกาหลี</text>
+  <!-- URL -->
+  <text x="1120" y="590" font-family="Inter,Arial,sans-serif" font-size="20" fill="rgba(240,238,255,0.3)" text-anchor="end">muzik-match.vercel.app</text>
+</svg>
