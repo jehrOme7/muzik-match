@@ -1,0 +1,197 @@
+{
+  "thai": [
+    {
+      "name": "PURPEECH",
+      "emoji": "🌙",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Indie Pop / Soul",
+      "bio": "Indie Soul ลึกซึ้ง ซาวด์อบอุ่นที่มาพร้อมกับความรู้สึกคิดถึงและเดียวดาย",
+      "tags": ["Indie Pop", "Soul", "Chill"],
+      "mood": { "dark": 3, "chill": 6, "energetic": 2, "emotional": 9, "indie": 7 }
+    },
+    {
+      "name": "Bodyslam",
+      "emoji": "🎸",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Rock / Alternative",
+      "bio": "วงร็อคระดับตำนาน เพลงเปี่ยมพลังงานและแรงผลักดันชีวิต",
+      "tags": ["Rock", "Alternative", "Legend"],
+      "mood": { "dark": 4, "chill": 3, "energetic": 8, "emotional": 8, "indie": 4 }
+    },
+    {
+      "name": "PUN",
+      "emoji": "💙",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Melodic R&B / Pop",
+      "bio": "ถ่ายทอดเรื่องราวความรักและความเจ็บปวดผ่านเมโลดี้หวานปนเศร้า",
+      "tags": ["R&B", "Melodic", "Heartbreak"],
+      "mood": { "dark": 4, "chill": 5, "energetic": 3, "emotional": 9, "indie": 5 }
+    },
+    {
+      "name": "YOUNGOHM",
+      "emoji": "🔥",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Hip-Hop / Trap",
+      "bio": "ผู้บุกเบิกวงการฮิปฮอปไทยยุคใหม่ บีตแทร็ปหนัก โฟลว์คม เล่าเรื่องจากความจริง",
+      "tags": ["Hip-Hop", "Trap", "OG"],
+      "mood": { "dark": 8, "chill": 2, "energetic": 7, "emotional": 4, "indie": 4 }
+    },
+    {
+      "name": "Three Man Down",
+      "emoji": "🎸",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Pop Rock / Alternative",
+      "bio": "เจ้าของเพลงฮิตที่เข้าถึงทุกความสัมพันธ์ที่ต้องปล่อยมือและจากลา",
+      "tags": ["Pop Rock", "Heartbreak", "Emotional"],
+      "mood": { "dark": 5, "chill": 3, "energetic": 6, "emotional": 8, "indie": 5 }
+    },
+    {
+      "name": "BOWKYLION",
+      "emoji": "🌸",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Indie Pop / Soul",
+      "bio": "น้ำเสียงทรงเสน่ห์ ถ่ายทอดความรู้สึกของผู้หญิงในความสัมพันธ์ได้อย่างคมคาย",
+      "tags": ["Pop", "Soul", "Intimate"],
+      "mood": { "dark": 3, "chill": 7, "energetic": 2, "emotional": 8, "indie": 8 }
+    },
+    {
+      "name": "Polycat",
+      "emoji": "😎",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Synth-Pop / 80s",
+      "bio": "ความโรแมนติกสไตล์ย้อนยุค ซาวด์ซินธ์ลอยๆ กลิ่นอายพระรองยุค 80s",
+      "tags": ["Synth-Pop", "Retro", "Chill"],
+      "mood": { "dark": 1, "chill": 9, "energetic": 5, "emotional": 5, "indie": 6 }
+    },
+    {
+      "name": "Taitosmith",
+      "emoji": "⚡",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Modern Rock / เพื่อชีวิต",
+      "bio": "บทเพลงเพื่อชีวิตร่วมสมัย ดนตรีร็อคเข้มข้น สะท้อนภาพสังคมได้อย่างตรงไปตรงมา",
+      "tags": ["Rock", "Folk Rock", "Intense"],
+      "mood": { "dark": 6, "chill": 2, "energetic": 8, "emotional": 7, "indie": 6 }
+    },
+    {
+      "name": "Tilly Birds",
+      "emoji": "🐦",
+      "nat": "🇹🇭 ไทย",
+      "genre": "Indie Pop / Rock",
+      "bio": "ดนตรีสดใหม่ ไดนามิกโดดเด่น เพลงรักที่ไม่จำเจ",
+      "tags": ["Indie Pop", "Alternative", "Fresh"],
+      "mood": { "dark": 3, "chill": 5, "energetic": 7, "emotional": 6, "indie": 8 }
+    }
+  ],
+  "intl": [
+    {
+      "name": "The Weeknd",
+      "emoji": "🌙",
+      "nat": "🇨🇦 สากล",
+      "genre": "Dark R&B / Synthwave",
+      "bio": "ราชาแห่งดนตรียามดึก ซาวด์ที่พาคุณเดินทางเข้าสู่ด้านมืดของความเย้ายวน",
+      "tags": ["Dark R&B", "Synthwave", "Late Night"],
+      "mood": { "dark": 8, "chill": 4, "energetic": 6, "emotional": 7, "indie": 5 }
+    },
+    {
+      "name": "Billie Eilish",
+      "emoji": "🖤",
+      "nat": "🇺🇸 สากล",
+      "genre": "Alt Pop / Dark Pop",
+      "bio": "เสียงกระซิบอันทรงพลัง ดนตรีมินิมอลที่พาคุณสำรวจอารมณ์ลึกซึ้งข้างใน",
+      "tags": ["Alt Pop", "Dark Pop", "Vulnerable"],
+      "mood": { "dark": 8, "chill": 6, "energetic": 2, "emotional": 9, "indie": 8 }
+    },
+    {
+      "name": "Kendrick Lamar",
+      "emoji": "👑",
+      "nat": "🇺🇸 สากล",
+      "genre": "Conscious Hip-Hop",
+      "bio": "กวีนิพนธ์แห่งดนตรีฮิปฮอป ถ่ายทอดความจริงของสังคมผ่านไรห์มที่ลึกซึ้ง",
+      "tags": ["Hip-Hop", "Conscious", "Masterpiece"],
+      "mood": { "dark": 8, "chill": 2, "energetic": 7, "emotional": 7, "indie": 7 }
+    },
+    {
+      "name": "SZA",
+      "emoji": "🌸",
+      "nat": "🇺🇸 สากล",
+      "genre": "Neo-Soul / Contemporary R&B",
+      "bio": "เปิดเผยความอ่อนแอและความรู้สึกที่ไม่สมบูรณ์แบบได้อย่างงดงาม",
+      "tags": ["Neo-Soul", "R&B", "Honest"],
+      "mood": { "dark": 4, "chill": 6, "energetic": 3, "emotional": 10, "indie": 6 }
+    },
+    {
+      "name": "Cigarettes After Sex",
+      "emoji": "🌑",
+      "nat": "🇺🇸 สากล",
+      "genre": "Dream Pop / Ambient",
+      "bio": "ซาวด์ดนตรีสีขาวดำที่เบาสบาย ล่องลอย และเยือกเย็นอย่างเงียบสงบ",
+      "tags": ["Dream Pop", "Slowcore", "Nocturnal"],
+      "mood": { "dark": 6, "chill": 10, "energetic": 1, "emotional": 7, "indie": 9 }
+    },
+    {
+      "name": "Frank Ocean",
+      "emoji": "🌊",
+      "nat": "🇺🇸 สากล",
+      "genre": "R&B / Neo-Soul",
+      "bio": "ผลงานดนตรีเหนือกาลเวลา ถ่ายทอดอารมณ์ละเอียดอ่อนผ่านท่วงทำนองที่ไม่เหมือนใคร",
+      "tags": ["R&B", "Neo-Soul", "Artistic"],
+      "mood": { "dark": 6, "chill": 7, "energetic": 2, "emotional": 10, "indie": 9 }
+    },
+    {
+      "name": "Arctic Monkeys",
+      "emoji": "🐒",
+      "nat": "🇬🇧 สากล",
+      "genre": "Indie Rock",
+      "bio": "ริฟฟ์กีตาร์เท่ๆ สไตล์อังกฤษ กับการเล่าเรื่องผ่านมุมมองที่เปี่ยมด้วยไหวพริบ",
+      "tags": ["Indie Rock", "British", "Cool"],
+      "mood": { "dark": 5, "chill": 4, "energetic": 7, "emotional": 5, "indie": 8 }
+    }
+  ],
+  "korean": [
+    {
+      "name": "BTS",
+      "emoji": "💜",
+      "nat": "🇰🇷 เกาหลี",
+      "genre": "K-Pop / Hip-Hop",
+      "bio": "ดนตรีที่เชื่อมโยงผู้คนเข้าด้วยกัน พร้อมพลังงานบวกและข้อความปลอบประโลม",
+      "tags": ["K-Pop", "Global", "Inspiring"],
+      "mood": { "dark": 3, "chill": 4, "energetic": 8, "emotional": 8, "indie": 4 }
+    },
+    {
+      "name": "DPR Live",
+      "emoji": "🎬",
+      "nat": "🇰🇷 เกาหลี",
+      "genre": "K-HipHop / R&B",
+      "bio": "ดนตรีที่ผสมผสานความอาร์ตและภาพยนตร์ ซาวด์โมเดิร์นน่าหลงใหล",
+      "tags": ["K-HipHop", "Cinematic", "Stylish"],
+      "mood": { "dark": 5, "chill": 5, "energetic": 5, "emotional": 7, "indie": 7 }
+    },
+    {
+      "name": "NewJeans",
+      "emoji": "👖",
+      "nat": "🇰🇷 เกาหลี",
+      "genre": "K-Pop / Y2K",
+      "bio": "ความสดใสของวัยเยาว์ สไตล์เรโทรที่เข้าถึงง่ายและฟังได้ไม่รู้เบื่อ",
+      "tags": ["Y2K", "Fresh", "Catchy"],
+      "mood": { "dark": 1, "chill": 8, "energetic": 6, "emotional": 5, "indie": 6 }
+    },
+    {
+      "name": "Ash Island",
+      "emoji": "🖤",
+      "nat": "🇰🇷 เกาหลี",
+      "genre": "Emo Rap / Rock",
+      "bio": "เมโลดี้บีบหัวใจ กลิ่นอายความมืดและความเหงาของวัยหนุ่มสาว",
+      "tags": ["Emo Rap", "Dark Melodic", "Melancholy"],
+      "mood": { "dark": 8, "chill": 3, "energetic": 5, "emotional": 8, "indie": 6 }
+    },
+    {
+      "name": "Colde",
+      "emoji": "❄️",
+      "nat": "🇰🇷 เกาหลี",
+      "genre": "K-R&B / Indie",
+      "bio": "ซาวด์อบอุ่นเหมือนสายลมในฤดูหนาว ให้คุณได้นั่งพักใจในวันที่เหนื่อยล้า",
+      "tags": ["K-R&B", "Chill", "Warm"],
+      "mood": { "dark": 3, "chill": 8, "energetic": 2, "emotional": 8, "indie": 8 }
+    }
+  ]
+}
