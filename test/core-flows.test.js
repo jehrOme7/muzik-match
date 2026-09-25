@@ -86,6 +86,36 @@ test('playlist shuffle labels direct links and search results honestly', () => {
   assert.equal(elements.get('plLinkLabel').textContent, 'เปิด Playlist ใน Spotify');
 });
 
+test('leaving the quiz cancels pending results and ignores delayed callbacks', () => {
+  const { context } = makePage();
+  const timers = [];
+  context.setTimeout = (callback, delay) => {
+    timers.push({ callback, delay });
+    return timers.length;
+  };
+  context.clearTimeout = () => {};
+  context.setInterval = () => 1;
+  context.clearInterval = () => {};
+  let shown = 0;
+  context.showResult = () => { shown++; };
+
+  context.showLoading();
+  context.showLoading();
+  assert.equal(timers.filter(timer => timer.delay === 3900).length, 1);
+  const firstResult = timers.find(timer => timer.delay === 3900);
+  context.switchTab('playlist');
+  firstResult.callback();
+  assert.equal(shown, 0);
+  assert.equal(context.loadingTimer, null);
+
+  context.showLoading();
+  const secondResult = timers.filter(timer => timer.delay === 3900)[1];
+  context.resetQuiz();
+  secondResult.callback();
+  assert.equal(shown, 0);
+  assert.equal(context.loadingTimer, null);
+});
+
 test('retry uses the current result and ignores a late previous response', async () => {
   const { context, elements } = makePage();
   context.AbortController = AbortController;
