@@ -1390,6 +1390,7 @@ function showResult(){
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
   // โหลดเพลงแนะนำ — ทำงาน async ไม่ block result
+  _songRecRequestId++;
   _songRecFetching = false;
   var _recContent = document.getElementById('songRecContent');
   if (_recContent) {
@@ -2038,15 +2039,14 @@ function renderChartTeaser(songs) {
     var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
     // Spotify: ใช้ URI เปิด app ก่อน fallback web
     var spUrl = chartSpotifyUrl(s.title, s.artist);
-    var spWeb = chartSpotifyWeb(s.title, s.artist);
     html += '<div class="chart-row" style="border-radius:0;border-left:none;border-right:none;border-top:none;' + (i===0?'border-top:none':'') + '">' +
       '<div class="' + cls + '">' + rank + '</div>' +
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + spUrl + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + spWeb + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + esc(spUrl) + '" target="_blank" rel="noopener" data-chart-action="spotify" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" onclick="switchTab(\'chart\');setTimeout(function(){playChartMV(null,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')},80);return false;" title="YouTube MV">' + YT_ICON + '</a>' : '') +
+        (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" data-chart-action="video" data-chart-from="teaser" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '" title="YouTube MV">' + YT_ICON + '</a>' : '') +
       '</div></div>';
   });
   html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
@@ -2117,7 +2117,7 @@ function renderChartPage(songs) {
     '</div>' +
     renderChartMVPlayer(s1) +
     '<div class="chart-listen-btns">' +
-      '<a class="chart-listen-btn chart-listen-sp" href="' + chartSpotifyUrl(s1.title,s1.artist) + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + chartSpotifyWeb(s1.title,s1.artist) + '\')">' +
+      '<a class="chart-listen-btn chart-listen-sp" href="' + esc(chartSpotifyUrl(s1.title,s1.artist)) + '" target="_blank" rel="noopener" data-chart-action="spotify">' +
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
@@ -2135,9 +2135,9 @@ function renderChartPage(songs) {
       artImg(s.artwork, 'chart-row-art', '🎵', s.wiki || s.artist) +
       '<div class="chart-row-info"><div class="chart-row-title">' + esc(s.title) + '</div><div class="chart-row-artist">' + esc(s.artist) + '</div></div>' +
       '<div class="chart-row-btns">' +
-        '<a class="chart-row-btn chart-row-btn-sp" href="' + chartSpotifyUrl(s.title,s.artist) + '" target="_blank" rel="noopener" onclick="return openSpotify(event, this,\'' + chartSpotifyWeb(s.title,s.artist) + '\')" title="Spotify">' + SP_ICON + '</a>' +
+        '<a class="chart-row-btn chart-row-btn-sp" href="' + esc(chartSpotifyUrl(s.title,s.artist)) + '" target="_blank" rel="noopener" data-chart-action="spotify" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" onclick="return playChartMV(event,\'' + esc(s.youtubeId) + '\',\'' + jsStr(s.title) + '\',\'' + jsStr(s.artist) + '\')" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
+        (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" data-chart-action="video" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
       '</div></div>';
   });
   listHtml += '</div>';
@@ -2288,9 +2288,11 @@ function goHome() { switchTab('home'); }
 // ============================================================
 var daAll = [];
 var daQueue = [];
+var daImageRequestSeq = 0;
 function daInit() {
   if (daAll.length) return;
-  daAll = [].concat(ARTISTS_THAI||[]).concat(ARTISTS_INTL||[]).concat(ARTISTS_KOREAN||[]);
+  daAll = [].concat(ARTISTS_THAI||[]).concat(ARTISTS_INTL||[]).concat(ARTISTS_KOREAN||[])
+    .filter(function(a){ return a && a.name; });
 }
 function daShuffle() {
   daInit();
@@ -2309,7 +2311,7 @@ function daShuffle() {
     var n=(a.nat||'').toLowerCase();
     return n.includes('ไทย')?'🇹🇭 ไทย':n.includes('เกาหลี')?'🇰🇷 เกาหลี':'🌍 สากล';
   })(artist);
-  document.getElementById('daName').textContent = (artist.emoji||'🎵')+' '+esc(artist.name);
+  document.getElementById('daName').textContent = (artist.emoji||'🎵')+' '+artist.name;
   document.getElementById('daBio').textContent = artist.bio||'';
   var th = '<span class="da-tag nat">'+esc(artist.nat||'')+'</span><span class="da-tag">'+esc(artist.genre||'')+'</span>';
   if(artist.tags&&artist.tags[0]) th+='<span class="da-tag">'+esc(artist.tags[0])+'</span>';
@@ -2327,11 +2329,12 @@ function daShuffle() {
   };
 
   var imgEl = document.getElementById('daImg');
-  imgEl.innerHTML = artist.emoji||'🎵'; imgEl.style.fontSize='36px';
-  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent((artist.name||'').replace(/ /g,'_')))
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(d){if(d&&d.thumbnail&&d.thumbnail.source){imgEl.innerHTML='<img src="'+d.thumbnail.source+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>';imgEl.style.fontSize='';}})
-    .catch(function(){});
+  var imageRequest = ++daImageRequestSeq;
+  imgEl.textContent = artist.emoji||'🎵'; imgEl.style.fontSize='36px';
+  fetchWikiSummaryThumb(artist.name).then(function(src){
+    if (imageRequest !== daImageRequestSeq || !src) return;
+    if (setWikiImgToEl(imgEl, src)) imgEl.style.fontSize='';
+  });
 }
 
 document.addEventListener('DOMContentLoaded',function(){
@@ -2341,6 +2344,17 @@ document.addEventListener('DOMContentLoaded',function(){
   var pa = document.getElementById('plAgainBtn');
   if(ps) ps.addEventListener('click',doPlShuffle);
   if(pa) pa.addEventListener('click',doPlShuffle);
+  document.addEventListener('click', function(e){
+    var link = e.target.closest && e.target.closest('a[data-chart-action]');
+    if (!link) return;
+    if (link.dataset.chartAction === 'spotify') {
+      openSpotify(e, link, link.href);
+    } else if (link.dataset.chartAction === 'video') {
+      e.preventDefault();
+      if (link.dataset.chartFrom === 'teaser') switchTab('chart');
+      playChartMV(null, link.dataset.videoId, link.dataset.videoTitle, link.dataset.videoArtist);
+    }
+  });
   // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
   initChart();
 });
@@ -2350,16 +2364,22 @@ document.addEventListener('DOMContentLoaded',function(){
 // เรียกทันทีหลัง showResult() แสดง top artist
 // ============================================================
 var _songRecArtist = '';  // artist ที่ใช้เป็น seed
+var _songRecPersona = '';
+var _songRecLang = 'intl';
 var _songRecFetching = false;
+var _songRecRequestId = 0;
 
 function loadSongRecommendations(artistName, personaName, lang) {
   if (_songRecFetching) return;
   _songRecFetching = true;
   _songRecArtist = artistName || '';
+  _songRecPersona = personaName || '';
+  _songRecLang = lang || 'intl';
+  var requestId = ++_songRecRequestId;
 
   var titleEl = document.getElementById('songRecTitle');
   var contentEl = document.getElementById('songRecContent');
-  if (!contentEl) return;
+  if (!contentEl) { _songRecFetching = false; return; }
 
   // ปรับหัวข้อตามศิลปิน
   if (titleEl && artistName) {
@@ -2379,6 +2399,7 @@ function loadSongRecommendations(artistName, personaName, lang) {
     return r.json();
   })
   .then(function(data) {
+    if (requestId !== _songRecRequestId) return;
     _songRecFetching = false;
     if (!data || !data.songs || !data.songs.length) {
       showSongRecError(contentEl, 'ไม่พบเพลงแนะนำ ลองทำ Quiz ใหม่นะครับ');
@@ -2387,6 +2408,7 @@ function loadSongRecommendations(artistName, personaName, lang) {
     renderSongRec(contentEl, data.songs, lang);
   })
   .catch(function(err) {
+    if (requestId !== _songRecRequestId) return;
     _songRecFetching = false;
     showSongRecError(contentEl, 'AI ยุ่งอยู่ครับ กดลองใหม่ได้เลย');
   });
@@ -2436,7 +2458,7 @@ function reloadSongRec() {
   if (!contentEl) return;
   contentEl.innerHTML = '<div class="song-rec-loading"><div class="chart-dots"><span></span><span></span><span></span></div>AI กำลังเลือกเพลงที่ match คุณ...</div>';
   _songRecFetching = false;
-  loadSongRecommendations(_songRecArtist, _shareState.personaName, _shareState.lang);
+  loadSongRecommendations(_songRecArtist, _songRecPersona, _songRecLang);
 }
 
 </script>
