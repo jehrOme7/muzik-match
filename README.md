@@ -8,6 +8,8 @@ The site renders the bundled 20-song snapshot immediately, with its source and d
 
 The chart API caches the iTunes feed for up to one hour. Songs with a verified bundled YouTube ID can play an embedded video; newer songs link to a YouTube search instead.
 
+Playlist Shuffle keeps direct Spotify links where the playlist matches the label. Entries whose old link was missing or led to an unrelated playlist open Spotify's playlist search for that category instead. This applies to both the main page and the standalone `/playlist.html` page.
+
 ## Development checks
 
 Run `npm test` to check matching, recommendations, Discover, chart rendering, and the chart API. The site has no build step or runtime npm dependencies.
