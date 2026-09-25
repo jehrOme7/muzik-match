@@ -1,16 +1,19 @@
-# Muzik Match — Security Checked Build
+# Muzik Match
 
-Files in this package:
+Muzik Match is a static music personality quiz and discovery site. The frontend lives in `public/index.html`; Vercel Functions in `api/` provide AI song recommendations, the iTunes US chart, and a legacy YouTube lookup endpoint.
 
-- `public/index.html` — frontend with safer Wikipedia image rendering.
-- `api/search.js` — Gemini proxy with method/content-type validation, input cleanup, response normalization, basic rate limit, no-store cache.
-- `api/youtube.js` — YouTube lookup endpoint with method/query validation and basic rate limit.
-- `vercel.json` — security headers including CSP, HSTS, Referrer-Policy, Permissions-Policy, frame protection, and nosniff.
+## Charts
 
-Optional environment variable:
+The site renders the bundled 20-song snapshot immediately, with its source and date visible. It then requests `/api/charts?limit=20` in the background. When that request succeeds, the page shows the current iTunes US Top Songs feed and its update time. If it fails, the dated snapshot stays visible.
 
-```txt
-ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
-```
+The chart API caches the iTunes feed for up to one hour. Songs with a verified bundled YouTube ID can play an embedded video; newer songs link to a YouTube search instead.
 
-If `ALLOWED_ORIGINS` is empty, the API does not emit permissive CORS and stays same-origin friendly.
+## Development checks
+
+Run `npm test` to check matching, recommendations, Discover, chart rendering, and the chart API. The site has no build step or runtime npm dependencies.
+
+## Configuration
+
+Set `GEMINI_API_KEY` in Vercel for AI recommendations. `GEMINI_API_KEY_2` and `GEMINI_API_KEY_3` are optional fallback keys. `ALLOWED_ORIGINS` can contain a comma-separated list of allowed browser origins for `/api/search`; when unset, that endpoint does not emit permissive CORS headers.
+
+`vercel.json` sets the site's security headers, including CSP, HSTS, frame protection, and `nosniff`. API keys belong only in Vercel environment variables.

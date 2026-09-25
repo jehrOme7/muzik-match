@@ -341,6 +341,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 .chart-teaser-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .chart-teaser-left .chart-teaser-eyebrow{font-size:12px;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
 .chart-teaser-left .chart-teaser-title{font-size:clamp(18px,2.5vw,24px);font-weight:800;color:var(--text);letter-spacing:-.02em}
+.chart-teaser-source{font-size:11px;color:var(--text3);margin-top:4px}
 .chart-teaser-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#fb923c;padding:7px 14px;border:1px solid rgba(251,146,60,.25);border-radius:10px;background:none;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .chart-teaser-btn:hover{background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.4)}
 .chart-preview{background:var(--card);border:1.5px solid var(--border2);border-radius:18px;overflow:hidden}
@@ -465,7 +466,8 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
   <div class="chart-teaser-header">
     <div class="chart-teaser-left">
       <div class="chart-teaser-eyebrow">📊 TOP HIT ติด CHARTS</div>
-      <div class="chart-teaser-title">เพลง TOP HIT ที่น่าฟังตอนนี้</div>
+      <div class="chart-teaser-title">20 เพลงจาก iTunes US</div>
+      <div class="chart-teaser-source" id="chartTeaserSource">ข้อมูลสำรอง · อัปเดตล่าสุด 27 มิ.ย. 2569</div>
     </div>
     <button type="button" class="chart-teaser-btn" onclick="switchTab('chart')">
       ดูทั้งหมด
@@ -606,8 +608,8 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
 <div class="page" id="pageChart">
 <div class="chart-page-wrap">
   <div class="chart-page-eyebrow">📊 TOP HIT ติด CHARTS</div>
-  <h1>เพลง TOP HIT<br/><span class="g">ที่น่าฟังตอนนี้</span></h1>
-  <p class="chart-page-sub">อ้างอิง Top 20 จาก iTunes · กดฟังได้ทันทีใน Spotify YouTube Apple Music 🎧</p>
+  <h1>เพลง TOP HIT<br/><span class="g">จาก iTunes US</span></h1>
+  <p class="chart-page-sub" id="chartPageSource">ข้อมูลสำรอง · อัปเดตล่าสุด 27 มิ.ย. 2569 · กดฟังต่อใน Spotify, YouTube หรือ Apple Music 🎧</p>
   <div id="chartPageContent"></div>
   <button onclick="goHome()" style="width:100%;margin-top:32px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(251,146,60,.3)';this.style.color='#fb923c'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)';this.style.color='var(--text3)'">← กลับหน้าหลัก</button>
 </div>
@@ -1579,10 +1581,13 @@ function jsStr(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
 // ============================================================
-// CHART SYSTEM — Static iTunes Top 20 database, no runtime API fetch
+// CHART SYSTEM — show the bundled snapshot immediately, then refresh from /api/charts
 // ============================================================
 var chartData = null;       // cache data
 var chartDataFetching = false;
+var chartDataUpdatedAt = '';
+var chartDataIsLive = false;
+var chartDataStale = false;
 
 // icon SVGs
 var SP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>';
@@ -1610,13 +1615,11 @@ function chartSpotifyWeb(title, artist) {
 // ============================================================
 // STATIC CHART DATABASE — อ้างอิง iTunes Top 20
 // ข้อมูลนี้เป็น Snapshot จาก iTunes US Top Songs
-// ไม่ fetch iTunes / ไม่เรียก /api/charts ตอนผู้ใช้เปิดหน้า ทำให้ Charts แสดงผลทันที
-// วิธีอัปเดต: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง จากนั้นอัปโหลดไฟล์ใหม่
+// ใช้เป็นข้อมูลสำรองเมื่อ /api/charts ติดต่อ iTunes ไม่ได้
+// วิธีอัปเดตข้อมูลสำรอง: ไปเช็ก iTunes Top Songs แล้วแก้ title, artist, artwork, appleUrl ให้ครบ 20 เพลง
 // artwork ใส่ค่าว่างได้ ระบบจะดึงรูปศิลปินจาก Wikipedia แบบ async หลังจาก list แสดงแล้ว
 // ============================================================
 var STATIC_CHART_UPDATED_AT = 'อัปเดตล่าสุด: 27 มิ.ย. 2569 · อ้างอิง iTunes US Top Songs';
-var STATIC_CHART_SOURCE_LABEL = 'iTunes US Top Songs · TOP HIT ติด CHARTS';
-
 var STATIC_CHART_SONGS = [
   {
     "rank": 1,
@@ -1815,20 +1818,55 @@ function normalizeStaticCharts() {
   }).filter(function(s) { return s.title && s.artist; }).slice(0, 20);
 }
 
-function fetchChartData(cb) {
-  // Static database: ไม่ fetch iTunes/API ตอนผู้ใช้เปิดหน้า จึงตอบกลับทันทีแบบ synchronous
-  if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
-  cb(null, chartData);
+function safeChartUrl(value, hosts) {
+  try {
+    var url = new URL(value);
+    return url.protocol === 'https:' && hosts.test(url.hostname) ? url.href : '';
+  } catch(e) { return ''; }
 }
 
-// คงชื่อ function เดิมไว้ เผื่อมีปุ่ม retry หรือโค้ดส่วนอื่นเรียกใช้
-function tryApiCharts(cb) {
-  fetchChartData(cb);
+function normalizeApiCharts(songs) {
+  return (Array.isArray(songs) ? songs : []).filter(function(s) {
+    return s && typeof s.title === 'string' && s.title.trim() &&
+      typeof s.artist === 'string' && s.artist.trim();
+  }).slice(0, 20).map(function(s, i) {
+    var title = s.title.trim().slice(0, 200);
+    var artist = s.artist.trim().slice(0, 200);
+    var known = STATIC_CHART_SONGS.find(function(item) {
+      return chartSongKey(item.title, item.artist) === chartSongKey(title, artist);
+    });
+    return {
+      rank: i + 1,
+      title: title,
+      artist: artist,
+      artwork: safeChartUrl(s.artwork, /(^|\.)mzstatic\.com$/i),
+      appleUrl: safeChartUrl(s.appleUrl, /(^|\.)apple\.com$/i),
+      youtubeId: known ? known.youtubeId : '',
+      youtubeLabel: known ? known.youtubeLabel : '',
+      wiki: wikiNameFromArtist(artist)
+    };
+  });
 }
 
 function bgRefreshChart() {
-  // ไม่มี background refresh แล้ว เพราะใช้ข้อมูล manual/static
-  return false;
+  if (chartDataFetching || typeof fetch !== 'function') return Promise.resolve(false);
+  chartDataFetching = true;
+  var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var timer = controller ? setTimeout(function(){ controller.abort(); }, 6000) : null;
+  return fetch('/api/charts?limit=20', { signal: controller ? controller.signal : undefined })
+    .then(function(r) { if (!r.ok) throw new Error('Charts HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      var fresh = normalizeApiCharts(data.songs);
+      if (fresh.length !== 20) throw new Error('Incomplete chart data');
+      chartData = fresh;
+      chartDataUpdatedAt = data.updatedAt || '';
+      chartDataStale = !!data.stale;
+      chartDataIsLive = true;
+      initChart();
+      return true;
+    })
+    .catch(function() { return false; })
+    .finally(function() { if (timer) clearTimeout(timer); chartDataFetching = false; });
 }
 
 
@@ -2024,7 +2062,9 @@ function renderChartTeaser(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + esc(spUrl) + '" target="_blank" rel="noopener" data-chart-action="spotify" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        (s.youtubeId ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" data-chart-action="video" data-chart-from="teaser" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '" title="YouTube MV">' + YT_ICON + '</a>' : '') +
+        '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(chartYoutubeUrl(s)) + '" ' +
+          (s.youtubeId ? 'data-chart-action="video" data-chart-from="teaser" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '"' : 'target="_blank" rel="noopener"') +
+          ' title="' + (s.youtubeId ? 'YouTube MV' : 'ค้นหาบน YouTube') + '">' + YT_ICON + '</a>' +
       '</div></div>';
   });
   html += '<div style="text-align:center;padding:12px;border-top:1px solid var(--border)">' +
@@ -2035,7 +2075,10 @@ function renderChartTeaser(songs) {
 
 
 function chartYoutubeUrl(s) {
-  return s && s.youtubeId ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(s.youtubeId) : '';
+  if (!s) return '';
+  return s.youtubeId
+    ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(s.youtubeId)
+    : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(s.title + ' ' + s.artist + ' official mv');
 }
 function chartYoutubeEmbedUrl(id, autoplay) {
   return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?rel=0&modestbranding=1' + (autoplay ? '&autoplay=1' : '');
@@ -2099,11 +2142,11 @@ function renderChartPage(songs) {
         SP_ICON + ' เปิดใน Spotify' +
       '</a>' +
       (s1.appleUrl ? '<a class="chart-listen-btn chart-listen-apple" href="' + esc(s1.appleUrl) + '" target="_blank" rel="noopener">' + APPLE_ICON + ' Apple Music</a>' : '') +
-      (ytHeroUrl ? '<a class="chart-listen-btn chart-listen-yt" href="' + esc(ytHeroUrl) + '" target="_blank" rel="noopener">' + YT_ICON + ' YouTube MV</a>' : '') +
+      (ytHeroUrl ? '<a class="chart-listen-btn chart-listen-yt" href="' + esc(ytHeroUrl) + '" target="_blank" rel="noopener">' + YT_ICON + (s1.youtubeId ? ' YouTube MV' : ' ค้นหาบน YouTube') + '</a>' : '') +
     '</div>' +
   '</div>';
 
-  var listHtml = '<div class="chart-rank-label">อันดับ 1–20 · เลือกเพลงเพื่อเล่น MV ในหน้านี้</div><div class="chart-list">';
+  var listHtml = '<div class="chart-rank-label">อันดับ 1–20 · เลือกเพลงเพื่อฟังต่อ</div><div class="chart-list">';
   songs.forEach(function(s, i) {
     var rank = ranks[i] || ('#' + s.rank);
     var cls = i < 3 ? 'chart-row-num t3' : 'chart-row-num';
@@ -2115,7 +2158,9 @@ function renderChartPage(songs) {
       '<div class="chart-row-btns">' +
         '<a class="chart-row-btn chart-row-btn-sp" href="' + esc(chartSpotifyUrl(s.title,s.artist)) + '" target="_blank" rel="noopener" data-chart-action="spotify" title="Spotify">' + SP_ICON + '</a>' +
         (s.appleUrl ? '<a class="chart-row-btn chart-row-btn-apple" href="' + esc(s.appleUrl) + '" target="_blank" rel="noopener" title="Apple Music">' + APPLE_ICON + '</a>' : '') +
-        (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" data-chart-action="video" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '" title="เล่น MV ในเว็บ">' + YT_ICON + '</a>' : '') +
+        (ytUrl ? '<a class="chart-row-btn chart-row-btn-yt" href="' + esc(ytUrl) + '" ' +
+          (s.youtubeId ? 'data-chart-action="video" data-video-id="' + esc(s.youtubeId) + '" data-video-title="' + esc(s.title) + '" data-video-artist="' + esc(s.artist) + '"' : 'target="_blank" rel="noopener"') +
+          ' title="' + (s.youtubeId ? 'เล่น MV ในเว็บ' : 'ค้นหาบน YouTube') + '">' + YT_ICON + '</a>' : '') +
       '</div></div>';
   });
   listHtml += '</div>';
@@ -2208,13 +2253,26 @@ function openSpotify(e, el, webUrl) {
   return openSpotifyUrl(e, el || (e && e.currentTarget), webUrl || (el && el.href));
 }
 
-// ---- Load chart data once on init ----
-// chart state: 'idle' | 'loading' | 'ok' | 'fail'
+// ---- Render immediately from the bundled snapshot, then show API data when available ----
 var chartState = 'idle';
-var chartReadyCbs = []; // callbacks รอเมื่อ chart โหลดเสร็จ
+function chartSourceText() {
+  if (!chartDataIsLive) return 'ข้อมูลสำรอง · ' + STATIC_CHART_UPDATED_AT;
+  var updated = new Date(chartDataUpdatedAt);
+  var dateText = isNaN(updated.getTime()) ? 'ไม่ระบุเวลา' :
+    updated.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'medium', timeStyle: 'short' });
+  return (chartDataStale ? 'ข้อมูลล่าสุดที่ดึงได้จาก iTunes US · ' : 'iTunes US Top Songs · อัปเดต ') + dateText;
+}
+function updateChartSource() {
+  var source = chartSourceText();
+  var teaser = document.getElementById('chartTeaserSource');
+  var page = document.getElementById('chartPageSource');
+  if (teaser) teaser.textContent = source;
+  if (page) page.textContent = source + ' · กดฟังต่อใน Spotify, YouTube หรือ Apple Music 🎧';
+}
 function initChart(onReady) {
   if (!chartData || !chartData.length) chartData = normalizeStaticCharts();
   chartState = 'ok';
+  updateChartSource();
   try { renderChartTeaser(chartData); } catch(e) { console.error('renderChartTeaser error:', e); }
   try { renderChartPage(chartData); } catch(e) {
     console.error('renderChartPage error:', e);
@@ -2226,9 +2284,7 @@ function initChart(onReady) {
   if (onReady) { try { onReady(chartData); } catch(e){} }
 }
 function retryChart() {
-  chartData = normalizeStaticCharts();
-  chartState = 'ok';
-  initChart();
+  return bgRefreshChart();
 }
 
 // ============================================================
@@ -2237,8 +2293,7 @@ function retryChart() {
 function switchTab(tab) {
   var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
 
-  // สำคัญ: ถ้าเข้า chart/home ให้ render จาก static database ก่อนเปลี่ยนหน้า
-  // เพื่อไม่ให้ผู้ใช้เห็นหน้ากำลังโหลด charts อีก
+  // Render the current chart data before showing the page.
   if (tab === 'chart' || tab === 'home') {
     try { initChart(); } catch(e) { console.error('initChart error:', e); }
   }
@@ -2332,8 +2387,9 @@ document.addEventListener('DOMContentLoaded',function(){
       playChartMV(null, link.dataset.videoId, link.dataset.videoTitle, link.dataset.videoArtist);
     }
   });
-  // render chart จาก static database ทันที ไม่ต้องรอ API/iTunes
+  // Show the bundled snapshot immediately, then refresh it in the background.
   initChart();
+  bgRefreshChart();
 });
 
 // ============================================================

@@ -135,3 +135,35 @@ test('match ranking removes duplicate artists and derives percent from mood dist
   assert.equal(context.matchPercent(ranked[1].score), 90);
   assert.equal(context.rankArtists([partial, exact], mood)[0].a.name, 'Exact');
 });
+
+test('charts show the dated snapshot first and replace it with validated API songs', async () => {
+  const { context, elements } = makePage();
+  context.initChart();
+  assert.match(elements.get('chartTeaserSource').textContent, /27 มิ\.ย\. 2569/);
+  const songs = Array.from({ length: 20 }, (_, i) => ({
+    title: `Current song ${i + 1}`, artist: `Artist ${i + 1}`,
+    artwork: i === 0 ? 'https://example.com/unsafe.jpg' : 'https://is1-ssl.mzstatic.com/art.jpg',
+    appleUrl: 'https://music.apple.com/us/album/example'
+  }));
+  context.fetch = async () => ({ ok: true, json: async () => ({
+    songs, updatedAt: '2026-09-25T09:13:39.000Z'
+  }) });
+  assert.equal(await context.bgRefreshChart(), true);
+  assert.equal(context.chartData.length, 20);
+  assert.equal(context.chartData[0].title, 'Current song 1');
+  assert.equal(context.chartData[0].artwork, '');
+  assert.match(elements.get('chartTeaserSource').textContent, /iTunes US Top Songs/);
+  assert.match(elements.get('chartPageContent').innerHTML, /Current song 1/);
+  assert.match(elements.get('chartPageContent').innerHTML, /ค้นหาบน YouTube/);
+  assert.doesNotMatch(elements.get('chartPageContent').innerHTML, /data-video-id=""/);
+});
+
+test('charts keep the dated snapshot if the API is unavailable', async () => {
+  const { context, elements } = makePage();
+  context.initChart();
+  const before = context.chartData[0].title;
+  context.fetch = async () => { throw new Error('offline'); };
+  assert.equal(await context.bgRefreshChart(), false);
+  assert.equal(context.chartData[0].title, before);
+  assert.match(elements.get('chartPageSource').textContent, /ข้อมูลสำรอง/);
+});

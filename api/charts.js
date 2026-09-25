@@ -5,6 +5,7 @@
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 ชั่วโมง
 let memCache = null;
 let memCachedAt = 0;
+let memUpdatedAt = null;
 
 module.exports = async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -15,12 +16,13 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const limit = Math.min(parseInt(req.query?.limit || '20', 10), 20);
+  const requestedLimit = parseInt(req.query?.limit || '20', 10);
+  const limit = Number.isFinite(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 20)) : 20;
 
   // serve memory cache ถ้ายังสด
   if (memCache && Date.now() - memCachedAt < CACHE_TTL_MS) {
     res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).json({ songs: memCache.slice(0, limit) });
+    return res.status(200).json({ songs: memCache.slice(0, limit), updatedAt: memUpdatedAt });
   }
 
   try {
@@ -53,16 +55,19 @@ module.exports = async function handler(req, res) {
       };
     }).filter(s => s.title && s.artist);
 
+    if (!songs.length) throw new Error('iTunes RSS returned no songs');
+    const feedUpdatedAt = Date.parse(data?.feed?.updated?.label || '');
+    memUpdatedAt = new Date(Number.isFinite(feedUpdatedAt) ? feedUpdatedAt : Date.now()).toISOString();
     memCache = songs;
     memCachedAt = Date.now();
     res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).json({ songs: songs.slice(0, limit) });
+    return res.status(200).json({ songs: songs.slice(0, limit), updatedAt: memUpdatedAt });
 
   } catch (err) {
     console.error('[charts] fetch error:', err.message);
     if (memCache) {
       res.setHeader('Cache-Control', 'public, s-maxage=60');
-      return res.status(200).json({ songs: memCache.slice(0, limit), stale: true });
+      return res.status(200).json({ songs: memCache.slice(0, limit), updatedAt: memUpdatedAt, stale: true });
     }
     return res.status(502).json({ error: 'โหลด chart ไม่ได้ในขณะนี้' });
   }
