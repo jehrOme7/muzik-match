@@ -1332,6 +1332,9 @@ function matchPercent(score) {
 // SHOW RESULT — กรองชื่อซ้ำก่อนจับคู่ศิลปิน
 // ============================================================
 function showResult(){
+  cancelSongRecRequest();
+  if (_songRecStartTimer) clearTimeout(_songRecStartTimer);
+  _songRecStartTimer = null;
   stopBlackholeLoading();
   document.getElementById('loadingScreen').classList.remove('active');
   document.getElementById('resultScreen').classList.add('active');
@@ -1370,13 +1373,12 @@ function showResult(){
   if(top.name) loadWiki(top.name.replace(/ /g,'_'),'topImg',top.emoji);
 
   // โหลดเพลงแนะนำ — ทำงาน async ไม่ block result
-  _songRecRequestId++;
-  _songRecFetching = false;
   var _recContent = document.getElementById('songRecContent');
   if (_recContent) {
     _recContent.innerHTML = '<div class="song-rec-loading"><div class="chart-dots"><span></span><span></span><span></span></div>AI กำลังเลือกเพลงที่ match คุณ...</div>';
   }
-  setTimeout(function() {
+  _songRecStartTimer = setTimeout(function() {
+    _songRecStartTimer = null;
     loadSongRecommendations(top.name || '', persona.name || '', selectedLang || 'intl');
   }, 400); // หน่วง 400ms ให้ result screen render ก่อน
 
@@ -1394,6 +1396,9 @@ function showResult(){
   document.getElementById('resultScreen').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function resetQuiz(){
+  cancelSongRecRequest();
+  if (_songRecStartTimer) clearTimeout(_songRecStartTimer);
+  _songRecStartTimer = null;
   currentQ=0;answers=[];moodScore={dark:0,chill:0,energetic:0,emotional:0,indie:0};selectedLang=null;
   ['resultScreen','loadingScreen'].forEach(function(id){document.getElementById(id).classList.remove('active');});
   document.getElementById('quizScreen').classList.remove('active');
@@ -2401,6 +2406,18 @@ var _songRecPersona = '';
 var _songRecLang = 'intl';
 var _songRecFetching = false;
 var _songRecRequestId = 0;
+var _songRecController = null;
+var _songRecTimeout = null;
+var _songRecStartTimer = null;
+
+function cancelSongRecRequest() {
+  ++_songRecRequestId;
+  if (_songRecTimeout) clearTimeout(_songRecTimeout);
+  _songRecTimeout = null;
+  if (_songRecController) _songRecController.abort();
+  _songRecController = null;
+  _songRecFetching = false;
+}
 
 function loadSongRecommendations(artistName, personaName, lang) {
   if (_songRecFetching) return;
@@ -2413,6 +2430,13 @@ function loadSongRecommendations(artistName, personaName, lang) {
   var titleEl = document.getElementById('songRecTitle');
   var contentEl = document.getElementById('songRecContent');
   if (!contentEl) { _songRecFetching = false; return; }
+  _songRecController = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var controller = _songRecController;
+  _songRecTimeout = setTimeout(function() {
+    if (requestId !== _songRecRequestId) return;
+    cancelSongRecRequest();
+    showSongRecError(contentEl, 'รอ AI นานเกินไป กดลองใหม่ได้เลย');
+  }, 15000);
 
   // ปรับหัวข้อตามศิลปิน
   if (titleEl && artistName) {
@@ -2425,6 +2449,7 @@ function loadSongRecommendations(artistName, personaName, lang) {
   fetch('/api/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: controller ? controller.signal : undefined,
     body: JSON.stringify({ query: query, mode: 'song', artist: artistName, persona: personaName, lang: _songRecLang })
   })
   .then(function(r) {
@@ -2433,6 +2458,9 @@ function loadSongRecommendations(artistName, personaName, lang) {
   })
   .then(function(data) {
     if (requestId !== _songRecRequestId) return;
+    clearTimeout(_songRecTimeout);
+    _songRecTimeout = null;
+    _songRecController = null;
     _songRecFetching = false;
     if (!data || !data.songs || !data.songs.length) {
       showSongRecError(contentEl, 'ไม่พบเพลงแนะนำ ลองทำ Quiz ใหม่นะครับ');
@@ -2442,6 +2470,9 @@ function loadSongRecommendations(artistName, personaName, lang) {
   })
   .catch(function(err) {
     if (requestId !== _songRecRequestId) return;
+    clearTimeout(_songRecTimeout);
+    _songRecTimeout = null;
+    _songRecController = null;
     _songRecFetching = false;
     showSongRecError(contentEl, 'AI ยุ่งอยู่ครับ กดลองใหม่ได้เลย');
   });
@@ -2489,8 +2520,8 @@ function showSongRecError(el, msg) {
 function reloadSongRec() {
   var contentEl = document.getElementById('songRecContent');
   if (!contentEl) return;
+  cancelSongRecRequest();
   contentEl.innerHTML = '<div class="song-rec-loading"><div class="chart-dots"><span></span><span></span><span></span></div>AI กำลังเลือกเพลงที่ match คุณ...</div>';
-  _songRecFetching = false;
   loadSongRecommendations(_songRecArtist, _songRecPersona, _songRecLang);
 }
 
