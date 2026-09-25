@@ -488,7 +488,7 @@ footer{position:relative;z-index:1;text-align:center;padding:28px 24px;border-to
     <div class="da-idle" id="daIdle">
       <span class="da-idle-emoji">🎵</span>
       <div class="da-idle-text">อยากค้นพบศิลปินใหม่ที่คุณอาจยังไม่รู้จัก?<br/>กดสุ่มได้เลย — มีทั้งไทย สากล และเกาหลี 🌏</div>
-      <div class="da-idle-hint">มีศิลปินให้สุ่มกว่า 300 คน 🎨</div>
+      <div class="da-idle-hint">ค้นพบศิลปินจากเพลงไทย สากล และเกาหลี 🎨</div>
       <button class="da-shuffle-btn" onclick="daShuffle()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
         🎲 สุ่มศิลปินประจำวัน!
@@ -1296,8 +1296,38 @@ function calculateMoodScore(){
   return score;
 }
 
+function uniqueArtists(artists) {
+  var seen = new Set();
+  return (artists || []).filter(function(a) {
+    if (!a || !a.name) return false;
+    var key = String(a.name).trim().replace(/\s+/g, ' ').toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function rankArtists(artists, mood) {
+  var dims = ['dark', 'chill', 'energetic', 'emotional', 'indie'];
+  function clamp(v) { return Math.max(0, Math.min(10, v)); }
+  return uniqueArtists((artists || []).filter(function(a) {
+    return a && a.mood && typeof a.mood === 'object';
+  })).map(function(a, index) {
+    var score = 0;
+    dims.forEach(function(d) {
+      var userVal = clamp((mood[d] || 0) + 5);
+      score += 10 - Math.abs(userVal - (a.mood[d] || 0));
+    });
+    return { a: a, score: score, order: index };
+  }).sort(function(a, b) { return b.score - a.score || a.order - b.order; });
+}
+
+function matchPercent(score) {
+  return Math.round(Math.max(0, Math.min(50, score)) * 2);
+}
+
 // ============================================================
-// SHOW RESULT — ใช้ database ใหม่ 300 ศิลปิน
+// SHOW RESULT — กรองชื่อซ้ำก่อนจับคู่ศิลปิน
 // ============================================================
 function showResult(){
   stopBlackholeLoading();
@@ -1307,68 +1337,16 @@ function showResult(){
 
   // เลือก database ตาม language ที่เลือก
   // thai → ARTISTS_THAI, intl → ARTISTS_INTL, korean → ARTISTS_KOREAN
-  // ถ้า db เดียวน้อยเกินไปก็ merge กัน top results
   var db;
   if(selectedLang==='thai') db=ARTISTS_THAI;
   else if(selectedLang==='korean') db=ARTISTS_KOREAN;
   else db=ARTISTS_INTL;
 
-  // สำคัญ: กรองช่องว่าง/ข้อมูลไม่ครบใน Array ก่อนคำนวณ
-  // เดิม database มี empty slot เช่น ARTISTS_THAI[65], ARTISTS_INTL[81], ARTISTS_KOREAN[96]
-  // เมื่อ sort แล้ว empty slot ถูกดันไปท้าย Array ทำให้ scored[scored.length-1] เป็น undefined
-  // และ showResult() พังที่ .score ก่อน render รายชื่อศิลปิน
-  db=(db||[]).filter(function(a){
-    return a&&a.name&&a.mood&&typeof a.mood==='object';
-  });
-
-  if(!db.length){
+  var scored = rankArtists(db, s);
+  if(!scored.length){
     document.getElementById('topMatchCard').innerHTML='<div class="artist-bio">ยังไม่มีฐานข้อมูลศิลปินสำหรับหมวดนี้ ลองเลือกภาษาใหม่อีกครั้งนะครับ</div>';
     document.getElementById('otherCards').innerHTML='';
     return;
-  }
-
-  // --- Scoring: คำนวณ cosine-like distance กับ mood profile ---
-  // normalize moodScore ก่อน (raw scores จาก quiz อาจ range ต่างกัน)
-  var dims=['dark','chill','energetic','emotional','indie'];
-  var normFactor=10; // artist mood 0-10, quiz score อาจสูงกว่า scale ลง
-  function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
-
-  var scored=db.map(function(a){
-    var score=0;
-    dims.forEach(function(d){
-      var userVal=clamp((s[d]||0)+5,0,10); // shift +5 เพราะ quiz เริ่มจาก 0
-      var artistVal=a.mood[d]||0;
-      var diff=Math.abs(userVal-artistVal);
-      score+=(10-diff);
-    });
-    return{a:a,score:score};
-  });
-  scored.sort(function(a,b){return b.score-a.score;});
-
-  // --- เพิ่ม randomness เล็กน้อยใน top 10 เพื่อให้ผลหลากหลาย ---
-  // สลับ top 10 เล็กน้อยเพื่อกัน always show same artist เมื่อ score ใกล้กัน
-  var top10=scored.slice(0,10);
-  var rest=scored.slice(10);
-  // shuffle เฉพาะกลุ่มที่ score ใกล้กัน (±2 จาก top)
-  var topScore=top10[0].score;
-  var nearTop=top10.filter(function(x){return topScore-x.score<=4;});
-  var farTop=top10.filter(function(x){return topScore-x.score>4;});
-  // shuffle nearTop เพื่อให้ได้ผลต่างในแต่ละครั้ง
-  for(var i=nearTop.length-1;i>0;i--){
-    var j=Math.floor(Math.random()*(i+1));
-    var tmp=nearTop[i];nearTop[i]=nearTop[j];nearTop[j]=tmp;
-  }
-  scored=[].concat(nearTop,farTop,rest);
-
-  // --- % match ---
-  var maxS=scored[0].score,minS=scored[scored.length-1].score;
-  var topBase=Math.round(78+Math.random()*10); // 78-88%
-  function pct(sc,isTop){
-    if(isTop) return topBase;
-    var ratio=(sc-minS)/(scored[0].score-minS||1);
-    var base=Math.round(topBase-8-(1-ratio)*22);
-    var jitter=Math.floor(Math.random()*5)-2;
-    return Math.min(topBase-3,Math.max(40,base+jitter));
   }
 
   var persona=PERSONALITIES[PERSONALITIES.length-1];
@@ -1380,9 +1358,9 @@ function showResult(){
   document.getElementById('resDesc').textContent=persona.desc;
   document.getElementById('resQuote').textContent=persona.quote;
 
-  var top=scored[0].a,topPct=pct(scored[0].score,true);
+  var top=scored[0].a,topPct=matchPercent(scored[0].score);
   document.getElementById('topMatchCard').innerHTML=
-    '<div class="match-pct-row"><div class="match-pct-num">'+topPct+'%</div><div class="match-pct-info"><div class="match-pct-label">match score 🎯</div><div class="match-pct-bar"><div class="match-pct-fill" id="topBar" style="width:0%"></div></div></div></div>'+
+    '<div class="match-pct-row"><div class="match-pct-num">'+topPct+'%</div><div class="match-pct-info"><div class="match-pct-label">ความใกล้เคียงของ mood 5 ด้าน 🎯</div><div class="match-pct-bar"><div class="match-pct-fill" id="topBar" style="width:0%"></div></div></div></div>'+
     '<div class="artist-row"><div class="artist-img" id="topImg">'+top.emoji+'</div><div class="artist-info"><div class="artist-name">'+esc(top.name)+'</div><div class="artist-tags"><span class="atag nat">'+esc(top.nat)+'</span><span class="atag">'+esc(top.genre)+'</span>'+(top.tags||[]).slice(0,2).map(function(t){return'<span class="atag">'+esc(t)+'</span>';}).join('')+'</div></div></div>'+
     '<div class="artist-bio">'+esc(top.bio)+'</div>'+
     '<a class="btn-spotify" href="'+spotifyWebSearchUrl(top.name)+'" target="_blank" rel="noopener" onclick="return openSpotifySearch(event, this, \''+jsStr(top.name)+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.6.4-.9.2-2.4-1.5-5.5-1.8-9.1-1-.4.1-.7-.2-.8-.5-.1-.4.2-.7.5-.8 3.9-.9 7.3-.5 10.1 1.2.3.2.4.6.2.7zm1.2-2.7c-.2.4-.7.5-1.1.3-2.8-1.7-7-2.2-10.2-1.2-.4.1-.9-.1-1-.6-.1-.4.1-.9.6-1 3.7-1.1 8.3-.6 11.5 1.4.3.2.5.7.2 1.1zm.1-2.8C14.5 9 8.9 8.8 5.6 9.8c-.5.2-1.1-.1-1.2-.6-.2-.5.1-1.1.6-1.2 3.8-1.1 10-.9 13.9 1.4.5.3.6.9.4 1.4-.3.4-.9.6-1.4.3z"/></svg>🎵 เปิด This Is ใน Spotify</a>';
@@ -1403,7 +1381,7 @@ function showResult(){
   // --- Others: แสดง 5 คนถัดไป (index 1-5) ---
   var othersHtml='';
   scored.slice(1,6).forEach(function(item,i){
-    var a=item.a,p=pct(item.score);
+    var a=item.a,p=matchPercent(item.score);
     othersHtml+='<a class="other-card" href="'+spotifyWebSearchUrl(a.name)+'" target="_blank" rel="noopener" onclick="return openSpotifySearch(event, this, \''+jsStr(a.name)+'\')" style="animation-delay:'+(i*0.08)+'s">'+
       '<div class="other-pct">'+p+'%</div>'+
       '<div class="other-info"><div class="other-name">'+a.emoji+' '+esc(a.name)+'</div><div class="other-genre">'+esc(a.nat)+' · '+esc(a.genre)+'</div></div>'+
@@ -2291,8 +2269,7 @@ var daQueue = [];
 var daImageRequestSeq = 0;
 function daInit() {
   if (daAll.length) return;
-  daAll = [].concat(ARTISTS_THAI||[]).concat(ARTISTS_INTL||[]).concat(ARTISTS_KOREAN||[])
-    .filter(function(a){ return a && a.name; });
+  daAll = uniqueArtists([].concat(ARTISTS_THAI||[]).concat(ARTISTS_INTL||[]).concat(ARTISTS_KOREAN||[]));
 }
 function daShuffle() {
   daInit();
