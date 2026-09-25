@@ -99,7 +99,7 @@ test('retry uses the current result and ignores a late previous response', async
 test('Discover skips empty artist slots and discards a previous image', async () => {
   const { context, elements } = makePage();
   context.daInit();
-  assert.equal(context.daAll.length, 300);
+  assert.equal(context.daAll.length, 273);
   const pending = [];
   const applied = [];
   context.fetchWikiSummaryThumb = () => {
@@ -118,4 +118,20 @@ test('Discover skips empty artist slots and discards a previous image', async ()
   await new Promise(setImmediate);
   assert.deepEqual(applied, ['https://upload.wikimedia.org/new.jpg']);
   assert.ok(elements.get('daName').textContent);
+});
+
+test('match ranking removes duplicate artists and derives percent from mood distance', () => {
+  const { context } = makePage();
+  const mood = { dark: 0, chill: 0, energetic: 0, emotional: 0, indie: 0 };
+  const exact = { name: 'Exact', mood: { dark: 5, chill: 5, energetic: 5, emotional: 5, indie: 5 } };
+  const partial = { name: 'Partial', mood: { dark: 5, chill: 5, energetic: 5, emotional: 5, indie: 0 } };
+  const ranked = context.rankArtists([partial, exact, { ...exact, name: ' exact ' }, null], mood);
+  assert.equal(ranked.length, 2);
+  assert.equal(ranked[0].a.name, 'Exact');
+  assert.equal(ranked[0].score, 50);
+  assert.equal(context.matchPercent(ranked[0].score), 100);
+  assert.equal(ranked[1].a.name, 'Partial');
+  assert.equal(ranked[1].score, 45);
+  assert.equal(context.matchPercent(ranked[1].score), 90);
+  assert.equal(context.rankArtists([partial, exact], mood)[0].a.name, 'Exact');
 });
