@@ -70,6 +70,22 @@ test('chart actions remain valid for song names containing quotes', () => {
   assert.deepEqual(Array.from(played), [null, song.youtubeId, song.title, song.artist]);
 });
 
+test('playlist shuffle labels direct links and search results honestly', () => {
+  const { context, elements } = makePage();
+  context.setTimeout = callback => { callback(); return 1; };
+  context.PL_DATA = [{ emoji: '🎵', name: 'เพลงไทยฮิต', desc: 'เพลงไทย', lang: 'เพลงไทย', url: '', search: 'เพลงไทยฮิต' }];
+  context.plQueue = [];
+  context.doPlShuffle();
+  assert.match(elements.get('plLink').href, /open\.spotify\.com\/search\/.+\/playlists$/);
+  assert.equal(elements.get('plLinkLabel').textContent, 'ค้นหา Playlist ใน Spotify');
+
+  context.PL_DATA = [{ emoji: '🎵', name: 'K-Pop', desc: 'เพลงเกาหลี', lang: 'แนวเพลง', url: 'https://open.spotify.com/playlist/abc123' }];
+  context.plQueue = [];
+  context.doPlShuffle();
+  assert.equal(elements.get('plLink').href, 'https://open.spotify.com/playlist/abc123');
+  assert.equal(elements.get('plLinkLabel').textContent, 'เปิด Playlist ใน Spotify');
+});
+
 test('retry uses the current result and ignores a late previous response', async () => {
   const { context, elements } = makePage();
   context.AbortController = AbortController;
