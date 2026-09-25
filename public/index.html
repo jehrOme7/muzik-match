@@ -1252,7 +1252,8 @@ function nextQuestion(){
 }
 var loadingTimer=null;
 var loadingTextTimer=null;
-function startBlackholeLoading(){
+var loadingRequestId=0;
+function startBlackholeLoading(requestId){
   var sub=document.getElementById('loadingSub');
   var title=document.getElementById('loadingTitle');
   var langMap={thai:'เพลงไทย',intl:'เพลงสากล',korean:'เพลงเกาหลี'};
@@ -1267,18 +1268,30 @@ function startBlackholeLoading(){
   if(sub) sub.textContent=steps[0];
   clearInterval(loadingTextTimer);
   loadingTextTimer=setInterval(function(){
+    if(requestId!==loadingRequestId) return;
     i=(i+1)%steps.length;
     if(!sub) return;
     sub.style.opacity='0';
-    setTimeout(function(){sub.textContent=steps[i];sub.style.opacity='1';},180);
+    setTimeout(function(){
+      if(requestId!==loadingRequestId) return;
+      sub.textContent=steps[i];sub.style.opacity='1';
+    },180);
   },850);
 }
-function stopBlackholeLoading(){clearInterval(loadingTextTimer);loadingTextTimer=null;clearTimeout(loadingTimer);loadingTimer=null;}
+function stopBlackholeLoading(){
+  ++loadingRequestId;
+  clearInterval(loadingTextTimer);loadingTextTimer=null;
+  clearTimeout(loadingTimer);loadingTimer=null;
+}
 function showLoading(){
+  if(loadingTimer!==null) return;
   document.getElementById('quizScreen').classList.remove('active');
   document.getElementById('loadingScreen').classList.add('active');
-  startBlackholeLoading();
-  loadingTimer=setTimeout(showResult,3900);
+  var requestId=++loadingRequestId;
+  startBlackholeLoading(requestId);
+  loadingTimer=setTimeout(function(){
+    if(requestId===loadingRequestId) showResult();
+  },3900);
 }
 
 // ============================================================
@@ -1396,6 +1409,7 @@ function showResult(){
   document.getElementById('resultScreen').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function resetQuiz(){
+  stopBlackholeLoading();
   cancelSongRecRequest();
   if (_songRecStartTimer) clearTimeout(_songRecStartTimer);
   _songRecStartTimer = null;
@@ -2298,6 +2312,12 @@ function retryChart() {
 // ============================================================
 function switchTab(tab) {
   var tabs = {home:'pageHome', quiz:'pageQuiz', playlist:'pagePlaylist', chart:'pageChart'};
+
+  if (tab !== 'quiz' && loadingTimer !== null) {
+    stopBlackholeLoading();
+    document.getElementById('loadingScreen').classList.remove('active');
+    document.getElementById('quizScreen').classList.add('active');
+  }
 
   // Render the current chart data before showing the page.
   if (tab === 'chart' || tab === 'home') {
