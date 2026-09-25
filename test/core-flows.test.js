@@ -82,7 +82,10 @@ test('retry uses the current result and ignores a late previous response', async
   context.loadSongRecommendations('Artist A', 'Persona A', 'thai');
   context.reloadSongRec();
   assert.equal(requests.length, 2);
-  assert.equal(requests[1].body.query, 'Artist A Persona A');
+  assert.equal(requests[1].body.query, 'Artist A');
+  assert.equal(requests[1].body.artist, 'Artist A');
+  assert.equal(requests[1].body.persona, 'Persona A');
+  assert.equal(requests[1].body.lang, 'thai');
   requests[1].pending.resolve({ ok: true, json: () => Promise.resolve({
     songs: [{ name: 'Current song', artist: 'Artist A' }]
   }) });
