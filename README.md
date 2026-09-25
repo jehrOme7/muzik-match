@@ -17,5 +17,6 @@ Run `npm test` to check matching, recommendations, Discover, chart rendering, an
 Set `GEMINI_API_KEY` in Vercel for AI recommendations. `GEMINI_API_KEY_2` and `GEMINI_API_KEY_3` are optional fallback keys. `ALLOWED_ORIGINS` can contain a comma-separated list of allowed browser origins for `/api/search`; when unset, that endpoint does not emit permissive CORS headers.
 
 The AI endpoint uses Gemini 3.6 Flash. Quiz recommendations send the matched artist, music personality, and selected music language as separate context fields; existing query-only requests remain supported.
+If a recommendation request takes longer than 15 seconds, the quiz shows a retry option. Retrying or resetting the quiz cancels the previous request so older results cannot replace the current ones.
 
 `vercel.json` sets the site's security headers, including CSP, HSTS, frame protection, and `nosniff`. API keys belong only in Vercel environment variables.

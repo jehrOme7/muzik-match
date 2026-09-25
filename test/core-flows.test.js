@@ -72,16 +72,19 @@ test('chart actions remain valid for song names containing quotes', () => {
 
 test('retry uses the current result and ignores a late previous response', async () => {
   const { context, elements } = makePage();
+  context.AbortController = AbortController;
   const requests = [];
   context.fetch = (_url, options) => {
     const pending = deferred();
-    requests.push({ pending, body: JSON.parse(options.body) });
+    requests.push({ pending, body: JSON.parse(options.body), signal: options.signal });
     return pending.promise;
   };
 
   context.loadSongRecommendations('Artist A', 'Persona A', 'thai');
   context.reloadSongRec();
   assert.equal(requests.length, 2);
+  assert.equal(requests[0].signal.aborted, true);
+  assert.equal(requests[1].signal.aborted, false);
   assert.equal(requests[1].body.query, 'Artist A');
   assert.equal(requests[1].body.artist, 'Artist A');
   assert.equal(requests[1].body.persona, 'Persona A');
@@ -97,6 +100,42 @@ test('retry uses the current result and ignores a late previous response', async
   const result = elements.get('songRecContent').innerHTML;
   assert.match(result, /Current song/);
   assert.doesNotMatch(result, /Old song/);
+});
+
+test('a stalled song recommendation shows retry and ignores its late response', async () => {
+  const { context, elements } = makePage();
+  context.AbortController = AbortController;
+  const timers = [];
+  context.setTimeout = (callback, delay) => {
+    timers.push({ callback, delay });
+    return timers.length;
+  };
+  context.clearTimeout = () => {};
+  const requests = [];
+  context.fetch = (_url, options) => {
+    const pending = deferred();
+    requests.push({ pending, signal: options.signal });
+    return pending.promise;
+  };
+
+  context.loadSongRecommendations('Artist A', 'Persona A', 'thai');
+  assert.equal(timers[0].delay, 15000);
+  timers[0].callback();
+  assert.equal(requests[0].signal.aborted, true);
+  assert.match(elements.get('songRecContent').innerHTML, /ลองใหม่/);
+
+  context.reloadSongRec();
+  assert.equal(requests.length, 2);
+  requests[0].pending.resolve({ ok: true, json: () => Promise.resolve({
+    songs: [{ name: 'Late song', artist: 'Artist A' }]
+  }) });
+  await new Promise(setImmediate);
+  assert.doesNotMatch(elements.get('songRecContent').innerHTML, /Late song/);
+  requests[1].pending.resolve({ ok: true, json: () => Promise.resolve({
+    songs: [{ name: 'New song', artist: 'Artist A' }]
+  }) });
+  await new Promise(setImmediate);
+  assert.match(elements.get('songRecContent').innerHTML, /New song/);
 });
 
 test('Discover skips empty artist slots and discards a previous image', async () => {
